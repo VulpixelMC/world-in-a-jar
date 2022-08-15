@@ -1,0 +1,10 @@
+{
+	"generator": {
+		"type": "worldinajar:void",
+		"biome_source": {
+			"type": "minecraft:fixed",
+			"biome": "minecraft:plains"
+		}
+	},
+	"type": "worldinajar:jar_type"
+}
