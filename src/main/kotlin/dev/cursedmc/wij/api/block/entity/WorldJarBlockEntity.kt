@@ -1,5 +1,6 @@
 package dev.cursedmc.wij.api.block.entity
 
+import dev.cursedmc.wij.api.WorldContainer
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.nbt.NbtCompound
@@ -10,21 +11,34 @@ class WorldJarBlockEntity(
 	blockPos: BlockPos?,
 	blockState: BlockState?,
 	val subworld: World? = null,
-) : BlockEntity(BlockEntityTypes.WORLD_JAR, blockPos, blockState) {
-	var magnitude: Int = DEFAULT_MAGNITUDE
+) : BlockEntity(BlockEntityTypes.WORLD_JAR, blockPos, blockState), WorldContainer {
+	var magnitude: Int = -1
 	val scale: Float
 		get() = 1.0f / magnitude
-	var jarId = -1
+	var x = 0
+	var y = 0
+	var z = 0
 	
 	override fun readNbt(nbt: NbtCompound) {
-		magnitude = nbt.getInt("scale")
-		if (magnitude == 0) {
-			magnitude = DEFAULT_MAGNITUDE
-		}
+		magnitude = nbt.getInt("magnitude")
+		x = nbt.getInt("x")
+		y = nbt.getInt("y")
+		z = nbt.getInt("z")
 	}
 	
 	override fun writeNbt(nbt: NbtCompound) {
-		nbt.putInt("scale", magnitude)
+		super.writeNbt(nbt)
+		if (magnitude != -1) {
+			nbt.putInt("magnitude", magnitude)
+		}
+		
+		nbt.putInt("x", x)
+		nbt.putInt("y", y)
+		nbt.putInt("z", z)
+	}
+	
+	override fun getWorld(): World? {
+		return this.subworld
 	}
 	
 	companion object {

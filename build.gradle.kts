@@ -37,6 +37,10 @@ repositories {
 		name = "auoeke Maven"
 		url = uri("https://maven.auoeke.net")
 	}
+	
+	maven {
+		url = uri("https://maven.bai.lol")
+	}
 }
 
 val modImplementationInclude by configurations.register("modImplementationInclude")
@@ -72,6 +76,8 @@ dependencies {
 	// Quilted Fabric API will automatically pull in the correct QSL version.
 	modImplementation(libs.quilted.fabric.api)
 	// modImplementation libs.bundles.quilted.fabric.api // If you wish to use Fabric API's deprecated modules, you can replace the above line with this one
+	
+	modCompileOnly("mcp.mobius.waila:wthit-api:quilt-5.10.0")
 
 	modRuntimeOnly("com.terraformersmc", "modmenu", "4.0.6")
 	modRuntimeOnly("maven.modrinth", "wthit", "quilt-5.10.0")

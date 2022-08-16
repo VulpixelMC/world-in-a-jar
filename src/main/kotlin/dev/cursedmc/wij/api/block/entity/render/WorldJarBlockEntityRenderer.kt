@@ -35,7 +35,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 					// translate to position
 					matrices.translate(x.toDouble(), y.toDouble(), z.toDouble())
 					
-					val pos = BlockPos(x, y, z)
+					val pos = BlockPos(x + entity.x, y + entity.y, z + entity.z)
 					val state = entity.subworld?.getBlockState(pos)
 					
 					ctx.renderManager.renderBlockAsEntity(state, matrices, vertexConsumers, light, overlay)
