@@ -1,7 +1,7 @@
 @file:Suppress("UnstableApiUsage")
 
 plugins {
-	id("org.jetbrains.kotlin.jvm") version "1.7.0"
+	id("org.jetbrains.kotlin.jvm").version(libs.versions.kotlin)
 	alias(libs.plugins.quilt.loom)
 	`maven-publish`
 }
@@ -39,7 +39,6 @@ repositories {
 	}
 }
 
-
 val modImplementationInclude by configurations.register("modImplementationInclude")
 
 // All the dependencies are declared at gradle/libs.version.toml and referenced with "libs.<id>"
@@ -52,18 +51,20 @@ dependencies {
 	})
 	modImplementation(libs.quilt.loader)
 
+	modImplementation(libs.fabric.lang.kotlin)
+
 	modImplementationInclude(libs.qsl.base)
-	
+
 	modImplementationInclude(libs.block.entity)
 	modImplementationInclude(libs.block.extensions)
-	
+
 	modImplementationInclude(libs.item.group)
 	modImplementationInclude(libs.item.setting)
 
 	modImplementationInclude("net.auoeke", "reflect", "5.+")
 	modImplementationInclude("net.gudenau.lib", "unsafe", "latest.release")
 	modImplementationInclude("org.objenesis", "objenesis", "3.3")
-	
+
 	modImplementation("net.bytebuddy", "byte-buddy-agent", "1.12.+")
 	modImplementation("maven.modrinth", "yqh", "0.1.2")
 
@@ -119,8 +120,7 @@ tasks.withType<AbstractArchiveTask> {
 
 // Configure the maven publication
 publishing {
-	publications {
-	}
+	publications { }
 
 	// See https://docs.gradle.org/current/userguide/publishing_maven.html for information on how to set up publishing.
 	repositories {
