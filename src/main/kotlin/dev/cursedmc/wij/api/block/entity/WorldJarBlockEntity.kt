@@ -7,7 +7,7 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 
-class WorldJarBlockEntity(
+open class WorldJarBlockEntity(
 	blockPos: BlockPos?,
 	blockState: BlockState?,
 	val subworld: World? = null,

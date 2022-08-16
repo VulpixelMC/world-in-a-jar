@@ -11,7 +11,7 @@ import net.minecraft.util.Hand
 import net.minecraft.util.TypedActionResult
 import net.minecraft.world.World
 
-class WorldJarBlockItem(block: Block?, settings: Settings?) : BlockItem(block, settings) {
+open class WorldJarBlockItem(block: Block?, settings: Settings?) : BlockItem(block, settings) {
 	override fun use(world: World, user: PlayerEntity, hand: Hand): TypedActionResult<ItemStack> {
 		if (!world.isClient) {
 			val item = user.getStackInHand(hand)

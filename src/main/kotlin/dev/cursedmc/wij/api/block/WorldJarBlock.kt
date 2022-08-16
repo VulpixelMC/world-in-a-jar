@@ -11,7 +11,7 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import org.quiltmc.loader.api.minecraft.MinecraftQuiltLoader
 
-class WorldJarBlock(settings: Settings?) : Block(settings), BlockEntityProvider {
+open class WorldJarBlock(settings: Settings?) : Block(settings), BlockEntityProvider {
 	override fun createBlockEntity(pos: BlockPos?, state: BlockState?): BlockEntity {
 		var world: World? = null
 		if (MinecraftQuiltLoader.getEnvironmentType() == EnvType.CLIENT) {

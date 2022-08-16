@@ -1,4 +1,4 @@
-package dev.cursedmc.wij.api
+package dev.cursedmc.wij.impl
 
 import net.minecraft.util.Identifier
 
