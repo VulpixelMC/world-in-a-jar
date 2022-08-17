@@ -10,11 +10,9 @@ import net.minecraft.text.Text
 class WorldJarBlockComponentProvider : IBlockComponentProvider {
 	override fun appendBody(tooltip: ITooltip, accessor: IBlockAccessor, config: IPluginConfig) {
 		val scale = accessor.getBlockEntity<WorldJarBlockEntity>()?.magnitude
-		val x = accessor.getBlockEntity<WorldJarBlockEntity>()?.x
-		val y = accessor.getBlockEntity<WorldJarBlockEntity>()?.y
-		val z = accessor.getBlockEntity<WorldJarBlockEntity>()?.z
+		val subPos = accessor.getBlockEntity<WorldJarBlockEntity>()?.subPos
 		
 		tooltip.addLine(Text.literal("Scale: $scale"))
-		tooltip.addLine(Text.literal("Position: $x, $y, $z"))
+		tooltip.addLine(Text.literal("Position: $subPos"))
 	}
 }

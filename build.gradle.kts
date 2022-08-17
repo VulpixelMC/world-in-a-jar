@@ -41,6 +41,27 @@ repositories {
 	maven {
 		url = uri("https://maven.bai.lol")
 	}
+	
+	maven {
+		name = "Cursed Maven"
+		url = uri("https://cursemaven.com")
+		content {
+			includeGroup("curse.maven")
+		}
+	}
+	
+	maven {
+		url = uri("https://repo.minelittlepony-mod.com/maven/release")
+	}
+	
+	maven {
+		name = "Gegy"
+		url = uri("https://maven.gegy.dev")
+	}
+	
+	maven {
+		url = uri("https://nexus.velocitypowered.com/repository/maven-public/")
+	}
 }
 
 val modImplementationInclude by configurations.register("modImplementationInclude")
@@ -83,6 +104,35 @@ dependencies {
 	modRuntimeOnly("maven.modrinth", "wthit", "quilt-5.10.0")
 	modRuntimeOnly("maven.modrinth", "badpackets", "fabric-0.2.0")
 	modRuntimeOnly("maven.modrinth", "emi", "0.3.3+1.19")
+	modRuntimeOnly("maven.modrinth", "sodium", "mc1.19-0.4.2")
+	modRuntimeOnly("maven.modrinth", "lithium", "mc1.19.2-0.8.3")
+	modRuntimeOnly("maven.modrinth", "lazydfu", "0.1.3")
+	modRuntimeOnly("maven.modrinth", "appleskin", "fabric-mc1.19-2.4.1")
+	modRuntimeOnly("maven.modrinth", "presence-footsteps", "1.6.1")
+	modRuntimeOnly("maven.modrinth", "blur-fabric", "2.6.0")
+	modRuntimeOnly("maven.modrinth", "starlight", "1.1.1+1.19")
+	modRuntimeOnly("maven.modrinth", "sodium-extra", "mc1.19-0.4.6")
+	modRuntimeOnly("maven.modrinth", "krypton", "0.2.1")
+//	modRuntimeOnly("maven.modrinth", "phosphor", "mc1.19.x-0.8.1")
+	modRuntimeOnly("maven.modrinth", "lambdynamiclights", "2.1.2+1.19")
+	modRuntimeOnly("maven.modrinth", "ferrite-core", "5.0.0-fabric")
+	modRuntimeOnly("maven.modrinth", "dynamic-fps", "2.2.0")
+	modRuntimeOnly("maven.modrinth", "reeses-sodium-options", "mc1.19.2-1.4.6")
+//	modRuntimeOnly("maven.modrinth", "ok-zoomer", "5.0.0-beta.9+1.19")
+	modRuntimeOnly("maven.modrinth", "lambdabettergrass", "1.3.0+1.19")
+//	modRuntimeOnly("maven.modrinth", "c2me-fabric", "0.2.0+alpha.8.37+1.19.2")
+//	modRuntimeOnly("maven.modrinth", "libzoomer", "0.5.0+1.19")
+	
+	// fixme: fuck
+	modRuntimeOnly("com.minelittlepony", "kirin", "1.11.0")
+	modRuntimeOnly("dev.lambdaurora", "spruceui", "4.0.0+1.19")
+	modRuntimeOnly("com.moandjiezana.toml", "toml4j", "0.7.2")
+	modRuntimeOnly("com.velocitypowered", "velocity-native", "3.1.0")
+	modRuntimeOnly("maven.modrinth", "satin-api", "1.8.0")
+	modRuntimeOnly("maven.modrinth", "midnightlib", "0.5.2")
+	modRuntimeOnly("maven.modrinth", "cloth-config", "7.0.69")
+	modRuntimeOnly("org.joml", "joml", "1.10.4")
+	
 //	modRuntimeOnly(libs.quilted.fabric.api)
 
 	add(sourceSets.main.get().getTaskName("mod", JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME), modImplementationInclude)

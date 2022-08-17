@@ -2,11 +2,14 @@ package dev.cursedmc.wij.api.block.entity.render
 
 import dev.cursedmc.wij.api.block.entity.WorldJarBlockEntity
 import dev.cursedmc.wij.impl.scale
+import net.minecraft.client.MinecraftClient
+import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.block.entity.BlockEntityRenderer
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.random.RandomGenerator
 
 open class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Context) : BlockEntityRenderer<WorldJarBlockEntity> {
 	override fun render(
@@ -22,6 +25,9 @@ open class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFacto
 		matrices.scale(entity.scale)
 		matrices.translate(0.0, 1.0, 0.0)
 		
+		// todo: build a VBO (VertexBuffer Object) and upload that shit to the GPU for rendering
+		// THE MODFEST IS IN 3 MINUTES HELP WHY WON'T IT UPLOAD PLEASE
+		
 		for (x in 0..max) {
 			for (y in 0 until max) {
 				for (z in 0..max) {
@@ -35,7 +41,7 @@ open class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFacto
 					// translate to position
 					matrices.translate(x.toDouble(), y.toDouble(), z.toDouble())
 					
-					val pos = BlockPos(x + entity.x, y + entity.y, z + entity.z)
+					val pos = BlockPos.Mutable(x, y, z).add(entity.subPos)
 					val state = entity.subworld?.getBlockState(pos)
 					
 					ctx.renderManager.renderBlockAsEntity(state, matrices, vertexConsumers, light, overlay)
