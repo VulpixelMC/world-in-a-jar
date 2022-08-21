@@ -1,8 +1,8 @@
 package dev.cursedmc.wij.api.block.entity
 
 import dev.cursedmc.wij.api.Initializable
-import dev.cursedmc.wij.impl.WIJConstants.id
 import dev.cursedmc.wij.api.block.Blocks
+import dev.cursedmc.wij.impl.WIJConstants.id
 import net.minecraft.block.entity.BlockEntityType
 import net.minecraft.util.registry.Registry
 import org.quiltmc.qsl.block.entity.api.QuiltBlockEntityTypeBuilder

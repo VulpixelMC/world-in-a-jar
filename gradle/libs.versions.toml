@@ -9,7 +9,8 @@ quilt_loader = "0.17.3"
 quilted_fabric_api = "4.0.0-beta.8+0.59.0-1.19.2"
 qsl = "3.0.0-beta.13+1.19.2"
 
-fabric_lang_kotlin = "1.8.1+kotlin.1.7.0"
+fabric_lang_kotlin = "1.8.2+kotlin.1.7.0"
+quilt_lang_kotlin = "0.1.2-MODFEST+kt.1.7.10+flk.1.8.2"
 
 [libraries]
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
@@ -18,11 +19,14 @@ quilt_loader = { module = "org.quiltmc:quilt-loader", version.ref = "quilt_loade
 
 quilted_fabric_api = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api", version.ref = "quilted_fabric_api" }
 quilted_fabric_api_deprecated = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api-deprecated", version.ref = "quilted_fabric_api" }
-qsl_base = { module = "org.quiltmc.qsl.core:qsl_base", version.ref = "qsl" }
+core_qsl_base = { module = "org.quiltmc.qsl.core:qsl_base", version.ref = "qsl" }
+core_networking = { module = "org.quiltmc.qsl.core:networking", version.ref = "qsl" }
 block_entity = { module = "org.quiltmc.qsl.block:block_entity", version.ref = "qsl" }
 block_extensions = { module = "org.quiltmc.qsl.block:block_extensions", version.ref = "qsl" }
 item_group = { module = "org.quiltmc.qsl.item:item_group", version.ref = "qsl" }
 item_setting = { module = "org.quiltmc.qsl.item:item_setting", version.ref = "qsl" }
+
+quilt_lang_kotlin = { module = "maven.modrinth:qkl", version.ref = "quilt_lang_kotlin" }
 
 fabric_lang_kotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabric_lang_kotlin" }
 

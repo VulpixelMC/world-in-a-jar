@@ -75,10 +75,10 @@ dependencies {
 		// officialMojangMappings() // Uncomment if you want to use Mojang mappings as your primary mappings, falling back on QM for parameters and Javadocs
 	})
 	modImplementation(libs.quilt.loader)
+	modImplementation(libs.quilt.lang.kotlin)
 
-	modImplementation(libs.fabric.lang.kotlin)
-
-	modImplementationInclude(libs.qsl.base)
+	modImplementationInclude(libs.core.qsl.base)
+	modImplementationInclude(libs.core.networking)
 
 	modImplementationInclude(libs.block.entity)
 	modImplementationInclude(libs.block.extensions)
@@ -92,6 +92,7 @@ dependencies {
 
 	modImplementation("net.bytebuddy", "byte-buddy-agent", "1.12.+")
 	modImplementation("maven.modrinth", "yqh", "0.1.2")
+	modImplementation("maven.modrinth", "sodium", "mc1.19-0.4.2")
 
 	// QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
 	// Quilted Fabric API will automatically pull in the correct QSL version.
@@ -122,6 +123,7 @@ dependencies {
 	modRuntimeOnly("maven.modrinth", "lambdabettergrass", "1.3.0+1.19")
 //	modRuntimeOnly("maven.modrinth", "c2me-fabric", "0.2.0+alpha.8.37+1.19.2")
 //	modRuntimeOnly("maven.modrinth", "libzoomer", "0.5.0+1.19")
+	modRuntimeOnly("maven.modrinth", "ears", "1.4.6+fabric-1.19")
 	
 	// fixme: fuck
 	modRuntimeOnly("com.minelittlepony", "kirin", "1.11.0")

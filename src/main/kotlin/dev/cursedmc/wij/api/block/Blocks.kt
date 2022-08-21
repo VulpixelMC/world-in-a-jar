@@ -1,9 +1,9 @@
 package dev.cursedmc.wij.api.block
 
 import dev.cursedmc.wij.api.Initializable
-import dev.cursedmc.wij.impl.WIJConstants.id
 import dev.cursedmc.wij.api.block.item.WorldJarBlockItem
 import dev.cursedmc.wij.api.item.group.ItemGroups
+import dev.cursedmc.wij.impl.WIJConstants.id
 import net.minecraft.block.Blocks
 import net.minecraft.util.Rarity
 import net.minecraft.util.registry.Registry

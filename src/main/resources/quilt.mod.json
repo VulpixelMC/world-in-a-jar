@@ -20,7 +20,8 @@
 		"intermediate_mappings": "net.fabricmc:intermediary",
 		"entrypoints": {
 			"init": "dev.cursedmc.wij.impl.WorldInAJar",
-			"client_init": "dev.cursedmc.wij.impl.client.WorldInAJarClient"
+			"client_init": "dev.cursedmc.wij.impl.client.WorldInAJarClient",
+			"server_init": "dev.cursedmc.wij.impl.server.dedicated.WorldInAJarDedicatedServer"
 		},
 		"depends": [
 			{
@@ -32,8 +33,16 @@
 				"versions": ">=4.0.0-"
 			},
 			{
+				"id": "qkl",
+				"versions": ">=0.1.2-"
+			},
+			{
 				"id": "minecraft",
 				"versions": ">=1.19.2"
+			},
+			{
+				"id": "yqh",
+				"versions": "0.1.x"
 			}
 		]
 	},

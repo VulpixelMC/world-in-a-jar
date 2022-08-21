@@ -1,8 +1,8 @@
 package dev.cursedmc.wij.api.item.group
 
 import dev.cursedmc.wij.api.Initializable
-import dev.cursedmc.wij.impl.WIJConstants.id
 import dev.cursedmc.wij.api.block.Blocks
+import dev.cursedmc.wij.impl.WIJConstants.id
 import net.minecraft.item.ItemGroup
 import net.minecraft.item.ItemStack
 import org.quiltmc.qsl.item.group.api.QuiltItemGroup

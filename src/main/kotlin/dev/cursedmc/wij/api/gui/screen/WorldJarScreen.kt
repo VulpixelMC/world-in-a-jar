@@ -1,16 +1,19 @@
 package dev.cursedmc.wij.api.gui.screen
 
 import dev.cursedmc.wij.api.block.entity.WorldJarBlockEntity
+import dev.cursedmc.wij.api.network.c2s.C2SPackets
 import dev.cursedmc.wij.api.network.c2s.WorldJarUpdateC2SPacket
 import dev.cursedmc.wij.impl.WIJConstants.MOD_ID
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.gui.widget.TextFieldWidget
+import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
+import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
 
-open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, var blockEntity: BE) : Screen(text) {
+open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, private var blockEntity: BE) : Screen(text) {
 	protected open lateinit var inputX: TextFieldWidget
 	protected open lateinit var inputY: TextFieldWidget
 	protected open lateinit var inputZ: TextFieldWidget
@@ -20,34 +23,40 @@ open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, var blockEntity
 	constructor(blockEntity: BE) : this(SCREEN_TEXT, blockEntity)
 	
 	override fun init() {
-		this.inputX = TextFieldWidget(this.textRenderer, this.width / 4 - 176, 80, INPUT_WIDTH, INPUT_HEIGHT, X_POS_TEXT)
+		this.inputX = TextFieldWidget(this.textRenderer, this.width / 2 - 88, 80, INPUT_WIDTH, INPUT_HEIGHT, X_POS_TEXT)
 		this.inputX.setMaxLength(15)
 		this.inputX.text = blockEntity.subPos.x.toString()
 		this.addSelectableChild(inputX)
-		this.inputY = TextFieldWidget(this.textRenderer, this.width / 4 - 96, 80, INPUT_WIDTH, INPUT_HEIGHT, Y_POS_TEXT)
+		this.inputY = TextFieldWidget(this.textRenderer, this.width / 2 - 48, 80, INPUT_WIDTH, INPUT_HEIGHT, Y_POS_TEXT)
 		this.inputY.setMaxLength(15)
 		this.inputY.text = blockEntity.subPos.y.toString()
 		this.addSelectableChild(inputY)
-		this.inputZ = TextFieldWidget(this.textRenderer, this.width / 4 - 16, 80, INPUT_WIDTH, INPUT_HEIGHT, Z_POS_TEXT)
+		this.inputZ = TextFieldWidget(this.textRenderer, this.width / 2 - 8, 80, INPUT_WIDTH, INPUT_HEIGHT, Z_POS_TEXT)
 		this.inputZ.setMaxLength(15)
 		this.inputZ.text = blockEntity.subPos.z.toString()
 		this.addSelectableChild(inputZ)
-		this.inputScale = TextFieldWidget(this.textRenderer, this.width / 4 + 64, 120, INPUT_WIDTH, INPUT_HEIGHT, SCALE_TEXT)
+		this.inputScale = TextFieldWidget(this.textRenderer, this.width / 2 + 32, 120, INPUT_WIDTH, INPUT_HEIGHT, SCALE_TEXT)
 		this.inputScale.setMaxLength(4)
-		this.inputScale.text = blockEntity.scale.toString()
+		this.inputScale.text = blockEntity.magnitude.toString()
 		this.addSelectableChild(this.inputScale)
-		this.applyButton = this.addDrawableChild(ButtonWidget(this.width / 4 - 256, 160, BUTTON_WIDTH, BUTTON_HEIGHT, APPLY_TEXT) {
+		this.applyButton = this.addDrawableChild(ButtonWidget(this.width / 2 - 128, 160, BUTTON_WIDTH, BUTTON_HEIGHT, APPLY_TEXT) {
 			this.updateWorldJar()
 		})
 	}
 	
-	fun updateWorldJar() {
-		this.client?.networkHandler?.sendPacket(
-			WorldJarUpdateC2SPacket(
-				BlockPos(inputX.text.toInt(), inputY.text.toInt(), inputZ.text.toInt()),
-				inputScale.text.toInt(),
-			)
-		)
+	private fun updateWorldJar() {
+		ClientPlayNetworking.send(C2SPackets.WORLD_JAR_UPDATE, WorldJarUpdateC2SPacket.buf(BlockPos(this.inputX.text.toInt(), this.inputY.text.toInt(), this.inputZ.text.toInt()), this.inputScale.text.toInt(), this.blockEntity.pos))
+	}
+	
+	override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {
+		this.renderBackground(matrices)
+		
+		this.inputX.render(matrices, mouseX, mouseY, delta)
+		this.inputY.render(matrices, mouseX, mouseY, delta)
+		this.inputZ.render(matrices, mouseX, mouseY, delta)
+		this.inputScale.render(matrices, mouseX, mouseY, delta)
+		
+		super.render(matrices, mouseX, mouseY, delta)
 	}
 	
 	override fun tick() {
@@ -57,7 +66,7 @@ open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, var blockEntity
 		this.inputScale.tick()
 	}
 	
-	override fun resize(client: MinecraftClient?, width: Int, height: Int) {
+	override fun resize(client: MinecraftClient, width: Int, height: Int) {
 		val inputX = this.inputX.text
 		val inputY = this.inputY.text
 		val inputZ = this.inputZ.text
@@ -82,7 +91,7 @@ open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, var blockEntity
 		val Z_POS_TEXT: Text = Text.translatable("$MOD_ID.world_jar.z_pos")
 		val SCALE_TEXT: Text = Text.translatable("$MOD_ID.world_jar.scale")
 		val APPLY_TEXT: Text = Text.translatable("$MOD_ID.world_jar.apply")
-		const val INPUT_WIDTH: Int = 80
+		const val INPUT_WIDTH: Int = 40
 		const val INPUT_HEIGHT: Int = 20
 		const val BUTTON_WIDTH: Int = 80
 		const val BUTTON_HEIGHT: Int = 20

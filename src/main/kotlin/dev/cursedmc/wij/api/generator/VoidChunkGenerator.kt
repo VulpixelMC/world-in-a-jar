@@ -2,6 +2,7 @@ package dev.cursedmc.wij.api.generator
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import net.minecraft.block.Blocks
 import net.minecraft.structure.StructureManager
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.registry.Registry
@@ -54,7 +55,7 @@ class VoidChunkGenerator(registry: Registry<StructureSet?>?, private val biomeRe
 	}
 	
 	override fun getWorldHeight(): Int {
-		return 0
+		return 256
 	}
 	
 	override fun populateNoise(
@@ -64,6 +65,12 @@ class VoidChunkGenerator(registry: Registry<StructureSet?>?, private val biomeRe
 		structureManager: StructureManager?,
 		chunk: Chunk?
 	): CompletableFuture<Chunk> {
+		for (x in 0..16) {
+			for (z in 0..16) {
+				chunk?.setBlockState(BlockPos(chunk.pos.startX + x, chunk.bottomY, chunk.pos.startZ + z), Blocks.BARRIER.defaultState, false)
+			}
+		}
+		
 		return CompletableFuture.completedFuture(chunk)
 	}
 	
@@ -82,7 +89,7 @@ class VoidChunkGenerator(registry: Registry<StructureSet?>?, private val biomeRe
 		world: HeightLimitView?,
 		randomState: RandomState?
 	): Int {
-		return 0
+		return 256
 	}
 	
 	override fun getColumnSample(
@@ -100,7 +107,7 @@ class VoidChunkGenerator(registry: Registry<StructureSet?>?, private val biomeRe
 	companion object {
 		val CODEC: Codec<VoidChunkGenerator> = RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<VoidChunkGenerator> ->
 			return@create method_41042(instance)
-				.and(RecordCodecBuilder.of({ it: VoidChunkGenerator -> it.biomeRegistry }, RegistryOps.getRegistry(Registry.BIOME_KEY)))
+				.and(RegistryOps.getRegistry(Registry.BIOME_KEY).forGetter(VoidChunkGenerator::biomeRegistry))
 				.apply(instance, ::VoidChunkGenerator)
 		}
 	}

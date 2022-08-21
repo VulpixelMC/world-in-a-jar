@@ -1,7 +1,6 @@
 package dev.cursedmc.wij.api.block.entity
 
 import dev.cursedmc.wij.api.WorldContainer
-import dev.cursedmc.wij.impl.fromLong
 import net.minecraft.block.BlockState
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.nbt.NbtCompound
@@ -10,20 +9,22 @@ import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
+import org.quiltmc.qsl.block.entity.api.QuiltBlockEntity
 
 open class WorldJarBlockEntity(
 	blockPos: BlockPos?,
 	blockState: BlockState?,
-	val subworld: World? = null,
-) : BlockEntity(BlockEntityTypes.WORLD_JAR, blockPos, blockState), WorldContainer {
+) : BlockEntity(BlockEntityTypes.WORLD_JAR, blockPos, blockState), WorldContainer, QuiltBlockEntity {
+	var subworld: World? = null
 	var magnitude: Int = -1
 	val scale: Float
 		get() = 1.0f / magnitude
-	var subPos: BlockPos.Mutable = BlockPos.Mutable(0, 0, 0)
+	var subPos: BlockPos = BlockPos(0, 0, 0)
 	
 	override fun readNbt(nbt: NbtCompound) {
+		super.readNbt(nbt)
 		magnitude = nbt.getInt("magnitude")
-		subPos = BlockPos.Mutable::class.fromLong(nbt.getLong("pos"))
+		subPos = BlockPos.fromLong(nbt.getLong("pos"))
 	}
 	
 	override fun writeNbt(nbt: NbtCompound) {
@@ -39,11 +40,11 @@ open class WorldJarBlockEntity(
 		return this.toNbt()
 	}
 	
-	override fun toUpdatePacket(): Packet<ClientPlayPacketListener>? {
+	override fun toUpdatePacket(): Packet<ClientPlayPacketListener> {
 		return BlockEntityUpdateS2CPacket.of(this)
 	}
 	
-	override fun getWorld(): World? {
+	override fun getContainedWorld(): World? {
 		return this.subworld
 	}
 	
