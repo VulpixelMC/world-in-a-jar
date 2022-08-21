@@ -39,10 +39,6 @@
 			{
 				"id": "minecraft",
 				"versions": ">=1.19.2"
-			},
-			{
-				"id": "yqh",
-				"versions": "0.1.x"
 			}
 		]
 	},
