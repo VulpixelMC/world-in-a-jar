@@ -1,4 +1,4 @@
-package dev.cursedmc.wij.mixin;
+package dev.cursedmc.wij.impl.mixin;
 
 import it.unimi.dsi.fastutil.objects.Object2IntMap;
 import net.minecraft.world.IdCountsState;

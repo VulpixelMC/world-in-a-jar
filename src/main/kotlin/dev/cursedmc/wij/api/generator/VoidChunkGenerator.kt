@@ -105,6 +105,7 @@ class VoidChunkGenerator(registry: Registry<StructureSet?>?, private val biomeRe
 	}
 	
 	companion object {
+		@JvmField
 		val CODEC: Codec<VoidChunkGenerator> = RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<VoidChunkGenerator> ->
 			return@create method_41042(instance)
 				.and(RegistryOps.getRegistry(Registry.BIOME_KEY).forGetter(VoidChunkGenerator::biomeRegistry))

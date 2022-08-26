@@ -1,12 +1,50 @@
 package dev.cursedmc.wij.impl.server
 
 import dev.cursedmc.wij.api.Initializable
-import dev.cursedmc.wij.api.network.c2s.C2SPackets
+import dev.cursedmc.wij.impl.duck.PlayerWithReturnDim
+import dev.cursedmc.wij.impl.duck.PlayerWithReturnPos
+import dev.cursedmc.wij.api.dimension.DimensionTypes
+import dev.cursedmc.wij.impl.WIJConstants.MOD_ID
+import net.minecraft.server.command.ServerCommandSource
+import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.text.Text
+import net.minecraft.util.math.Vec3d
+import net.minecraft.world.TeleportTarget
+import org.quiltmc.qkl.wrapper.minecraft.brigadier.argument.literal
+import org.quiltmc.qkl.wrapper.minecraft.brigadier.util.server
+import org.quiltmc.qsl.command.api.CommandRegistrationCallback
+import org.quiltmc.qsl.worldgen.dimension.api.QuiltDimensions
 
 /**
  * Integrated/Dedicated server initialization
  */
 object WorldInAJarServer : Initializable {
+	private const val EXIT_COMMAND = "exit"
+	
 	override fun initialize() {
+		CommandRegistrationCallback.EVENT.register {
+				dispatcher, context, env ->
+			val backNode = dispatcher.register(
+				literal<ServerCommandSource>(EXIT_COMMAND)
+					.builder
+					.executes {
+						if (!it.source.method_43737()) {
+							it.source.sendError(Text.translatable("command.$MOD_ID.back.error.source"))
+							return@executes -1
+						}
+						val player = it.source.player
+						if (player.world.registryKey != DimensionTypes.WORLD_JAR_WORLD) {
+							it.source.sendError(Text.translatable("command.$MOD_ID.back.error.dimension"))
+							return@executes -1
+						}
+						val returnPos = it.source.player as PlayerWithReturnPos
+						val returnDim = it.source.player as PlayerWithReturnDim
+						QuiltDimensions.teleport<ServerPlayerEntity>(player, it.server.getWorld(returnDim.`worldinajar$getReturnDim`()), TeleportTarget(returnPos.`worldinajar$getReturnPos`(), Vec3d.ZERO, 0f, 0f))
+						return@executes 0
+					}
+			)
+			
+			dispatcher.register(literal<ServerCommandSource>("$MOD_ID:$EXIT_COMMAND").builder.redirect(backNode))
+		}
 	}
 }

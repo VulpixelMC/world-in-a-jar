@@ -2,6 +2,8 @@ package dev.cursedmc.wij.api.gui.screen
 
 import dev.cursedmc.wij.api.block.entity.WorldJarBlockEntity
 import dev.cursedmc.wij.api.network.c2s.C2SPackets
+import dev.cursedmc.wij.api.network.c2s.WorldJarEnterC2SPacket
+import dev.cursedmc.wij.api.network.c2s.WorldJarLoadedC2SPacket
 import dev.cursedmc.wij.api.network.c2s.WorldJarUpdateC2SPacket
 import dev.cursedmc.wij.impl.WIJConstants.MOD_ID
 import net.minecraft.client.MinecraftClient
@@ -11,6 +13,7 @@ import net.minecraft.client.gui.widget.TextFieldWidget
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.text.Text
 import net.minecraft.util.math.BlockPos
+import org.quiltmc.qsl.networking.api.PacketByteBufs
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
 
 open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, private var blockEntity: BE) : Screen(text) {
@@ -19,6 +22,7 @@ open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, private var blo
 	protected open lateinit var inputZ: TextFieldWidget
 	protected open lateinit var inputScale: TextFieldWidget
 	protected open lateinit var applyButton: ButtonWidget
+	protected open lateinit var enterButton: ButtonWidget
 	
 	constructor(blockEntity: BE) : this(SCREEN_TEXT, blockEntity)
 	
@@ -42,10 +46,27 @@ open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, private var blo
 		this.applyButton = this.addDrawableChild(ButtonWidget(this.width / 2 - 128, 160, BUTTON_WIDTH, BUTTON_HEIGHT, APPLY_TEXT) {
 			this.updateWorldJar()
 		})
+		this.enterButton = this.addDrawableChild(ButtonWidget(this.width / 2, 160, BUTTON_WIDTH, BUTTON_HEIGHT, ENTER_TEXT) {
+			this.enterWorldJar()
+		})
 	}
 	
 	private fun updateWorldJar() {
+		if (inputScale.text.toInt() > 16) {
+			inputScale.text = "16"
+		}
 		ClientPlayNetworking.send(C2SPackets.WORLD_JAR_UPDATE, WorldJarUpdateC2SPacket.buf(BlockPos(this.inputX.text.toInt(), this.inputY.text.toInt(), this.inputZ.text.toInt()), this.inputScale.text.toInt(), this.blockEntity.pos))
+		val buf = PacketByteBufs.create()
+		val packet = WorldJarLoadedC2SPacket(this.blockEntity.pos)
+		packet.write(buf)
+		ClientPlayNetworking.send(C2SPackets.WORLD_JAR_LOADED, buf)
+	}
+	
+	private fun enterWorldJar() {
+		val buf = PacketByteBufs.create()
+		val packet = WorldJarEnterC2SPacket(this.blockEntity.pos)
+		packet.write(buf)
+		ClientPlayNetworking.send(C2SPackets.WORLD_JAR_ENTER, buf)
 	}
 	
 	override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {
@@ -91,6 +112,7 @@ open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, private var blo
 		val Z_POS_TEXT: Text = Text.translatable("$MOD_ID.world_jar.z_pos")
 		val SCALE_TEXT: Text = Text.translatable("$MOD_ID.world_jar.scale")
 		val APPLY_TEXT: Text = Text.translatable("$MOD_ID.world_jar.apply")
+		val ENTER_TEXT: Text = Text.translatable("$MOD_ID.world_jar.enter")
 		const val INPUT_WIDTH: Int = 40
 		const val INPUT_HEIGHT: Int = 20
 		const val BUTTON_WIDTH: Int = 80

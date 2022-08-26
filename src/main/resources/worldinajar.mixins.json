@@ -1,15 +1,14 @@
 {
 	"required": true,
 	"minVersion": "0.8",
-	"package": "dev.cursedmc.wij.mixin",
+	"package": "dev.cursedmc.wij.impl.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"IdCountsStateAccessor"
+		"IdCountsStateAccessor",
+		"PlayerEntityMixin",
+		"WorldChunkMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
-	},
-	"client": [
-		"WorldRendererMixin"
-	]
+	}
 }

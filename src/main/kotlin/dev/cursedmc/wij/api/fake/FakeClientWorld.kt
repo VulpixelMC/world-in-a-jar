@@ -16,12 +16,8 @@ class FakeClientWorld : ClientWorld(MinecraftClient.getInstance().networkHandler
 			Blocks.VOID_AIR.defaultState
 		} else {
 			val worldChunk = this.getChunk(ChunkSectionPos.getSectionCoord(pos.x), ChunkSectionPos.getSectionCoord(pos.z))
-			var empty = true
 			if (!worldChunk.getBlockState(pos).isAir) {
-				empty = false
-			}
-			if (empty) {
-				worldChunk.loadToWorld()
+				println("not empty")
 			}
 			worldChunk.getBlockState(pos)
 		}

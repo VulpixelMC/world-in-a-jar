@@ -13,6 +13,6 @@ class WorldJarBlockComponentProvider : IBlockComponentProvider {
 		val subPos = accessor.getBlockEntity<WorldJarBlockEntity>()?.subPos
 		
 		tooltip.addLine(Text.literal("Scale: $scale"))
-		tooltip.addLine(Text.literal("Position: $subPos"))
+		tooltip.addLine(Text.literal("Position: ${subPos?.toShortString()}"))
 	}
 }
