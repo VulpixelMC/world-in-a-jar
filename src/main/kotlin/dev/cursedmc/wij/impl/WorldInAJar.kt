@@ -27,7 +27,6 @@ class WorldInAJar : ModInitializer {
 		}
 		
 		C2SPackets.initialize()
-		S2CPackets.initialize()
 		
 		WorldInAJarServer.initialize()
 		
