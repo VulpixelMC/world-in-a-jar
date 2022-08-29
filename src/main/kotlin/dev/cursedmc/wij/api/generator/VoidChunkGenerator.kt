@@ -55,7 +55,7 @@ class VoidChunkGenerator(registry: Registry<StructureSet?>?, private val biomeRe
 	}
 	
 	override fun getWorldHeight(): Int {
-		return 256
+		return 320
 	}
 	
 	override fun populateNoise(
@@ -79,7 +79,7 @@ class VoidChunkGenerator(registry: Registry<StructureSet?>?, private val biomeRe
 	}
 	
 	override fun getMinimumY(): Int {
-		return 0
+		return -64
 	}
 	
 	override fun getHeight(
@@ -89,7 +89,7 @@ class VoidChunkGenerator(registry: Registry<StructureSet?>?, private val biomeRe
 		world: HeightLimitView?,
 		randomState: RandomState?
 	): Int {
-		return 256
+		return 320
 	}
 	
 	override fun getColumnSample(
