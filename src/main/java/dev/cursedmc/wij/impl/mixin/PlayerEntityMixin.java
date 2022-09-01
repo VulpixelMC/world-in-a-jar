@@ -27,9 +27,11 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerWi
 	
 	@Inject(method = "writeCustomDataToNbt", at = @At("HEAD"))
 	private void writeNbt(NbtCompound nbt, CallbackInfo ci) {
-		nbt.putString("return_dim", worldinajar$returnDim.getValue().toString());
-		final long[] positions = new long[]{Double.doubleToLongBits(worldinajar$returnPos.x), Double.doubleToLongBits(worldinajar$returnPos.y), Double.doubleToLongBits(worldinajar$returnPos.z)};
-		nbt.putLongArray("return_pos", positions);
+		if (worldinajar$returnDim != null) nbt.putString("return_dim", worldinajar$returnDim.getValue().toString());
+		if (worldinajar$returnPos != null) {
+			final long[] positions = new long[]{Double.doubleToLongBits(worldinajar$returnPos.x), Double.doubleToLongBits(worldinajar$returnPos.y), Double.doubleToLongBits(worldinajar$returnPos.z)};
+			nbt.putLongArray("return_pos", positions);
+		}
 	}
 	
 	@Inject(method = "readCustomDataFromNbt", at = @At("HEAD"))
