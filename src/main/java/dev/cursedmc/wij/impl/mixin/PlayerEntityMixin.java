@@ -36,12 +36,14 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerWi
 	
 	@Inject(method = "readCustomDataFromNbt", at = @At("HEAD"))
 	private void readNbt(NbtCompound nbt, CallbackInfo ci) {
-		worldinajar$returnDim = RegistryKey.of(Registry.WORLD_KEY, new Identifier(nbt.getString("return_dim")));
-		long[] positions = nbt.getLongArray("return_pos");
-		if (positions.length == 0) {
-			positions = new long[]{Double.doubleToLongBits(0.0), Double.doubleToLongBits(0.0), Double.doubleToLongBits(0.0)};
+		if (nbt.contains("return_dim") && nbt.contains("return_pos")) {
+			worldinajar$returnDim = RegistryKey.of(Registry.WORLD_KEY, new Identifier(nbt.getString("return_dim")));
+			long[] positions = nbt.getLongArray("return_pos");
+			if (positions.length == 0) {
+				positions = new long[]{Double.doubleToLongBits(0.0), Double.doubleToLongBits(0.0), Double.doubleToLongBits(0.0)};
+			}
+			worldinajar$returnPos = new Vec3d(Double.longBitsToDouble(positions[0]), Double.longBitsToDouble(positions[1]), Double.longBitsToDouble(positions[2]));
 		}
-		worldinajar$returnPos = new Vec3d(Double.longBitsToDouble(positions[0]), Double.longBitsToDouble(positions[1]), Double.longBitsToDouble(positions[2]));
 	}
 	
 	@Override
