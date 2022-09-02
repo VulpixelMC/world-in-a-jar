@@ -76,7 +76,7 @@ open class WorldJarBlockEntity(
 			val packet = WorldJarLoadedS2CPacket(pos)
 			packet.write(buf)
 			ServerPlayNetworking.send(playersTracking, S2CPackets.WORLD_JAR_LOADED, buf)
-		} else {
+		} else if (MinecraftClient.getInstance().player?.getWorld() == world) {
 			val buf = PacketByteBufs.create()
 			val packet = WorldJarLoadedC2SPacket(pos)
 			packet.write(buf)
@@ -93,7 +93,7 @@ open class WorldJarBlockEntity(
 			magnitude = 16
 		}
 		
-		if (world?.isClient == true) {
+		if (world?.isClient == true && MinecraftClient.getInstance().player?.getWorld() == world) {
 			val buf = PacketByteBufs.create()
 			val packet = WorldJarLoadedC2SPacket(pos)
 			packet.write(buf)
