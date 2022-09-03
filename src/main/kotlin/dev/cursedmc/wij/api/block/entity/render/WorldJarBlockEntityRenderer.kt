@@ -34,7 +34,7 @@ open class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFacto
 					
 					matrices.translate(x.toDouble(), y.toDouble(), z.toDouble())
 					
-					val pos = BlockPos(x, y, z).add(entity.subPos)
+					val pos = BlockPos(x, y, z)
 					val state = entity.blockStates[pos.asLong()]
 					
 					if (state != null) {

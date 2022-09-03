@@ -54,8 +54,7 @@ open class WorldJarBlockEntity(
 			for (y in 1..max) {
 				for (z in 0..max) {
 					val pos = BlockPos(x, y, z)
-					val state = world.getBlockState(pos)
-					if (state.isAir) continue
+					val state = world.getBlockState(pos.add(this.subPos))
 					blockStates[pos.asLong()] = state
 				}
 			}
