@@ -44,7 +44,7 @@ open class WorldJarBlockEntity(
 	var magnitude: Int = -1
 	val scale: Float
 		get() = 1.0f / magnitude
-	var subPos: BlockPos = BlockPos(0, 0, 0)
+	var subPos: BlockPos = BlockPos(0, -64, 0)
 	internal var blockStates: Long2ObjectMap<BlockState> = Long2ObjectArrayMap()
 	
 	fun updateBlockStates(server: MinecraftServer) {
