@@ -52,14 +52,28 @@ open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, private var blo
 	}
 	
 	private fun updateWorldJar() {
-		if (inputScale.text.toInt() > 16) {
-			inputScale.text = "16"
+		try {
+			if (inputScale.text.toInt() > 16) {
+				inputScale.text = "16"
+			}
+
+			ClientPlayNetworking.send(
+				C2SPackets.WORLD_JAR_UPDATE,
+				WorldJarUpdateC2SPacket.buf(
+					BlockPos(
+						this.inputX.text.toInt(),
+						this.inputY.text.toInt(),
+						this.inputZ.text.toInt()
+					), this.inputScale.text.toInt(), this.blockEntity.pos
+				)
+			)
+			val buf = PacketByteBufs.create()
+			val packet = WorldJarLoadedC2SPacket(this.blockEntity.pos)
+			packet.write(buf)
+			ClientPlayNetworking.send(C2SPackets.WORLD_JAR_LOADED, buf)
+		} catch (ex: java.lang.NumberFormatException) {
+			return
 		}
-		ClientPlayNetworking.send(C2SPackets.WORLD_JAR_UPDATE, WorldJarUpdateC2SPacket.buf(BlockPos(this.inputX.text.toInt(), this.inputY.text.toInt(), this.inputZ.text.toInt()), this.inputScale.text.toInt(), this.blockEntity.pos))
-		val buf = PacketByteBufs.create()
-		val packet = WorldJarLoadedC2SPacket(this.blockEntity.pos)
-		packet.write(buf)
-		ClientPlayNetworking.send(C2SPackets.WORLD_JAR_LOADED, buf)
 	}
 	
 	private fun enterWorldJar() {
@@ -79,7 +93,7 @@ open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, private var blo
 		
 		super.render(matrices, mouseX, mouseY, delta)
 	}
-	
+
 	override fun tick() {
 		this.inputX.tick()
 		this.inputY.tick()
