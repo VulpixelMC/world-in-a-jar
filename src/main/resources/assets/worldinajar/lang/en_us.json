@@ -1,6 +1,7 @@
 {
 	"${id}": "${id}",
 	"block.${id}.world_jar": "World Jar",
+	"block.${id}.sussystone": "Sussystone",
 	"itemGroup.${id}.world_jar": "World In A Jar",
 	"command.${id}.back.error.source": "This command must be run by a player!",
 	"command.${id}.back.error.dimension": "This command must be run inside of a World Jar!",

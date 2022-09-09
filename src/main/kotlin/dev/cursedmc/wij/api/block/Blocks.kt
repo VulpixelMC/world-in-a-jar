@@ -4,7 +4,9 @@ import dev.cursedmc.wij.api.Initializable
 import dev.cursedmc.wij.api.block.item.WorldJarBlockItem
 import dev.cursedmc.wij.api.item.group.ItemGroups
 import dev.cursedmc.wij.impl.WIJConstants.id
+import net.minecraft.block.Block
 import net.minecraft.block.Blocks
+import net.minecraft.item.BlockItem
 import net.minecraft.util.Rarity
 import net.minecraft.util.registry.Registry
 import org.quiltmc.qsl.block.extensions.api.QuiltBlockSettings
@@ -32,4 +34,24 @@ object Blocks : Initializable {
 				.maxCount(1),
 		),
 	)
+	
+	override fun initialize() {
+		val sussystone = Registry.register(
+			Registry.BLOCK,
+			id("sussystone"),
+			Block(
+				QuiltBlockSettings.copyOf(Blocks.COBBLESTONE),
+			),
+		)
+		
+		Registry.register(
+			Registry.ITEM,
+			Registry.BLOCK.getId(sussystone),
+			BlockItem(
+				sussystone,
+				QuiltItemSettings()
+					.group(ItemGroups.WORLD_JAR)
+			)
+		)
+	}
 }
