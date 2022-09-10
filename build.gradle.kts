@@ -65,7 +65,7 @@ repositories {
 	
 	maven {
 		name = "QuiltMC Snapshot"
-		url = uri("https://mavne.quiltmc.org/repository/snapshot")
+		url = uri("https://maven.quiltmc.org/repository/snapshot")
 	}
 }
 
