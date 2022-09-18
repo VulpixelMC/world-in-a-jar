@@ -36,12 +36,12 @@ object WorldInAJarServer : Initializable {
 					.builder
 					.executes {
 						if (!it.source.method_43737()) {
-							it.source.sendError(Text.translatable("command.$MOD_ID.back.error.source"))
+							it.source.sendError(Text.translatable("command.$MOD_ID.$EXIT_COMMAND.error.source"))
 							return@executes -1
 						}
 						val player = it.source.player
 						if (player.world.registryKey != DimensionTypes.WORLD_JAR_WORLD) {
-							it.source.sendError(Text.translatable("command.$MOD_ID.back.error.dimension"))
+							it.source.sendError(Text.translatable("command.$MOD_ID.$EXIT_COMMAND.error.dimension"))
 							return@executes -1
 						}
 						val returnPos = it.source.player as PlayerWithReturnPos
