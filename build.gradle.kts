@@ -2,6 +2,7 @@
 
 import com.hierynomus.gradle.license.tasks.LicenseCheck
 import com.hierynomus.gradle.license.tasks.LicenseFormat
+import nl.javadude.gradle.plugins.license.License
 
 plugins {
 	id("com.github.hierynomus.license").version("0.16.1")
@@ -197,12 +198,7 @@ tasks.build {
 	dependsOn(tasks.license)
 }
 
-tasks.withType<LicenseCheck> {
-	header = file("LHEADER")
-	exclude("**/*.json")
-}
-
-tasks.withType<LicenseFormat> {
+tasks.withType<License> {
 	header = file("LHEADER")
 	exclude("**/*.json")
 }
