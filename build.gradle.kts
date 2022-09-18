@@ -195,10 +195,12 @@ tasks.build {
 
 tasks.withType<LicenseCheck> {
 	header = file("LHEADER")
+	exclude("**/*.json")
 }
 
 tasks.withType<LicenseFormat> {
 	header = file("LHEADER")
+	exclude("**/*.json")
 }
 
 // Configure the maven publication
