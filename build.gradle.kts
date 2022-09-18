@@ -187,6 +187,10 @@ tasks.withType<AbstractArchiveTask> {
 	from("LICENSE") {
 		rename { "${it}_${modId}" }
 	}
+	
+	from("LICENSE-APPENDIX") {
+		rename { "${it}_${modId}" }
+	}
 }
 
 tasks.build {
