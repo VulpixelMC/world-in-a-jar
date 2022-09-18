@@ -1,29 +1,23 @@
-# Quilt Template Mod
+ever wanted to stuff an entire world in a jar? no? too bad! this mod squeezes entire worlds into jars for your enjoyment. play god or go home.
+<br><br>
+You can put blocks in a jar block** with up to infinite* room! All of your storage issues are solved!<br>
+Make little snow globes, make a cool redstone contraption; The possibilities are endless.
+<br><br>
+![Created for ModFest: Singularity](https://blob.jortage.com/blobs/5/d4d/5d4d14d96db2e2024d87cf5606cb7ce6421633a002e328947f85d210ba250ecb9f86de8df210dd031be2d4eafb0980494e7a1e8e99590a550abaa42d82768b9f)
+<br><br>
+<img src="https://github.com/RevTecCom/website/raw/cbef848772315aafcb0aa029245bb78d24af088f/images/badgeCPL.png" alt="CmPL Common Software" width=20%/>
 
-The official Quilt template Mod. You can use it as a template for your own mods!
 
-## Usage
-
-In order to use this mod as a template:
-
-1. Create a new repository from this template with `Use this template`
-2. Clone the recently-created repo on your PC
-3. Make the necessary changes in order to make it yours:
-    - Update `gradle.properties` in order to use your Maven group and mod ID
-        - If you don't know which Maven group to use, and you are planning to host the mod's source code on GitHub, use `io.github.<Your_Username_Here>`
-    - Update `quilt.mod.json` in order to reflect your mod's metadata
-        - If you are planning to include (jar-in-jar) a mod, don't forget to declare its dependency on it!
-        - The icon provided here is a placeholder one. If you aren't able to replace it yet, you can delete it and remove the "icon" property
-    - Create a LICENSE file for this mod! If you don't know which license to use, check out [here](https://choosealicense.com/).
-        - If you use `LICENSE.md`, don't forget to update the buildscript in order to use that file name!
-        - In `quilt.mod.json`, don't forget to put the license's [SPDX identifier](https://spdx.org/licenses/) under the `"license"` property in `"metadata"`.
-        - The GPLv3 and AGPLv3 are not valid mod licenses, so you can use almost any license except for those.
-    - Update the Java sub-directory structure so it reflects your Maven group
-    - If the dependencies on `gradle/libs.versions.toml` isn't up-to-date, feel free to update them! The [linked utility](https://lambdaurora.dev/tools/import_quilt.html) should help you in this easy and quick process.
-4. The mod is now ready to be worked on!
+## Disclaimers
+*The world ends at the world border; it is not truly infinite.<br>
+**As of releasing the ModFest version, the jar item is currently uncraftable.<br>
 
 ## License
+Copyright (c) 2022 CursedMC. All rights reserved.
 
-This template on the QuiltMC GitHub is licensed under the [Creative Common Zero v1.0 license](./LICENSE-TEMPLATE.md).
+World In A Jar is common software: you can redistribute it and/or modify it under the terms of the Commons Protection License as published by the Revolutionary Technical Committee.
 
-Mods created with this template are not automatically licensed under the CC0, and are not required to give any kind of credit back to QuiltMC for this template.
+This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Commons Protection License for more details.
+
+## License Linking Exception
+See `LICENSE-APPENDIX` in the source-code.
