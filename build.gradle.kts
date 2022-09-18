@@ -1,10 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
-import com.hierynomus.gradle.license.tasks.LicenseCheck
-import com.hierynomus.gradle.license.tasks.LicenseFormat
-
 plugins {
-	id("com.github.hierynomus.license").version("0.16.1")
 	id("org.jetbrains.kotlin.jvm").version(libs.versions.kotlin)
 	alias(libs.plugins.quilt.loom)
 	`maven-publish`
@@ -187,18 +183,6 @@ tasks.withType<AbstractArchiveTask> {
 	from("LICENSE") {
 		rename { "${it}_${modId}" }
 	}
-}
-
-tasks.build {
-	dependsOn(tasks.license)
-}
-
-tasks.withType<LicenseCheck> {
-	header = file("LHEADER")
-}
-
-tasks.withType<LicenseFormat> {
-	header = file("LHEADER")
 }
 
 // Configure the maven publication

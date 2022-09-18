@@ -1,10 +1,3 @@
-/**
- * Copyright (c) 2022 CursedMC. All rights reserved.
- *
- * World In A Jar is common software: you can redistribute it and/or modify it under the terms of the Commons Protection License as published by the Revolutionary Technical Committee.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Commons Protection License for more details.
- */
 package dev.cursedmc.wij.api.block
 
 import dev.cursedmc.wij.api.Initializable
@@ -13,9 +6,7 @@ import dev.cursedmc.wij.api.item.group.ItemGroups
 import dev.cursedmc.wij.impl.WIJConstants.id
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
-import net.minecraft.block.Material
 import net.minecraft.item.BlockItem
-import net.minecraft.sound.BlockSoundGroup
 import net.minecraft.util.Rarity
 import net.minecraft.util.registry.Registry
 import org.quiltmc.qsl.block.extensions.api.QuiltBlockSettings
@@ -28,8 +19,6 @@ object Blocks : Initializable {
 		WorldJarBlock(
 			QuiltBlockSettings
 				.copyOf(Blocks.BEACON)
-				.requiresTool()
-				.strength(1.0F, 4.0F)
 				.luminance(0),
 		),
 	)
@@ -51,11 +40,7 @@ object Blocks : Initializable {
 			Registry.BLOCK,
 			id("sussystone"),
 			Block(
-				QuiltBlockSettings
-					.of(Material.STONE)
-					.requiresTool()
-					.strength(2.0F, 6.0F)
-					.sounds(BlockSoundGroup.STONE),
+				QuiltBlockSettings.copyOf(Blocks.COBBLESTONE),
 			),
 		)
 		
