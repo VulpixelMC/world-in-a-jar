@@ -19,7 +19,7 @@ import dev.cursedmc.wij.impl.toPalettedContainer
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.TeleportTarget
-import org.quiltmc.qkl.wrapper.qsl.networking.playersTracking
+import org.quiltmc.qkl.library.networking.playersTracking
 import org.quiltmc.qsl.networking.api.PacketByteBufs
 import org.quiltmc.qsl.networking.api.ServerPlayNetworking
 import org.quiltmc.qsl.worldgen.dimension.api.QuiltDimensions

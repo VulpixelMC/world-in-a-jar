@@ -16,9 +16,10 @@ import dev.cursedmc.wij.api.network.c2s.C2SPackets
 import dev.cursedmc.wij.api.network.s2c.S2CPackets
 import dev.cursedmc.wij.impl.WIJConstants.id
 import dev.cursedmc.wij.impl.server.WorldInAJarServer
+import net.minecraft.registry.Registries
 import net.minecraft.util.Identifier
-import net.minecraft.util.registry.Registry
-import net.minecraft.util.registry.RegistryKey
+import net.minecraft.registry.Registry
+import net.minecraft.registry.RegistryKey
 import org.quiltmc.loader.api.ModContainer
 import org.quiltmc.loader.api.QuiltLoader
 import org.quiltmc.qsl.base.api.entrypoint.ModInitializer
@@ -39,7 +40,7 @@ class WorldInAJar : ModInitializer {
 		
 		DimensionTypes.initialize()
 		
-		Registry.register(Registry.CHUNK_GENERATOR, id("jar"), VoidChunkGenerator.CODEC)
+		Registry.register(Registries.CHUNK_GENERATOR, id("jar"), VoidChunkGenerator.CODEC)
 		
 		Blocks.initialize()
 		BlockEntityTypes.initialize()

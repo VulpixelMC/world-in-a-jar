@@ -17,8 +17,8 @@ import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.TeleportTarget
-import org.quiltmc.qkl.wrapper.minecraft.brigadier.argument.literal
-import org.quiltmc.qkl.wrapper.minecraft.brigadier.util.server
+import org.quiltmc.qkl.library.brigadier.argument.literal
+import org.quiltmc.qkl.library.brigadier.util.server
 import org.quiltmc.qsl.command.api.CommandRegistrationCallback
 import org.quiltmc.qsl.worldgen.dimension.api.QuiltDimensions
 
@@ -35,12 +35,12 @@ object WorldInAJarServer : Initializable {
 				literal<ServerCommandSource>(EXIT_COMMAND)
 					.builder
 					.executes {
-						if (!it.source.method_43737()) {
+						if (!it.source.isPlayer) {
 							it.source.sendError(Text.translatable("command.$MOD_ID.$EXIT_COMMAND.error.source"))
 							return@executes -1
 						}
 						val player = it.source.player
-						if (player.world.registryKey != DimensionTypes.WORLD_JAR_WORLD) {
+						if (player!!.world.registryKey != DimensionTypes.WORLD_JAR_WORLD) {
 							it.source.sendError(Text.translatable("command.$MOD_ID.$EXIT_COMMAND.error.dimension"))
 							return@executes -1
 						}

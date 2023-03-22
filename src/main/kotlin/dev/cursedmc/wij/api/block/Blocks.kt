@@ -15,15 +15,16 @@ import net.minecraft.block.Block
 import net.minecraft.block.Blocks
 import net.minecraft.block.Material
 import net.minecraft.item.BlockItem
+import net.minecraft.registry.Registries
 import net.minecraft.sound.BlockSoundGroup
 import net.minecraft.util.Rarity
-import net.minecraft.util.registry.Registry
+import net.minecraft.registry.Registry
 import org.quiltmc.qsl.block.extensions.api.QuiltBlockSettings
 import org.quiltmc.qsl.item.setting.api.QuiltItemSettings
 
 object Blocks : Initializable {
 	val WORLD_JAR: WorldJarBlock = Registry.register(
-		Registry.BLOCK,
+		Registries.BLOCK,
 		id("world_jar"),
 		WorldJarBlock(
 			QuiltBlockSettings
@@ -35,38 +36,34 @@ object Blocks : Initializable {
 	)
 	
 	val WORLD_JAR_ITEM: WorldJarBlockItem = Registry.register(
-		Registry.ITEM,
+		Registries.ITEM,
 		id("world_jar"),
 		WorldJarBlockItem(
 			WORLD_JAR,
 			QuiltItemSettings()
-				.group(ItemGroups.WORLD_JAR)
 				.rarity(Rarity.UNCOMMON)
 				.maxCount(1),
 		),
 	)
 	
-	override fun initialize() {
-		val sussystone = Registry.register(
-			Registry.BLOCK,
-			id("sussystone"),
-			Block(
-				QuiltBlockSettings
-					.of(Material.STONE)
-					.requiresTool()
-					.strength(2.0F, 6.0F)
-					.sounds(BlockSoundGroup.STONE),
-			),
+	val SUSSYSTONE: Block = Registry.register(
+		Registries.BLOCK,
+		id("sussystone"),
+		Block(
+			QuiltBlockSettings
+				.of(Material.STONE)
+				.requiresTool()
+				.strength(2.0F, 6.0F)
+				.sounds(BlockSoundGroup.STONE),
+		),
+	)
+	
+	val SUSSYSTONE_ITEM: BlockItem = Registry.register(
+		Registries.ITEM,
+		Registries.BLOCK.getId(SUSSYSTONE),
+		BlockItem(
+			SUSSYSTONE,
+			QuiltItemSettings()
 		)
-		
-		Registry.register(
-			Registry.ITEM,
-			Registry.BLOCK.getId(sussystone),
-			BlockItem(
-				sussystone,
-				QuiltItemSettings()
-					.group(ItemGroups.WORLD_JAR)
-			)
-		)
-	}
+	)
 }

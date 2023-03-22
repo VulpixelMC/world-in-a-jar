@@ -7,7 +7,7 @@
  */
 package dev.cursedmc.wij.impl.duck;
 
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 
 // todo create api

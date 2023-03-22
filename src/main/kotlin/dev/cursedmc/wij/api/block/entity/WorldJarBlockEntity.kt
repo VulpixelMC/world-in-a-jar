@@ -26,14 +26,14 @@ import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.nbt.NbtCompound
-import net.minecraft.network.Packet
+import net.minecraft.network.packet.Packet
 import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import net.minecraft.world.chunk.palette.PalettedContainer
-import org.quiltmc.qkl.wrapper.qsl.networking.playersTracking
+import org.quiltmc.qkl.library.networking.playersTracking
 import org.quiltmc.qsl.block.entity.api.QuiltBlockEntity
 import org.quiltmc.qsl.networking.api.PacketByteBufs
 import org.quiltmc.qsl.networking.api.ServerPlayNetworking
@@ -116,12 +116,12 @@ open class WorldJarBlockEntity(
 		nbt.putLong("pos", subPos.asLong())
 	}
 	
-	override fun toInitialChunkDataNbt(): NbtCompound {
-		return this.toNbt()
-	}
-	
 	override fun toUpdatePacket(): Packet<ClientPlayPacketListener> {
 		return BlockEntityUpdateS2CPacket.of(this)
+	}
+	
+	override fun toSyncedNbt(): NbtCompound {
+		return this.toNbt()
 	}
 	
 	override fun markRemoved() {

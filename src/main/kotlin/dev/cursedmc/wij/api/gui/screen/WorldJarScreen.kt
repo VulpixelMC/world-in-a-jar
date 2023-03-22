@@ -50,12 +50,20 @@ open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, private var blo
 		this.inputScale.setMaxLength(4)
 		this.inputScale.text = blockEntity.magnitude.toString()
 		this.addSelectableChild(this.inputScale)
-		this.applyButton = this.addDrawableChild(ButtonWidget(this.width / 2 - 128, 160, BUTTON_WIDTH, BUTTON_HEIGHT, APPLY_TEXT) {
-			this.updateWorldJar()
-		})
-		this.enterButton = this.addDrawableChild(ButtonWidget(this.width / 2, 160, BUTTON_WIDTH, BUTTON_HEIGHT, ENTER_TEXT) {
-			this.enterWorldJar()
-		})
+		this.applyButton = this.addDrawableChild(
+			ButtonWidget.builder(APPLY_TEXT) {
+				this.updateWorldJar()
+			}
+				.positionAndSize(this.width / 2 - 128, 160, BUTTON_WIDTH, BUTTON_HEIGHT)
+				.build()
+		)
+		this.enterButton = this.addDrawableChild(
+			ButtonWidget.builder(ENTER_TEXT) {
+				this.enterWorldJar()
+			}
+				.positionAndSize(this.width / 2, 160, BUTTON_WIDTH, BUTTON_HEIGHT)
+				.build()
+		)
 	}
 	
 	private fun updateWorldJar() {

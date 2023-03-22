@@ -12,9 +12,7 @@ import dev.cursedmc.wij.api.block.entity.BlockEntityTypes
 import dev.cursedmc.wij.api.network.c2s.C2SPackets
 import dev.cursedmc.wij.api.network.c2s.WorldJarLoadedC2SPacket
 import dev.cursedmc.wij.impl.WIJConstants.id
-import dev.cursedmc.wij.impl.WorldInAJar
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap
-import net.minecraft.block.Blocks
 import net.minecraft.util.math.BlockPos
 import org.quiltmc.qsl.networking.api.PacketByteBufs
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
@@ -54,7 +52,7 @@ object S2CPackets : Initializable {
 				for (y in 1..max) {
 					for (z in 0..max) {
 						val blockPos = BlockPos(x, y, z)
-						val state = blockStateContainer.method_12321(x, y, z)
+						val state = blockStateContainer.get(x, y, z)
 						if (state.isAir) continue
 						entity.blockStates[blockPos.asLong()] = state
 					}

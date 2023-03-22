@@ -10,10 +10,11 @@ package dev.cursedmc.wij.api.block.entity.render
 import dev.cursedmc.wij.api.Initializable
 import dev.cursedmc.wij.api.block.entity.BlockEntityTypes
 import net.fabricmc.fabric.api.client.rendering.v1.BlockEntityRendererRegistry
+import net.minecraft.client.render.block.entity.BlockEntityRendererFactories
 
 object BlockEntityRenderers : Initializable {
 	init {
-		BlockEntityRendererRegistry.register(
+		BlockEntityRendererFactories.register(
 			BlockEntityTypes.WORLD_JAR,
 			::WorldJarBlockEntityRenderer,
 		)

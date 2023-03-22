@@ -12,10 +12,11 @@ import dev.cursedmc.wij.impl.duck.PlayerWithReturnPos;
 import net.minecraft.entity.LivingEntity;
 import net.minecraft.entity.player.PlayerEntity;
 import net.minecraft.nbt.NbtCompound;
+import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.util.registry.Registry;
-import net.minecraft.util.registry.RegistryKey;
+import net.minecraft.registry.Registry;
+import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
@@ -44,7 +45,7 @@ public abstract class PlayerEntityMixin extends LivingEntity implements PlayerWi
 	@Inject(method = "readCustomDataFromNbt", at = @At("HEAD"))
 	private void readNbt(NbtCompound nbt, CallbackInfo ci) {
 		if (nbt.contains("return_dim") && nbt.contains("return_pos")) {
-			worldinajar$returnDim = RegistryKey.of(Registry.WORLD_KEY, new Identifier(nbt.getString("return_dim")));
+			worldinajar$returnDim = RegistryKey.of(RegistryKeys.WORLD, new Identifier(nbt.getString("return_dim")));
 			long[] positions = nbt.getLongArray("return_pos");
 			if (positions.length == 0) {
 				positions = new long[]{Double.doubleToLongBits(0.0), Double.doubleToLongBits(0.0), Double.doubleToLongBits(0.0)};

@@ -9,17 +9,18 @@ package dev.cursedmc.wij.api.generator
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
+import dev.cursedmc.wij.impl.WorldInAJar
 import net.minecraft.block.Blocks
+import net.minecraft.registry.RegistryKeys
+import net.minecraft.registry.VanillaDynamicRegistries
 import net.minecraft.structure.StructureManager
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.registry.Registry
-import net.minecraft.util.registry.RegistryOps
 import net.minecraft.world.ChunkRegion
 import net.minecraft.world.HeightLimitView
 import net.minecraft.world.Heightmap
-import net.minecraft.world.biome.Biome
-import net.minecraft.world.biome.BiomeKeys
+import net.minecraft.world.biome.Biomes
 import net.minecraft.world.biome.source.BiomeAccess
+import net.minecraft.world.biome.source.BiomeSource
 import net.minecraft.world.biome.source.FixedBiomeSource
 import net.minecraft.world.chunk.Chunk
 import net.minecraft.world.gen.GenerationStep
@@ -27,13 +28,16 @@ import net.minecraft.world.gen.RandomState
 import net.minecraft.world.gen.chunk.Blender
 import net.minecraft.world.gen.chunk.ChunkGenerator
 import net.minecraft.world.gen.chunk.VerticalBlockSample
-import net.minecraft.world.gen.structure.StructureSet
-import java.util.*
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
 
-class VoidChunkGenerator(registry: Registry<StructureSet?>?, private val biomeRegistry: Registry<Biome>) :
-	ChunkGenerator(registry, Optional.empty(), FixedBiomeSource(biomeRegistry.getOrCreateHolder(BiomeKeys.PLAINS).get().orThrow())) {
+private val THING = FixedBiomeSource(VanillaDynamicRegistries.createLookup().getLookupOrThrow(RegistryKeys.BIOME).getHolderOrThrow(Biomes.PLAINS))
+
+class VoidChunkGenerator(thing: BiomeSource) :
+	ChunkGenerator(thing) {
+	constructor() : this(THING) {
+		WorldInAJar.LOGGER.info("${THING.biomes.elementAt(0).key.get()}")
+	}
 	
 	override fun getCodec(): Codec<out ChunkGenerator> {
 		return CODEC
@@ -108,15 +112,13 @@ class VoidChunkGenerator(registry: Registry<StructureSet?>?, private val biomeRe
 		return VerticalBlockSample(0, arrayOfNulls(0))
 	}
 	
-	override fun m_hfetlfug(list: MutableList<String>?, randomState: RandomState?, pos: BlockPos?) {
+	override fun method_40450(list: MutableList<String>?, randomState: RandomState?, pos: BlockPos?) {
 	}
 	
 	companion object {
 		@JvmField
 		val CODEC: Codec<VoidChunkGenerator> = RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<VoidChunkGenerator> ->
-			return@create method_41042(instance)
-				.and(RegistryOps.getRegistry(Registry.BIOME_KEY).forGetter(VoidChunkGenerator::biomeRegistry))
-				.apply(instance, ::VoidChunkGenerator)
+			return@create instance.stable(VoidChunkGenerator())
 		}
 	}
 }
