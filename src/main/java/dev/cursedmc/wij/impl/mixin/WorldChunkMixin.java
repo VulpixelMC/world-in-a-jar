@@ -7,11 +7,11 @@
  */
 package dev.cursedmc.wij.impl.mixin;
 
-import dev.cursedmc.wij.api.block.Blocks;
-import dev.cursedmc.wij.api.block.entity.WorldJarBlockEntity;
-import dev.cursedmc.wij.api.dimension.DimensionTypes;
-import dev.cursedmc.wij.api.network.s2c.JarWorldBlockUpdateS2CPacket;
-import dev.cursedmc.wij.api.network.s2c.S2CPackets;
+import dev.cursedmc.wij.block.Blocks;
+import dev.cursedmc.wij.block.entity.WorldJarBlockEntity;
+import dev.cursedmc.wij.dimension.DimensionTypes;
+import dev.cursedmc.wij.network.s2c.JarWorldBlockUpdateS2CPacket;
+import dev.cursedmc.wij.network.s2c.S2CPackets;
 import net.minecraft.block.BlockState;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
@@ -44,7 +44,7 @@ public abstract class WorldChunkMixin extends Chunk {
 	}
 	
 	/**
-	 * Send a {@link dev.cursedmc.wij.api.network.s2c.JarWorldBlockUpdateS2CPacket} to clients tracking any {@link dev.cursedmc.wij.api.block.entity.WorldJarBlockEntity}s.
+	 * Send a {@link JarWorldBlockUpdateS2CPacket} to clients tracking any {@link WorldJarBlockEntity}s.
 	 */
 	@Inject(method = "setBlockState", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/BlockPos;getX()I"), cancellable = true)
 	private void updateWorldJar(BlockPos pos, BlockState state, boolean moved, CallbackInfoReturnable<BlockState> cir) {

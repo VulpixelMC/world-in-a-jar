@@ -7,7 +7,7 @@
  */
 package dev.cursedmc.wij.impl.plugin.wthit.component.block
 
-import dev.cursedmc.wij.api.block.entity.WorldJarBlockEntity
+import dev.cursedmc.wij.block.entity.WorldJarBlockEntity
 import mcp.mobius.waila.api.IBlockAccessor
 import mcp.mobius.waila.api.IBlockComponentProvider
 import mcp.mobius.waila.api.IPluginConfig

@@ -10,7 +10,7 @@ package dev.cursedmc.wij.impl.server
 import dev.cursedmc.wij.api.Initializable
 import dev.cursedmc.wij.impl.duck.PlayerWithReturnDim
 import dev.cursedmc.wij.impl.duck.PlayerWithReturnPos
-import dev.cursedmc.wij.api.dimension.DimensionTypes
+import dev.cursedmc.wij.dimension.DimensionTypes
 import dev.cursedmc.wij.impl.WIJConstants.MOD_ID
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity

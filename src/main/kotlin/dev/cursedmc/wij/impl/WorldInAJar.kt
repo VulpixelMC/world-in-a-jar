@@ -7,19 +7,16 @@
  */
 package dev.cursedmc.wij.impl
 
-import dev.cursedmc.wij.api.block.Blocks
-import dev.cursedmc.wij.api.block.entity.BlockEntityTypes
-import dev.cursedmc.wij.api.dimension.DimensionTypes
-import dev.cursedmc.wij.api.generator.VoidChunkGenerator
-import dev.cursedmc.wij.api.item.group.ItemGroups
-import dev.cursedmc.wij.api.network.c2s.C2SPackets
-import dev.cursedmc.wij.api.network.s2c.S2CPackets
+import dev.cursedmc.wij.block.Blocks
+import dev.cursedmc.wij.block.entity.BlockEntityTypes
+import dev.cursedmc.wij.dimension.DimensionTypes
+import dev.cursedmc.wij.generator.VoidChunkGenerator
+import dev.cursedmc.wij.item.group.ItemGroups
+import dev.cursedmc.wij.network.c2s.C2SPackets
 import dev.cursedmc.wij.impl.WIJConstants.id
 import dev.cursedmc.wij.impl.server.WorldInAJarServer
 import net.minecraft.registry.Registries
-import net.minecraft.util.Identifier
 import net.minecraft.registry.Registry
-import net.minecraft.registry.RegistryKey
 import org.quiltmc.loader.api.ModContainer
 import org.quiltmc.loader.api.QuiltLoader
 import org.quiltmc.qsl.base.api.entrypoint.ModInitializer

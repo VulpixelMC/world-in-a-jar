@@ -7,9 +7,9 @@
  */
 package dev.cursedmc.wij.impl.client
 
-import dev.cursedmc.wij.api.block.Blocks
-import dev.cursedmc.wij.api.block.entity.render.BlockEntityRenderers
-import dev.cursedmc.wij.api.network.s2c.S2CPackets
+import dev.cursedmc.wij.block.Blocks
+import dev.cursedmc.wij.block.entity.render.BlockEntityRenderers
+import dev.cursedmc.wij.network.s2c.S2CPackets
 import net.minecraft.client.render.RenderLayer
 import org.quiltmc.loader.api.ModContainer
 import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer
