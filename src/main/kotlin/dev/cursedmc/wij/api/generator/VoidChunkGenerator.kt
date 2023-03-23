@@ -9,18 +9,18 @@ package dev.cursedmc.wij.api.generator
 
 import com.mojang.serialization.Codec
 import com.mojang.serialization.codecs.RecordCodecBuilder
-import dev.cursedmc.wij.impl.WorldInAJar
 import net.minecraft.block.Blocks
-import net.minecraft.registry.RegistryKeys
-import net.minecraft.registry.VanillaDynamicRegistries
+import net.minecraft.registry.Holder
+import net.minecraft.registry.RegistryKey
+import net.minecraft.registry.RegistryOps
 import net.minecraft.structure.StructureManager
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.ChunkRegion
 import net.minecraft.world.HeightLimitView
 import net.minecraft.world.Heightmap
+import net.minecraft.world.biome.Biome
 import net.minecraft.world.biome.Biomes
 import net.minecraft.world.biome.source.BiomeAccess
-import net.minecraft.world.biome.source.BiomeSource
 import net.minecraft.world.biome.source.FixedBiomeSource
 import net.minecraft.world.chunk.Chunk
 import net.minecraft.world.gen.GenerationStep
@@ -30,15 +30,10 @@ import net.minecraft.world.gen.chunk.ChunkGenerator
 import net.minecraft.world.gen.chunk.VerticalBlockSample
 import java.util.concurrent.CompletableFuture
 import java.util.concurrent.Executor
+import java.util.function.Function
 
-private val THING = FixedBiomeSource(VanillaDynamicRegistries.createLookup().getLookupOrThrow(RegistryKeys.BIOME).getHolderOrThrow(Biomes.PLAINS))
-
-class VoidChunkGenerator(thing: BiomeSource) :
-	ChunkGenerator(thing) {
-	constructor() : this(THING) {
-		WorldInAJar.LOGGER.info("${THING.biomes.elementAt(0).key.get()}")
-	}
-	
+class VoidChunkGenerator(biome: Holder.Reference<Biome>) :
+	ChunkGenerator(FixedBiomeSource(biome)) {
 	override fun getCodec(): Codec<out ChunkGenerator> {
 		return CODEC
 	}
@@ -118,7 +113,16 @@ class VoidChunkGenerator(thing: BiomeSource) :
 	companion object {
 		@JvmField
 		val CODEC: Codec<VoidChunkGenerator> = RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<VoidChunkGenerator> ->
-			return@create instance.stable(VoidChunkGenerator())
+			instance.group(RegistryOps.retrieveElement(BIOME)).apply(
+				instance, instance.stable(
+					Function { reference: Holder.Reference<Biome> ->
+						VoidChunkGenerator(
+							reference
+						)
+					})
+			)
 		}
+		
+		private val BIOME: RegistryKey<Biome> = Biomes.THE_VOID
 	}
 }
