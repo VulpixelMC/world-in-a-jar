@@ -1,3 +1,8 @@
+![Modrinth Downloads](https://img.shields.io/modrinth/dt/worldinajar)
+![Modrinth Followers](https://img.shields.io/modrinth/followers/worldinajar)
+![Modrinth Game Versions](https://img.shields.io/modrinth/game-versions/worldinajar)
+![Modrinth Version](https://img.shields.io/modrinth/v/worldinajar)
+
 ever wanted to stuff an entire world in a jar? no? too bad! this mod squeezes entire worlds into jars for your enjoyment. play god or go home.
 <br><br>
 You can put blocks in a jar block** with up to infinite* room! All of your storage issues are solved!<br>
