@@ -13,7 +13,7 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.gen.Accessor;
 
 @Mixin(IdCountsState.class)
-public interface IdCountsStateAccessor {
+public interface Accessor_IdCountsState {
 	@Accessor
 	Object2IntMap<String> getIdCounts();
 }

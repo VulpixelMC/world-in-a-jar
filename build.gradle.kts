@@ -1,7 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import com.hierynomus.gradle.license.tasks.LicenseCheck
-import com.hierynomus.gradle.license.tasks.LicenseFormat
 import nl.javadude.gradle.plugins.license.License
 
 plugins {
@@ -89,14 +87,14 @@ dependencies {
 		exclude(group = "org.quiltmc.qsl.entity")
 	}
 	
-	modImplementationInclude(libs.core.qsl.base)
-	modImplementationInclude(libs.core.networking)
+	modImplementation(libs.core.qsl.base)
+	modImplementation(libs.core.networking)
 	
-	modImplementationInclude(libs.block.entity)
-	modImplementationInclude(libs.block.extensions)
+	modImplementation(libs.block.entity)
+	modImplementation(libs.block.extensions)
 	
-	modImplementationInclude(libs.item.content.registry)
-	modImplementationInclude(libs.item.setting)
+	modImplementation(libs.item.content.registry)
+	modImplementation(libs.item.setting)
 	
 //	implementation(include("net.auoeke", "reflect", "5.+"))
 //	implementation(include("net.gudenau.lib", "unsafe", "latest.release"))
@@ -111,14 +109,9 @@ dependencies {
 	modImplementation(libs.quilted.fabric.api)
 	// modImplementation libs.bundles.quilted.fabric.api // If you wish to use Fabric API's deprecated modules, you can replace the above line with this one
 	
-	modCompileOnly("mcp.mobius.waila:wthit-api:quilt-7.1.1")
+	modCompileOnly("mcp.mobius.waila:wthit-api:quilt-8.1.1")
 	
-	modRuntimeOnly("com.terraformersmc", "modmenu", "6.1.0-rc.4")
-	
-//	modRuntimeOnly(libs.quilted.fabric.api)
-	
-	add(sourceSets.main.get().getTaskName("mod", JavaPlugin.IMPLEMENTATION_CONFIGURATION_NAME), modImplementationInclude)
-	add(net.fabricmc.loom.util.Constants.Configurations.INCLUDE, modImplementationInclude)
+	modRuntimeOnly("com.terraformersmc", "modmenu", "7.1.0")
 }
 
 tasks.processResources {

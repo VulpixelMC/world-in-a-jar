@@ -15,7 +15,6 @@ import net.minecraft.nbt.NbtCompound;
 import net.minecraft.registry.RegistryKeys;
 import net.minecraft.util.Identifier;
 import net.minecraft.util.math.Vec3d;
-import net.minecraft.registry.Registry;
 import net.minecraft.registry.RegistryKey;
 import net.minecraft.world.World;
 import org.spongepowered.asm.mixin.Mixin;
@@ -24,12 +23,12 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 @Mixin(value = PlayerEntity.class, priority = 1100)
-public abstract class PlayerEntityMixin extends LivingEntity implements PlayerWithReturnPos, PlayerWithReturnDim {
+public abstract class Mixin_PlayerEntity extends LivingEntity implements PlayerWithReturnPos, PlayerWithReturnDim {
 	private RegistryKey<World> worldinajar$returnDim;
 	private Vec3d worldinajar$returnPos;
 	
 	@SuppressWarnings("ConstantConditions")
-	private PlayerEntityMixin() {
+	private Mixin_PlayerEntity() {
 		super(null, null);
 	}
 	

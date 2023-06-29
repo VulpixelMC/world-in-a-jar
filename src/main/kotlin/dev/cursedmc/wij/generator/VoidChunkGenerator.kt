@@ -111,6 +111,8 @@ class VoidChunkGenerator(biome: Holder.Reference<Biome>) :
 	}
 	
 	companion object {
+		private val BIOME: RegistryKey<Biome> = Biomes.THE_VOID
+		
 		@JvmField
 		val CODEC: Codec<VoidChunkGenerator> = RecordCodecBuilder.create { instance: RecordCodecBuilder.Instance<VoidChunkGenerator> ->
 			instance.group(RegistryOps.retrieveElement(BIOME)).apply(
@@ -122,7 +124,5 @@ class VoidChunkGenerator(biome: Holder.Reference<Biome>) :
 					})
 			)
 		}
-		
-		private val BIOME: RegistryKey<Biome> = Biomes.THE_VOID
 	}
 }

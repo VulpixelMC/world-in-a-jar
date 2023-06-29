@@ -14,6 +14,7 @@ import dev.cursedmc.wij.network.c2s.WorldJarLoadedC2SPacket
 import dev.cursedmc.wij.network.c2s.WorldJarUpdateC2SPacket
 import dev.cursedmc.wij.impl.WIJConstants.MOD_ID
 import net.minecraft.client.MinecraftClient
+import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screen.Screen
 import net.minecraft.client.gui.widget.ButtonWidget
 import net.minecraft.client.gui.widget.TextFieldWidget
@@ -98,15 +99,15 @@ open class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, private var blo
 		ClientPlayNetworking.send(C2SPackets.WORLD_JAR_ENTER, buf)
 	}
 	
-	override fun render(matrices: MatrixStack, mouseX: Int, mouseY: Int, delta: Float) {
-		this.renderBackground(matrices)
+	override fun render(graphics: GuiGraphics, mouseX: Int, mouseY: Int, delta: Float) {
+		this.renderBackground(graphics)
 		
-		this.inputX.render(matrices, mouseX, mouseY, delta)
-		this.inputY.render(matrices, mouseX, mouseY, delta)
-		this.inputZ.render(matrices, mouseX, mouseY, delta)
-		this.inputScale.render(matrices, mouseX, mouseY, delta)
+		this.inputX.render(graphics, mouseX, mouseY, delta)
+		this.inputY.render(graphics, mouseX, mouseY, delta)
+		this.inputZ.render(graphics, mouseX, mouseY, delta)
+		this.inputScale.render(graphics, mouseX, mouseY, delta)
 		
-		super.render(matrices, mouseX, mouseY, delta)
+		super.render(graphics, mouseX, mouseY, delta)
 	}
 
 	override fun tick() {

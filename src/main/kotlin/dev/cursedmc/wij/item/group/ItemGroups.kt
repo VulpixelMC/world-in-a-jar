@@ -9,13 +9,16 @@ package dev.cursedmc.wij.item.group
 
 import dev.cursedmc.wij.api.Initializable
 import dev.cursedmc.wij.block.Blocks
+import dev.cursedmc.wij.impl.WIJConstants.MOD_ID
 import dev.cursedmc.wij.impl.WIJConstants.id
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.minecraft.item.ItemGroup
 import net.minecraft.item.ItemStack
+import net.minecraft.text.Text
 
 object ItemGroups : Initializable {
-	val WORLD_JAR: ItemGroup = FabricItemGroup.builder(id("world_jar"))
+	val WORLD_JAR: ItemGroup = FabricItemGroup.builder()
+		.name(Text.translatable("itemGroup.${MOD_ID}.world_jar"))
 		.icon { return@icon ItemStack(Blocks.WORLD_JAR_ITEM) }
 		.entries { _, collector ->
 			collector.addItem(Blocks.WORLD_JAR_ITEM)

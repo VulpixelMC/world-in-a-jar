@@ -30,7 +30,7 @@ import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @Mixin(WorldChunk.class)
-public abstract class WorldChunkMixin extends Chunk {
+public abstract class Mixin_WorldChunk extends Chunk {
 	@Shadow
 	@Final
 	World world;
@@ -39,7 +39,7 @@ public abstract class WorldChunkMixin extends Chunk {
 	public abstract BlockState getBlockState(BlockPos pos);
 	
 	@SuppressWarnings("ConstantConditions")
-	private WorldChunkMixin() {
+	private Mixin_WorldChunk() {
 		super(null, null, null, null, 0, null, null);
 	}
 	

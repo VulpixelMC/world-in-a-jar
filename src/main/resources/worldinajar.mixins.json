@@ -4,9 +4,9 @@
 	"package": "dev.cursedmc.wij.impl.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"IdCountsStateAccessor",
-		"PlayerEntityMixin",
-		"WorldChunkMixin"
+		"Accessor_IdCountsState",
+		"Mixin_PlayerEntity",
+		"Mixin_WorldChunk"
 	],
 	"injectors": {
 		"defaultRequire": 1

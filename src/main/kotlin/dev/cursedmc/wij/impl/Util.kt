@@ -7,8 +7,7 @@
  */
 package dev.cursedmc.wij.impl
 
-import dev.cursedmc.wij.impl.mixin.IdCountsStateAccessor
-import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap
+import dev.cursedmc.wij.impl.mixin.Accessor_IdCountsState
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
@@ -45,7 +44,7 @@ fun Long2ObjectMap<BlockState>.toPalettedContainer(): PalettedContainer<BlockSta
 
 fun nextJarId(world: World): Int {
 	val idCounts = world.server?.overworld?.persistentStateManager?.getOrCreate(IdCountsState::fromNbt, ::IdCountsState, "idcounts")!!
-	idCounts as IdCountsStateAccessor
+	idCounts as Accessor_IdCountsState
 	val id = idCounts.idCounts.getInt("jar") + 1
 	idCounts.idCounts["jar"] = id
 	idCounts.markDirty()

@@ -12,7 +12,6 @@ import dev.cursedmc.wij.block.item.WorldJarBlockItem
 import dev.cursedmc.wij.impl.WIJConstants.id
 import net.minecraft.block.Block
 import net.minecraft.block.Blocks
-import net.minecraft.block.Material
 import net.minecraft.item.BlockItem
 import net.minecraft.registry.Registries
 import net.minecraft.sound.BlockSoundGroup
@@ -50,7 +49,8 @@ object Blocks : Initializable {
 		id("sussystone"),
 		Block(
 			QuiltBlockSettings
-				.of(Material.STONE)
+				.create()
+				.sounds(BlockSoundGroup.STONE)
 				.requiresTool()
 				.strength(2.0F, 6.0F)
 				.sounds(BlockSoundGroup.STONE),
