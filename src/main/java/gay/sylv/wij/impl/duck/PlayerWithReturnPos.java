@@ -5,11 +5,15 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Commons Protection License for more details.
  */
+package gay.sylv.wij.impl.duck;
+
+import net.minecraft.util.math.Vec3d;
+
+// todo create api
 /**
- * The API for interfacing with World In A Jar.
- * @since 0.1.0
- * @deprecated Moved to gay.sylv.wij.api
- * @see gay.sylv.wij.api
+ * Holds a return position. A mixin implements this interface on all {@link net.minecraft.entity.player.PlayerEntity}s.
  */
-@Deprecated
-package dev.cursedmc.wij.api;
+public interface PlayerWithReturnPos {
+	Vec3d worldinajar$getReturnPos();
+	void worldinajar$setReturnPos(Vec3d returnPos);
+}

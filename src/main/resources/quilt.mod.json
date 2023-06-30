@@ -19,9 +19,9 @@
 		},
 		"intermediate_mappings": "net.fabricmc:intermediary",
 		"entrypoints": {
-			"init": "dev.cursedmc.wij.impl.WorldInAJar",
-			"client_init": "dev.cursedmc.wij.impl.client.WorldInAJarClient",
-			"server_init": "dev.cursedmc.wij.impl.server.dedicated.WorldInAJarDedicatedServer"
+			"init": "gay.sylv.wij.impl.WorldInAJar",
+			"client_init": "gay.sylv.wij.impl.client.WorldInAJarClient",
+			"server_init": "gay.sylv.wij.impl.server.dedicated.WorldInAJarDedicatedServer"
 		},
 		"depends": [
 			{
@@ -45,6 +45,6 @@
 	"mixin": "worldinajar.mixins.json",
 	"waila:plugins": {
 		"id": "worldinajar:wij_waila",
-		"initializer": "dev.cursedmc.wij.impl.plugin.wthit.WorldInAJarWailaPlugin"
+		"initializer": "gay.sylv.wij.impl.plugin.wthit.WorldInAJarWailaPlugin"
 	}
 }

@@ -5,11 +5,10 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Commons Protection License for more details.
  */
-/**
- * The API for interfacing with World In A Jar.
- * @since 0.1.0
- * @deprecated Moved to gay.sylv.wij.api
- * @see gay.sylv.wij.api
- */
-@Deprecated
-package dev.cursedmc.wij.api;
+package gay.sylv.wij.impl
+
+import net.minecraft.client.util.math.MatrixStack
+
+fun MatrixStack.scale(scale: Float) {
+	this.scale(scale, scale, scale)
+}

@@ -7,6 +7,10 @@
  */
 package dev.cursedmc.wij.api
 
+/**
+ * @see gay.sylv.wij.api.Initializable
+ */
+@Deprecated(message = "Moved to gay.sylv.wij.api", level = DeprecationLevel.ERROR)
 interface Initializable {
 	fun initialize() {}
 }

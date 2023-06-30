@@ -5,15 +5,23 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Commons Protection License for more details.
  */
-package dev.cursedmc.wij.api
+package gay.sylv.wij.impl.network.s2c
 
+import net.minecraft.network.PacketByteBuf
+import net.minecraft.network.listener.ClientPlayPacketListener
+import net.minecraft.network.packet.Packet
 import net.minecraft.util.math.BlockPos
 
 /**
- * Checks if this object has the specified [net.minecraft.util.math.BlockPos].
- * @see gay.sylv.wij.api.BlockPosChecker
+ * Signals that the jar has loaded and sends its location.
  */
-@Deprecated(message = "Moved to gay.sylv.wij.api", level = DeprecationLevel.ERROR)
-interface BlockPosChecker {
-	fun hasBlockPos(pos: BlockPos): Boolean
+class WorldJarLoadedS2CPacket(val pos: BlockPos) : Packet<ClientPlayPacketListener> {
+	constructor(buf: PacketByteBuf) : this(buf.readBlockPos())
+	
+	override fun write(buf: PacketByteBuf) {
+		buf.writeBlockPos(pos)
+	}
+	
+	override fun apply(listener: ClientPlayPacketListener) {
+	}
 }

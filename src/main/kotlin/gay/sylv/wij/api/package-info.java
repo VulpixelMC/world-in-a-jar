@@ -8,8 +8,5 @@
 /**
  * The API for interfacing with World In A Jar.
  * @since 0.1.0
- * @deprecated Moved to gay.sylv.wij.api
- * @see gay.sylv.wij.api
  */
-@Deprecated
-package dev.cursedmc.wij.api;
+package gay.sylv.wij.api;

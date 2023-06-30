@@ -5,15 +5,20 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Commons Protection License for more details.
  */
-package dev.cursedmc.wij.api
+package gay.sylv.wij.impl.network.c2s
 
+import net.minecraft.network.PacketByteBuf
+import net.minecraft.network.listener.ServerPlayPacketListener
+import net.minecraft.network.packet.Packet
 import net.minecraft.util.math.BlockPos
 
-/**
- * Checks if this object has the specified [net.minecraft.util.math.BlockPos].
- * @see gay.sylv.wij.api.BlockPosChecker
- */
-@Deprecated(message = "Moved to gay.sylv.wij.api", level = DeprecationLevel.ERROR)
-interface BlockPosChecker {
-	fun hasBlockPos(pos: BlockPos): Boolean
+class WorldJarEnterC2SPacket(val pos: BlockPos) : Packet<ServerPlayPacketListener> {
+	constructor(buf: PacketByteBuf) : this(buf.readBlockPos())
+	
+	override fun write(buf: PacketByteBuf) {
+		buf.writeBlockPos(pos)
+	}
+	
+	override fun apply(listener: ServerPlayPacketListener) {
+	}
 }

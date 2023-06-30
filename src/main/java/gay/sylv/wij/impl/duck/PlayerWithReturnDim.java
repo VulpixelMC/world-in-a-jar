@@ -5,11 +5,16 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Commons Protection License for more details.
  */
+package gay.sylv.wij.impl.duck;
+
+import net.minecraft.registry.RegistryKey;
+import net.minecraft.world.World;
+
+// todo create api
 /**
- * The API for interfacing with World In A Jar.
- * @since 0.1.0
- * @deprecated Moved to gay.sylv.wij.api
- * @see gay.sylv.wij.api
+ * Holds a return dimension ({@link RegistryKey}<{@link World}>). A mixin implements this class on every {@link net.minecraft.entity.player.PlayerEntity}.
  */
-@Deprecated
-package dev.cursedmc.wij.api;
+public interface PlayerWithReturnDim {
+	RegistryKey<World> worldinajar$getReturnDim();
+	void worldinajar$setReturnDim(RegistryKey<World> returnDim);
+}

@@ -5,11 +5,13 @@
  *
  * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Commons Protection License for more details.
  */
+package gay.sylv.wij.api
+
+import net.minecraft.util.math.BlockPos
+
 /**
- * The API for interfacing with World In A Jar.
- * @since 0.1.0
- * @deprecated Moved to gay.sylv.wij.api
- * @see gay.sylv.wij.api
+ * Checks if this object has the specified [net.minecraft.util.math.BlockPos].
  */
-@Deprecated
-package dev.cursedmc.wij.api;
+interface BlockPosChecker {
+	fun hasBlockPos(pos: BlockPos): Boolean
+}

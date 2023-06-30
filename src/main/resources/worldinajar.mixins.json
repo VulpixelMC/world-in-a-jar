@@ -1,12 +1,11 @@
 {
 	"required": true,
 	"minVersion": "0.8",
-	"package": "dev.cursedmc.wij.impl.mixin",
+	"package": "gay.sylv.wij.impl.mixin",
 	"compatibilityLevel": "JAVA_17",
 	"mixins": [
-		"Accessor_IdCountsState",
-		"Mixin_PlayerEntity",
-		"Mixin_WorldChunk"
+	  "Mixin_PlayerEntity",
+	  "Mixin_WorldChunk"
 	],
 	"injectors": {
 		"defaultRequire": 1
