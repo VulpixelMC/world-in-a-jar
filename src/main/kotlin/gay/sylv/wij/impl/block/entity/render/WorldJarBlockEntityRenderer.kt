@@ -7,15 +7,24 @@
  */
 package gay.sylv.wij.impl.block.entity.render
 
+import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.BufferBuilder
+import com.mojang.blaze3d.vertex.VertexBuffer
+import com.mojang.blaze3d.vertex.VertexFormat
+import com.mojang.blaze3d.vertex.VertexFormats
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import gay.sylv.wij.impl.scale
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import net.minecraft.client.render.RenderLayer
+import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.block.entity.BlockEntityRenderer
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
 import net.minecraft.client.util.math.MatrixStack
-import net.minecraft.util.math.BlockPos
 
 class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Context) : BlockEntityRenderer<WorldJarBlockEntity> {
+	private val subChunks: ObjectArrayList<SubChunk> = ObjectArrayList()
+	
 	override fun render(
 		entity: WorldJarBlockEntity,
 		tickDelta: Float,
@@ -24,33 +33,19 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		light: Int,
 		overlay: Int
 	) {
-		val max = entity.magnitude - 1
+		matrices.scale(entity.scale - 0.001f) // scale + prevent z-fighting
 		
-		matrices.scale(entity.scale)
-		
-		// THE MODFEST IS IN 3 MINUTES HELP WHY WON'T IT UPLOAD PLEASE
-		
-		for (x in 0..max) {
-			for (y in 1..max) {
-				for (z in 0..max) {
-					matrices.push()
-					
-					if (x == 0) matrices.translate(0.001, 0.0, 0.0) else if (x == max) matrices.translate(-0.001, 0.0 ,0.0)
-					if (y == max - 1) matrices.translate(0.0, -0.001, 0.0)
-					if (z == 0) matrices.translate(0.0, 0.0, 0.001) else if (z == max) matrices.translate(0.0, 0.0, -0.001)
-					
-					matrices.translate(x.toDouble(), y.toDouble(), z.toDouble())
-					
-					val pos = BlockPos(x, y, z)
-					val state = entity.blockStates[pos.asLong()]
-					
-					if (state != null) {
-						ctx.renderManager.renderBlockAsEntity(state, matrices, vertexConsumers, light, overlay)
-					}
-					
-					matrices.pop()
-				}
+		subChunks.forEach {
+			chunk ->
+			if (entity.statesChanged) {
+				entity.statesChanged = false
+				
+				chunk.bufferBuilders.get(RenderLayer.getSolid()).begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_TEXTURE)
 			}
+			
+			chunk.vertices.bind()
+			chunk.vertices.upload(chunk.bufferBuilders.get(RenderLayer.getSolid()).end())
+			VertexBuffer.unbind()
 		}
 	}
 }

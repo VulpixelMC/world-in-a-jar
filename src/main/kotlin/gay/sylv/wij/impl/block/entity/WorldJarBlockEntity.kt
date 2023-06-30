@@ -24,6 +24,7 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
+import org.quiltmc.loader.api.minecraft.ClientOnly
 import org.quiltmc.qkl.library.networking.playersTracking
 import org.quiltmc.qsl.block.entity.api.QuiltBlockEntity
 import org.quiltmc.qsl.networking.api.PacketByteBufs
@@ -43,7 +44,14 @@ class WorldJarBlockEntity(
 	val scale: Float
 		get() = 1.0f / magnitude
 	var subPos: BlockPos = BlockPos(0, -64, 0)
-	internal var blockStates: Long2ObjectMap<BlockState> = Long2ObjectArrayMap()
+	internal var blockStates: Long2ObjectMap<BlockState> = Long2ObjectArrayMap() // TODO: optimize
+	
+	/**
+	 * If the [BlockState]s in the jar have changed.
+	 * This is used in rendering to determine whether we need to rebuild the VBOs.
+	 */
+	@ClientOnly
+	internal var statesChanged = true
 	
 	fun updateBlockStates(server: MinecraftServer) {
 		val world = server.getWorld(DimensionTypes.WORLD_JAR_WORLD)!!
