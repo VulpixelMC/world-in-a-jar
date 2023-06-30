@@ -7,12 +7,12 @@
  */
 package gay.sylv.wij.impl.network.c2s
 
-import gay.sylv.wij.block.entity.BlockEntityTypes
-import gay.sylv.wij.dimension.DimensionTypes
+import gay.sylv.wij.impl.block.entity.BlockEntityTypes
+import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.WIJConstants.id
 import gay.sylv.wij.impl.toPalettedContainer
-import gay.sylv.wij.network.s2c.JarWorldChunkUpdateS2CPacket
-import gay.sylv.wij.network.s2c.S2CPackets
+import gay.sylv.wij.impl.network.s2c.JarWorldChunkUpdateS2CPacket
+import gay.sylv.wij.impl.network.s2c.S2CPackets
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.TeleportTarget
