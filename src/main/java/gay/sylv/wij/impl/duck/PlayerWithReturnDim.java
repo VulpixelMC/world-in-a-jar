@@ -14,6 +14,7 @@ import net.minecraft.world.World;
 /**
  * Holds a return dimension ({@link RegistryKey}<{@link World}>). A mixin implements this class on every {@link net.minecraft.entity.player.PlayerEntity}.
  */
+@SuppressWarnings("unused")
 public interface PlayerWithReturnDim {
 	RegistryKey<World> worldinajar$getReturnDim();
 	void worldinajar$setReturnDim(RegistryKey<World> returnDim);
