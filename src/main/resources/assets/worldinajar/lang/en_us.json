@@ -2,7 +2,7 @@
 	"${id}": "${id}",
 	"block.${id}.world_jar": "World Jar",
 	"block.${id}.sussystone": "Sussystone",
-	"itemGroup.${id}.world_jar": "World In A Jar",
+	"${id}.world_jar_group": "World In A Jar",
 	"command.${id}.exit.error.source": "This command must be run by a player!",
 	"command.${id}.exit.error.dimension": "This command must be run inside of a World Jar!",
 	"${id}.world_jar.screen": "World Jar",

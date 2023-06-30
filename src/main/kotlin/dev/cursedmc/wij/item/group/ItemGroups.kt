@@ -14,15 +14,21 @@ import dev.cursedmc.wij.impl.WIJConstants.id
 import net.fabricmc.fabric.api.itemgroup.v1.FabricItemGroup
 import net.minecraft.item.ItemGroup
 import net.minecraft.item.ItemStack
+import net.minecraft.registry.Registries
+import net.minecraft.registry.Registry
 import net.minecraft.text.Text
 
 object ItemGroups : Initializable {
 	val WORLD_JAR: ItemGroup = FabricItemGroup.builder()
-		.name(Text.translatable("itemGroup.${MOD_ID}.world_jar"))
+		.name(Text.translatable("${MOD_ID}.world_jar_group"))
 		.icon { return@icon ItemStack(Blocks.WORLD_JAR_ITEM) }
 		.entries { _, collector ->
 			collector.addItem(Blocks.WORLD_JAR_ITEM)
 			collector.addItem(Blocks.SUSSYSTONE_ITEM)
 		}
 		.build()
+	
+	override fun initialize() {
+		Registry.register(Registries.ITEM_GROUP, id("world_jar"), WORLD_JAR)
+	}
 }
