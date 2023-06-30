@@ -7,11 +7,11 @@
  */
 package gay.sylv.wij.impl.mixin;
 
-import gay.sylv.wij.block.Blocks;
-import gay.sylv.wij.block.entity.WorldJarBlockEntity;
-import gay.sylv.wij.dimension.DimensionTypes;
-import gay.sylv.wij.network.s2c.JarWorldBlockUpdateS2CPacket;
-import gay.sylv.wij.network.s2c.S2CPackets;
+import gay.sylv.wij.impl.block.Blocks;
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
+import gay.sylv.wij.impl.dimension.DimensionTypes;
+import gay.sylv.wij.impl.network.s2c.JarWorldBlockUpdateS2CPacket;
+import gay.sylv.wij.impl.network.s2c.S2CPackets;
 import net.minecraft.block.BlockState;
 import net.minecraft.network.PacketByteBuf;
 import net.minecraft.server.network.ServerPlayerEntity;
