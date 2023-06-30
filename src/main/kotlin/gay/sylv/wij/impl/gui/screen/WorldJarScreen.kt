@@ -23,15 +23,15 @@ import net.minecraft.util.math.BlockPos
 import org.quiltmc.qsl.networking.api.PacketByteBufs
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
 
-class WorldJarScreen<BE : WorldJarBlockEntity>(text: Text?, private var blockEntity: BE) : Screen(text) {
-	protected open lateinit var inputX: TextFieldWidget
-	protected open lateinit var inputY: TextFieldWidget
-	protected open lateinit var inputZ: TextFieldWidget
-	protected open lateinit var inputScale: TextFieldWidget
-	protected open lateinit var applyButton: ButtonWidget
-	protected open lateinit var enterButton: ButtonWidget
+class WorldJarScreen(text: Text?, private var blockEntity: WorldJarBlockEntity) : Screen(text) {
+	private lateinit var inputX: TextFieldWidget
+	private lateinit var inputY: TextFieldWidget
+	private lateinit var inputZ: TextFieldWidget
+	private lateinit var inputScale: TextFieldWidget
+	private lateinit var applyButton: ButtonWidget
+	private lateinit var enterButton: ButtonWidget
 	
-	constructor(blockEntity: BE) : this(SCREEN_TEXT, blockEntity)
+	constructor(blockEntity: WorldJarBlockEntity) : this(SCREEN_TEXT, blockEntity)
 	
 	override fun init() {
 		this.inputX = TextFieldWidget(this.textRenderer, this.width / 2 - 88, 80, INPUT_WIDTH, INPUT_HEIGHT, X_POS_TEXT)

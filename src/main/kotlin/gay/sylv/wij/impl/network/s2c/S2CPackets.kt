@@ -18,6 +18,7 @@ import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
 
 object S2CPackets : gay.sylv.wij.api.Initializable {
 	internal val JAR_WORLD_BLOCK_UPDATE = id("jar_world_block_update")
+	@Suppress("MemberVisibilityCanBePrivate")
 	internal val JAR_WORLD_CHUNK_UPDATE = id("jar_world_chunk_update")
 	internal val WORLD_JAR_LOADED = id("world_jar_loaded")
 	

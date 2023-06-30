@@ -7,7 +7,6 @@
  */
 package gay.sylv.wij.impl.block.entity
 
-import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.network.c2s.WorldJarLoadedC2SPacket
 import gay.sylv.wij.impl.network.s2c.S2CPackets
@@ -21,7 +20,6 @@ import net.minecraft.nbt.NbtCompound
 import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.network.packet.Packet
 import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket
-import net.minecraft.server.MinecraftServer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
 import org.quiltmc.qkl.library.networking.playersTracking
@@ -45,20 +43,6 @@ class WorldJarBlockEntity(
 	var subPos: BlockPos = BlockPos(0, -64, 0)
 	internal var blockStates: Long2ObjectMap<BlockState> = Long2ObjectArrayMap()
 	
-	fun updateBlockStates(server: MinecraftServer) {
-		val world = server.getWorld(DimensionTypes.WORLD_JAR_WORLD)!!
-		val max = magnitude - 1
-		for (x in 0..max) {
-			for (y in 1..max) {
-				for (z in 0..max) {
-					val pos = BlockPos(x, y, z)
-					val state = world.getBlockState(pos.add(this.subPos))
-					blockStates[pos.asLong()] = state
-				}
-			}
-		}
-	}
-	
 	override fun hasBlockPos(pos: BlockPos): Boolean {
 		return pos.isWithinDistance(this.pos, magnitude.toDouble())
 	}
@@ -73,7 +57,7 @@ class WorldJarBlockEntity(
 			val packet = WorldJarLoadedS2CPacket(pos)
 			packet.write(buf)
 			ServerPlayNetworking.send(playersTracking, S2CPackets.WORLD_JAR_LOADED, buf)
-		} else if (MinecraftClient.getInstance().player?.getWorld() == world) {
+		} else if (MinecraftClient.getInstance().player?.world == world) {
 			val buf = PacketByteBufs.create()
 			val packet = WorldJarLoadedC2SPacket(pos)
 			packet.write(buf)
@@ -90,7 +74,7 @@ class WorldJarBlockEntity(
 			magnitude = 16
 		}
 		
-		if (world?.isClient == true && MinecraftClient.getInstance().player?.getWorld() == world) {
+		if (world?.isClient == true && MinecraftClient.getInstance().player?.world == world) {
 			val buf = PacketByteBufs.create()
 			val packet = WorldJarLoadedC2SPacket(pos)
 			packet.write(buf)

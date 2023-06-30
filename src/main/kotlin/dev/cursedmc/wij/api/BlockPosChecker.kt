@@ -13,6 +13,7 @@ import net.minecraft.util.math.BlockPos
  * Checks if this object has the specified [net.minecraft.util.math.BlockPos].
  * @see gay.sylv.wij.api.BlockPosChecker
  */
+@Suppress("unused")
 @Deprecated(message = "Moved to gay.sylv.wij.api", level = DeprecationLevel.ERROR)
 interface BlockPosChecker {
 	fun hasBlockPos(pos: BlockPos): Boolean

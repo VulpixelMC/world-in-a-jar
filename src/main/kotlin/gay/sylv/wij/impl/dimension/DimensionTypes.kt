@@ -17,6 +17,7 @@ import net.minecraft.world.dimension.DimensionType
 object DimensionTypes : gay.sylv.wij.api.Initializable {
 	lateinit var WORLD_JAR: RegistryKey<DimensionOptions>
 	lateinit var WORLD_JAR_WORLD: RegistryKey<World>
+	@Suppress("MemberVisibilityCanBePrivate")
 	lateinit var WORLD_JAR_TYPE_KEY: RegistryKey<DimensionType>
 	
 	override fun initialize() {

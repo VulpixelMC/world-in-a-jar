@@ -38,7 +38,7 @@ public abstract class Mixin_WorldChunk extends Chunk {
 	@Shadow
 	public abstract BlockState getBlockState(BlockPos pos);
 	
-	@SuppressWarnings("ConstantConditions")
+	@SuppressWarnings("DataFlowIssue")
 	private Mixin_WorldChunk() {
 		super(null, null, null, null, 0, null, null);
 	}

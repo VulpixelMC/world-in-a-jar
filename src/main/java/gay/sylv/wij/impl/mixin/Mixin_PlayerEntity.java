@@ -27,7 +27,7 @@ public abstract class Mixin_PlayerEntity extends LivingEntity implements PlayerW
 	private RegistryKey<World> worldinajar$returnDim;
 	private Vec3d worldinajar$returnPos;
 	
-	@SuppressWarnings("ConstantConditions")
+	@SuppressWarnings("DataFlowIssue")
 	private Mixin_PlayerEntity() {
 		super(null, null);
 	}
