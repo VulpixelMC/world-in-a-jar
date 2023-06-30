@@ -16,6 +16,9 @@ import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.chunk.palette.PalettedContainer
 
+/**
+ * Signals that a chunk (entire size of jar) has updated. This sends the [BlockPos] of the jar as well as the [PalettedContainer]<[BlockState]> of the chunk.
+ */
 class JarWorldChunkUpdateS2CPacket(val pos: BlockPos, val blockStateContainer: PalettedContainer<BlockState>) : Packet<ClientPlayPacketListener> {
 	constructor(buf: PacketByteBuf) : this(buf.readBlockPos(), buf.run {
 		val container = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
@@ -25,7 +28,7 @@ class JarWorldChunkUpdateS2CPacket(val pos: BlockPos, val blockStateContainer: P
 	
 	override fun write(buf: PacketByteBuf) {
 		buf.writeBlockPos(pos)
-		blockStateContainer.writePacket(buf) // write
+		blockStateContainer.writePacket(buf)
 	}
 	
 	override fun apply(listener: ClientPlayPacketListener) {

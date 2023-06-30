@@ -14,6 +14,9 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.util.math.BlockPos
 
+/**
+ * Signals that a block has updated. This sends the [BlockPos] and [BlockState] of the block as well as the [BlockPos] of the jar.
+ */
 class JarWorldBlockUpdateS2CPacket(val pos: BlockPos, val state: BlockState, val jarPos: BlockPos) : Packet<ClientPlayPacketListener> {
 	constructor(buf: PacketByteBuf) : this(buf.readBlockPos(), Block.STATE_IDS.get(buf.readInt())!!, buf.readBlockPos())
 	

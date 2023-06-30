@@ -12,6 +12,9 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.util.math.BlockPos
 
+/**
+ * Signals that the jar has loaded and sends its location.
+ */
 class WorldJarLoadedS2CPacket(val pos: BlockPos) : Packet<ClientPlayPacketListener> {
 	constructor(buf: PacketByteBuf) : this(buf.readBlockPos())
 	
