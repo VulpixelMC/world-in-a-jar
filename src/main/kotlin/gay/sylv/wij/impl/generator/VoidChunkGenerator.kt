@@ -85,7 +85,7 @@ class VoidChunkGenerator(biome: Holder.Reference<Biome>) :
 	}
 	
 	override fun getMinimumY(): Int {
-		return -64
+		return MINIMUM_Y
 	}
 	
 	override fun getHeight(
@@ -95,7 +95,7 @@ class VoidChunkGenerator(biome: Holder.Reference<Biome>) :
 		world: HeightLimitView?,
 		randomState: RandomState?
 	): Int {
-		return 320
+		return HEIGHT
 	}
 	
 	override fun getColumnSample(
@@ -111,6 +111,9 @@ class VoidChunkGenerator(biome: Holder.Reference<Biome>) :
 	}
 	
 	companion object {
+		const val MINIMUM_Y = -64
+		const val HEIGHT = 320
+		
 		private val BIOME: RegistryKey<Biome> = Biomes.THE_VOID
 		
 		@JvmField

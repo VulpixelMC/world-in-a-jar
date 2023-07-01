@@ -7,6 +7,8 @@
  */
 package gay.sylv.wij.impl.block.entity
 
+import gay.sylv.wij.impl.block.entity.render.JarChunk
+import gay.sylv.wij.impl.block.entity.render.JarChunkRenderRegion
 import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.network.c2s.WorldJarLoadedC2SPacket
@@ -14,7 +16,13 @@ import gay.sylv.wij.impl.network.s2c.S2CPackets
 import gay.sylv.wij.impl.network.s2c.WorldJarLoadedS2CPacket
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
+import it.unimi.dsi.fastutil.longs.Long2ObjectMaps
+import it.unimi.dsi.fastutil.objects.ObjectArrayList
+import it.unimi.dsi.fastutil.shorts.Short2ObjectArrayMap
+import it.unimi.dsi.fastutil.shorts.Short2ObjectMap
+import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.nbt.NbtCompound
@@ -24,6 +32,7 @@ import net.minecraft.network.packet.s2c.play.BlockEntityUpdateS2CPacket
 import net.minecraft.server.MinecraftServer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.world.World
+import net.minecraft.world.chunk.palette.PalettedContainer
 import org.quiltmc.loader.api.minecraft.ClientOnly
 import org.quiltmc.qkl.library.networking.playersTracking
 import org.quiltmc.qsl.block.entity.api.QuiltBlockEntity
@@ -44,7 +53,8 @@ class WorldJarBlockEntity(
 	val scale: Float
 		get() = 1.0f / magnitude
 	var subPos: BlockPos = BlockPos(0, -64, 0)
-	internal var blockStates: Long2ObjectMap<BlockState> = Long2ObjectArrayMap() // TODO: optimize
+	val blockStates: PalettedContainer<BlockState> = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE) // this is likely faster, more direct, and is easier to manage than putting these in every single JarChunk. TODO: do tests to determine whether a single PalettedContainer is faster than multiple PalettedContainers for each JarChunk.
+	val blockEntities: Long2ObjectMap<BlockEntity> = Long2ObjectArrayMap()
 	
 	/**
 	 * If the [BlockState]s in the jar have changed.
@@ -53,15 +63,24 @@ class WorldJarBlockEntity(
 	@ClientOnly
 	internal var statesChanged = false
 	
+	/**
+	 * [JarChunk]s that are being rendered.
+	 */
+	@ClientOnly
+	val chunks: Short2ObjectMap<JarChunk> = Short2ObjectArrayMap()
+	
+	@ClientOnly
+	val renderRegion: JarChunkRenderRegion = JarChunkRenderRegion(this, chunks)
+	
 	fun updateBlockStates(server: MinecraftServer) {
 		val world = server.getWorld(DimensionTypes.WORLD_JAR_WORLD)!!
 		val max = magnitude - 1
 		for (x in 0..max) {
-			for (y in 1..max) {
+			for (y in 1..max) { // we move up one because the lowest layer is barrier blocks
 				for (z in 0..max) {
 					val pos = BlockPos(x, y, z)
 					val state = world.getBlockState(pos.add(this.subPos))
-					blockStates[pos.asLong()] = state
+					blockStates.set(pos.x, pos.y, pos.z, state)
 				}
 			}
 		}
