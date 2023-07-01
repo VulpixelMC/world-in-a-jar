@@ -14,6 +14,7 @@ import gay.sylv.wij.impl.block.entity.BlockEntityTypes
 import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.generator.VoidChunkGenerator
 import gay.sylv.wij.impl.item.group.ItemGroups
+import gay.sylv.wij.impl.network.Networking
 import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.server.WorldInAJarServer
 import net.minecraft.registry.Registries
@@ -32,19 +33,23 @@ class WorldInAJar : ModInitializer {
 			HAS_SODIUM = true
 		}
 		
+		// networking
+		Networking.initialize()
 		C2SPackets.initialize()
 		
+		// initialize server
 		WorldInAJarServer.initialize()
 		
+		// initialize dimensions & chunk generators
 		DimensionTypes.initialize()
-		
 		Registry.register(Registries.CHUNK_GENERATOR, id("jar"), VoidChunkGenerator.CODEC)
 		
+		// blocks/items
 		Blocks.initialize()
 		BlockEntityTypes.initialize()
 		ItemGroups.initialize()
 		
-		LOGGER.info("hi yes we have loaded {}", mod.metadata().name())
+		LOGGER.info("successfully loaded {}", mod.metadata().name())
 	}
 
 	companion object {

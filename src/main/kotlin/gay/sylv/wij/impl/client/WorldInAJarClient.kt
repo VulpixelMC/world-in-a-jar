@@ -15,13 +15,24 @@ import net.minecraft.client.render.RenderLayer
 import org.quiltmc.loader.api.ModContainer
 import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer
 import org.quiltmc.qsl.block.extensions.api.client.BlockRenderLayerMap
+import org.slf4j.Logger
+import org.slf4j.LoggerFactory
 
 class WorldInAJarClient : ClientModInitializer {
 	override fun onInitializeClient(mod: ModContainer?) {
+		LOGGER.info("initialized client")
+		
+		// networking
 		S2CPackets.initialize()
 		
+		// rendering
 		BlockEntityRenderers.initialize()
-		
 		BlockRenderLayerMap.put(RenderLayer.getTranslucent(), Blocks.WORLD_JAR)
+		
+		LOGGER.info("loaded client")
+	}
+	
+	companion object {
+		val LOGGER: Logger = LoggerFactory.getLogger("World In A Jar/Client")
 	}
 }

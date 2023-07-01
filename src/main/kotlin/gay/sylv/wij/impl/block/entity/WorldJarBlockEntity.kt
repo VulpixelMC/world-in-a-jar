@@ -51,7 +51,7 @@ class WorldJarBlockEntity(
 	 * This is used in rendering to determine whether we need to rebuild the VBOs.
 	 */
 	@ClientOnly
-	internal var statesChanged = true
+	internal var statesChanged = false
 	
 	fun updateBlockStates(server: MinecraftServer) {
 		val world = server.getWorld(DimensionTypes.WORLD_JAR_WORLD)!!

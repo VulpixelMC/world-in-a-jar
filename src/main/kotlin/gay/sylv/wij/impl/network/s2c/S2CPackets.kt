@@ -9,6 +9,7 @@ package gay.sylv.wij.impl.network.s2c
 
 import gay.sylv.wij.impl.WIJConstants.id
 import gay.sylv.wij.impl.block.entity.BlockEntityTypes
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.network.c2s.WorldJarLoadedC2SPacket
 import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap
@@ -33,6 +34,7 @@ object S2CPackets : gay.sylv.wij.api.Initializable {
 			val entity = entityOption.get()
 			
 			entity.blockStates[pos.asLong()] = packet.state
+			entity.statesChanged = true
 		}
 		ClientPlayNetworking.registerGlobalReceiver(JAR_WORLD_CHUNK_UPDATE) {
 				client, _, buf, _ ->
@@ -58,10 +60,16 @@ object S2CPackets : gay.sylv.wij.api.Initializable {
 					}
 				}
 			}
+			
+			entity.statesChanged = true
 		}
 		ClientPlayNetworking.registerGlobalReceiver(WORLD_JAR_LOADED) {
-				_, _, recBuf, _ ->
+				client, _, recBuf, _ ->
 			val recPacket = WorldJarLoadedS2CPacket(recBuf)
+			
+			val entity = client.world?.getBlockEntity(recPacket.pos) as WorldJarBlockEntity
+			entity.statesChanged = true
+			
 			val buf = PacketByteBufs.create()
 			val packet = WorldJarLoadedC2SPacket(recPacket.pos)
 			packet.write(buf)
