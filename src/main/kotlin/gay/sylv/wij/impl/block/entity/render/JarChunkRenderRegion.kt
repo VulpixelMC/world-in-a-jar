@@ -1,28 +1,39 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
-import gay.sylv.wij.impl.generator.VoidChunkGenerator
-import it.unimi.dsi.fastutil.shorts.Short2ObjectMap
+import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.client.color.biome.BiomeColorProvider
 import net.minecraft.client.world.BiomeColorCache
 import net.minecraft.fluid.FluidState
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.ChunkSectionPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.BlockRenderView
 import net.minecraft.world.chunk.light.LightingProvider
+import org.quiltmc.loader.api.minecraft.ClientOnly
 
 /**
  * A [BlockRenderView] for [JarChunk]s.
  */
-class JarChunkRenderRegion(val entity: WorldJarBlockEntity, val chunks: Short2ObjectMap<JarChunk>) : BlockRenderView {
+@ClientOnly
+class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val chunks: Long2ObjectMap<JarChunk>) : BlockRenderView {
 	override fun getBlockState(pos: BlockPos): BlockState {
-		return entity.blockStates.get(pos.x, pos.y, pos.z)
+		if (isOutside(pos)) {
+			return Blocks.AIR.defaultState
+		}
+//		val chunkPos = ChunkSectionPos.from(pos)
+//		return chunks[chunkPos.asLong()]?.blockStates?.get(pos.x, pos.y, pos.z)!!
+		return entity.blockStates[pos.asLong()] ?: Blocks.AIR.defaultState
 	}
 	
 	override fun getFluidState(pos: BlockPos): FluidState {
-		return entity.blockStates.get(pos.x, pos.y, pos.z).fluidState
+		if (isOutside(pos)) {
+			return Blocks.AIR.defaultState.fluidState
+		}
+		return entity.blockStates[pos.asLong()].fluidState
 	}
 	
 	override fun getBlockEntity(pos: BlockPos): BlockEntity? {
@@ -38,15 +49,29 @@ class JarChunkRenderRegion(val entity: WorldJarBlockEntity, val chunks: Short2Ob
 	}
 	
 	override fun getHeight(): Int {
-		return VoidChunkGenerator.HEIGHT
+		return entity.magnitude
 	}
 	
 	override fun getBottomY(): Int {
-		return VoidChunkGenerator.MINIMUM_Y
+		return 0
 	}
 	
 	override fun getLightingProvider(): LightingProvider? {
-		return null
+		return entity.world?.lightingProvider
+	}
+	
+	/**
+	 * Determines if the [BlockPos] is outside the range of the magnitude.
+	 */
+	private fun isOutside(blockPos: BlockPos): Boolean {
+		return isOutsideInt(blockPos.x) || isOutsideInt(blockPos.y) || isOutsideInt(blockPos.z)
+	}
+	
+	/**
+	 * Determines if the [Int] is outside the range of the magnitude.
+	 */
+	private fun isOutsideInt(x: Int): Boolean {
+		return x < 0 || x > entity.magnitude
 	}
 	
 	companion object {

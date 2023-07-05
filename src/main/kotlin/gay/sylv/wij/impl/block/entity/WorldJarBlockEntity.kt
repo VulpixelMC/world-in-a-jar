@@ -53,7 +53,7 @@ class WorldJarBlockEntity(
 	val scale: Float
 		get() = 1.0f / magnitude
 	var subPos: BlockPos = BlockPos(0, -64, 0)
-	val blockStates: PalettedContainer<BlockState> = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE) // this is likely faster, more direct, and is easier to manage than putting these in every single JarChunk. TODO: do tests to determine whether a single PalettedContainer is faster than multiple PalettedContainers for each JarChunk.
+	var blockStates: Long2ObjectMap<BlockState> = Long2ObjectArrayMap() // this is likely slower. however, i'm doing this for now to save me headaches. TODO: move to PalettedContainers in each JarChunk.
 	val blockEntities: Long2ObjectMap<BlockEntity> = Long2ObjectArrayMap()
 	
 	/**
@@ -67,7 +67,7 @@ class WorldJarBlockEntity(
 	 * [JarChunk]s that are being rendered.
 	 */
 	@ClientOnly
-	val chunks: Short2ObjectMap<JarChunk> = Short2ObjectArrayMap()
+	val chunks: Long2ObjectMap<JarChunk> = Long2ObjectArrayMap()
 	
 	@ClientOnly
 	val renderRegion: JarChunkRenderRegion = JarChunkRenderRegion(this, chunks)
@@ -80,7 +80,7 @@ class WorldJarBlockEntity(
 				for (z in 0..max) {
 					val pos = BlockPos(x, y, z)
 					val state = world.getBlockState(pos.add(this.subPos))
-					blockStates.set(pos.x, pos.y, pos.z, state)
+					blockStates[pos.asLong()] = state
 				}
 			}
 		}

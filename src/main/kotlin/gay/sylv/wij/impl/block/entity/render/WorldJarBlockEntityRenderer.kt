@@ -8,14 +8,11 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.vertex.BufferBuilder
-import com.mojang.blaze3d.vertex.VertexBuffer
-import com.mojang.blaze3d.vertex.VertexFormat
-import com.mojang.blaze3d.vertex.VertexFormats
+import com.mojang.blaze3d.vertex.*
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import gay.sylv.wij.impl.scale
-import it.unimi.dsi.fastutil.objects.ObjectArrayList
 import net.minecraft.block.BlockRenderType
+import net.minecraft.client.render.GameRenderer
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.VertexConsumerProvider
@@ -23,7 +20,11 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderer
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.random.RandomGenerator
+import org.joml.Matrix4f
+import org.quiltmc.loader.api.minecraft.ClientOnly
 
+@ClientOnly
 class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Context) : BlockEntityRenderer<WorldJarBlockEntity> {
 	override fun render(
 		entity: WorldJarBlockEntity,
@@ -35,33 +36,62 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 	) {
 		matrices.scale(entity.scale - 0.001f) // scale + prevent z-fighting
 		
-		if (entity.statesChanged) {
-			entity.statesChanged = false
-			
-			// build chunks
-			entity.chunks.forEach {
-				val chunk = it.value
+		val projMat = matrices.peek().model
+		loadProjectionMatrix(projMat)
+		
+		entity.chunks.forEach {
+			val chunk = it.value
+			if (entity.statesChanged) {
+				entity.statesChanged = false
+				
+				// build chunks
 				val beginPos = chunk.origin
 				val offset = BlockPos(15, 15, 15)
+				val randomGenerator = RandomGenerator.createLegacy()
+				
+				// begin building each buffer
+				RenderLayer.getBlockLayers().forEach { renderLayer ->
+					val bufferBuilder = chunk.buffers.get(renderLayer)
+					beginBufferBuilding(bufferBuilder)
+				}
 				
 				for (blockPos in BlockPos.iterate(beginPos, offset)) {
-					val state = entity.blockStates.get(blockPos.x, blockPos.y, blockPos.z)
+					val state = entity.blockStates[blockPos.asLong()]
 					
-					if (state.renderType != BlockRenderType.INVISIBLE) {
+					if (state != null && state.renderType != BlockRenderType.INVISIBLE) {
+//						println("found block of state $state")
 						// render block states
 						val renderLayer = RenderLayers.getBlockLayer(state)
-						val bufferBuilder = chunk.bufferBuilders.get(renderLayer)
-						beginBufferBuilding(bufferBuilder)
+						val bufferBuilder = chunk.buffers.get(renderLayer)
 						
 						matrices.push()
-						ctx.renderManager.renderBlock(state, blockPos, )
+						matrices.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
+						ctx.renderManager.renderBlock(state, blockPos, entity.renderRegion, matrices, bufferBuilder, false, randomGenerator)
+						matrices.pop()
+					}
+				}
+				
+				// end building and bind vertex buffers
+				chunk.vertexBuffers.forEach { (renderLayer, buffer) ->
+					val bufferBuilder = chunk.buffers.get(renderLayer)
+					val renderedBuffer = bufferBuilder.endOrDiscard()
+					if (renderedBuffer != null) {
+						buffer.bind()
+						buffer.upload(renderedBuffer)
+						buffer.drawElements()
 					}
 				}
 			}
+			
+			VertexBuffer.unbind()
 		}
 	}
 	
 	private fun beginBufferBuilding(bufferBuilder: BufferBuilder) {
 		bufferBuilder.begin(VertexFormat.DrawMode.QUADS, VertexFormats.POSITION_COLOR_TEXTURE_LIGHT_NORMAL)
+	}
+	
+	private fun loadProjectionMatrix(matrix: Matrix4f) {
+		RenderSystem.setProjectionMatrix(matrix, VertexSorting.DISTANCE_TO_ORIGIN)
 	}
 }
