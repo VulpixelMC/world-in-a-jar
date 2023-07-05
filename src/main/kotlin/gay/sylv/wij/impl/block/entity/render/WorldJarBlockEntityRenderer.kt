@@ -87,28 +87,19 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		// render each chunk
 		entity.chunks.forEach {
 			val chunk = it.value
-			val chunkPos = ChunkSectionPos.from(it.key)
 			
 			// render each render layer
 			BLOCK_LAYERS.forEach { renderLayer ->
 				// set up shader
-				RenderSystem.setShader(GameRenderer::getPositionShader)
+				renderLayer.startDrawing()
 				val shader = RenderSystem.getShader()!!
-				RenderSystem.setupShaderLights(shader)
-				shader.bind()
-				
-				val chunkOffset = shader.chunkOffset
-				chunkOffset?.setVec3(chunkPos.x.toFloat(), chunkPos.y.toFloat(), chunkPos.z.toFloat())
-				chunkOffset?.upload()
 				
 				val buffer = chunk.vertexBuffers[renderLayer]!!
 				buffer.bind()
-				matrices.push()
 				buffer.draw(matrices.peek().model, RenderSystem.getProjectionMatrix(), shader)
-				matrices.pop()
 				
 				VertexBuffer.unbind()
-				shader.unbind()
+				renderLayer.endDrawing()
 			}
 		}
 	}
