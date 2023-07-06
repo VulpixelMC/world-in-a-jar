@@ -37,7 +37,7 @@ object S2CPackets : gay.sylv.wij.api.Initializable {
 			val entity = entityOption.get()
 			
 			entity.blockStates[pos.asLong()] = packet.state
-			entity.statesChanged = true
+			client.execute { entity.statesChanged = true }
 		}
 		ClientPlayNetworking.registerGlobalReceiver(JAR_WORLD_CHUNK_UPDATE) {
 				client, _, buf, _ ->
@@ -74,21 +74,7 @@ object S2CPackets : gay.sylv.wij.api.Initializable {
 				client.execute { entity.chunks.put(chunkPos.asLong(), JarChunk(chunkPos)) }
 			}
 			
-			entity.statesChanged = true
-		}
-		ClientPlayNetworking.registerGlobalReceiver(WORLD_JAR_LOADED) {
-				client, _, recBuf, _ ->
-			val recPacket = WorldJarLoadedS2CPacket(recBuf)
-			
-			val entity = client.world?.getBlockEntity(recPacket.pos) as WorldJarBlockEntity
-			entity.statesChanged = true
-			
-			val buf = PacketByteBufs.create()
-			val packet = WorldJarLoadedC2SPacket(recPacket.pos)
-			packet.write(buf)
-			try {
-				ClientPlayNetworking.send(C2SPackets.WORLD_JAR_LOADED, buf)
-			} catch(_: Exception) {}
+			client.execute { entity.statesChanged = true }
 		}
 	}
 }

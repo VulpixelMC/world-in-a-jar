@@ -10,6 +10,7 @@ package gay.sylv.wij.impl.block.entity.render
 import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.*
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
+import gay.sylv.wij.impl.scale
 import net.minecraft.block.BlockRenderType
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.RenderLayers
@@ -31,10 +32,12 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		light: Int,
 		overlay: Int
 	) {
-//		matrices.scale(entity.scale - 0.001f) // scale + prevent z-fighting
+		matrices.scale(entity.scale - 0.001f) // scale + prevent z-fighting
+		matrices.translate(0.001f, -0.001f, 0.001f)
 		
 		if (entity.statesChanged) {
 			entity.statesChanged = false
+			println("rebuilding chunks")
 			
 			entity.chunks.forEach {
 				// build chunks
@@ -46,7 +49,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 				// begin building each buffer
 				RenderLayer.getBlockLayers().forEach { renderLayer ->
 					val bufferBuilder = chunk.buffers.get(renderLayer)
-					bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
+					bufferBuilder.begin(VertexFormat.DrawMode.QUADS, renderLayer.vertexFormat)
 				}
 				
 				val chunkMatrices = MatrixStack() // the matrices for the chunks

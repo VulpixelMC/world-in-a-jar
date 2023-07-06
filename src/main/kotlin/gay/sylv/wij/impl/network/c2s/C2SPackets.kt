@@ -51,6 +51,7 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 		}
 		ServerPlayNetworking.registerGlobalReceiver(WORLD_JAR_LOADED) {
 				server, player, _, buf, _ ->
+			println("jar loaded")
 			val packet = WorldJarLoadedC2SPacket(buf)
 			val pos = packet.pos
 			

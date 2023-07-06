@@ -96,10 +96,6 @@ class WorldJarBlockEntity(
 			if (!INSTANCES.contains(this)) {
 				INSTANCES.add(this)
 			}
-			val buf = PacketByteBufs.create()
-			val packet = WorldJarLoadedS2CPacket(pos)
-			packet.write(buf)
-			ServerPlayNetworking.send(playersTracking, S2CPackets.WORLD_JAR_LOADED, buf)
 		} else if (MinecraftClient.getInstance().player?.world == world) {
 			val buf = PacketByteBufs.create()
 			val packet = WorldJarLoadedC2SPacket(pos)
