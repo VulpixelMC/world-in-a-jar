@@ -46,7 +46,6 @@ object S2CPackets : gay.sylv.wij.api.Initializable {
 			val blockStateContainer = packet.blockStateContainer
 			val entityOption = client.world?.getBlockEntity(pos, BlockEntityTypes.WORLD_JAR)
 			if (entityOption!!.isEmpty) { // if the jar entity doesn't exist, return
-				println("fake")
 				return@registerGlobalReceiver
 			}
 			

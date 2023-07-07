@@ -75,12 +75,9 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 			
 			server.execute {
 				val blockEntity = player.world.getBlockEntity(pos)
-				println("$pos")
 				if (blockEntity?.type != BlockEntityTypes.WORLD_JAR) return@execute // quick check if this is a world jar
 				val jarEntity = blockEntity as WorldJarBlockEntity
-				println("entity loaded on client")
 				
-				println("sending chunks now")
 				ServerNetworking.sendChunks(player.world, jarEntity)
 			}
 		}

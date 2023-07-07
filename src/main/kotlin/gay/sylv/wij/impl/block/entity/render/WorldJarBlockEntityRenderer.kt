@@ -37,7 +37,6 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		
 		if (entity.statesChanged) {
 			entity.statesChanged = false
-			println("rebuilding chunks")
 			
 			entity.chunks.forEach {
 				// build chunks
