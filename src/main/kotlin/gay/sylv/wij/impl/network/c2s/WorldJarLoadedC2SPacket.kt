@@ -1,11 +1,11 @@
 package gay.sylv.wij.impl.network.c2s
 
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
+import gay.sylv.wij.impl.network.s2c.JarWorldChunkUpdateS2CPacket
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.listener.ServerPlayPacketListener
 import net.minecraft.network.packet.Packet
 import net.minecraft.util.math.BlockPos
-import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
-import gay.sylv.wij.impl.network.s2c.JarWorldChunkUpdateS2CPacket
 
 /**
  * This packet tells the server that the client has loaded the [WorldJarBlockEntity] and is ready to receive a [JarWorldChunkUpdateS2CPacket].

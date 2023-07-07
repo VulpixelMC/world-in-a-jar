@@ -9,7 +9,6 @@ import net.minecraft.client.color.biome.BiomeColorProvider
 import net.minecraft.client.world.BiomeColorCache
 import net.minecraft.fluid.FluidState
 import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.ChunkSectionPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.BlockRenderView
 import net.minecraft.world.chunk.light.LightingProvider

@@ -9,7 +9,6 @@ package gay.sylv.wij.impl.block.entity.render
 
 import gay.sylv.wij.impl.block.entity.BlockEntityTypes
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactories
-import net.minecraft.client.world.BiomeColorCache
 import org.quiltmc.loader.api.minecraft.ClientOnly
 
 @ClientOnly

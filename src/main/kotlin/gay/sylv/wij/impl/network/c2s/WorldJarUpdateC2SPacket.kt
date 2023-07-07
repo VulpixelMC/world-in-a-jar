@@ -7,12 +7,12 @@
  */
 package gay.sylv.wij.impl.network.c2s
 
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import io.netty.buffer.ByteBufAllocator
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.listener.ServerPlayPacketListener
 import net.minecraft.network.packet.Packet
 import net.minecraft.util.math.BlockPos
-import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 
 /**
  * This packet tells the server to update the properties of a [WorldJarBlockEntity] to the given parameters.

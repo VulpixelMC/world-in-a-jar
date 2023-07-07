@@ -1,14 +1,10 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import com.mojang.blaze3d.vertex.VertexBuffer
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkSectionPos
-import net.minecraft.world.chunk.palette.PalettedContainer
 import org.quiltmc.loader.api.minecraft.ClientOnly
 import java.util.stream.Collectors
 

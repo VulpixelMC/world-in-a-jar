@@ -8,7 +8,8 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.vertex.*
+import com.mojang.blaze3d.vertex.VertexBuffer
+import com.mojang.blaze3d.vertex.VertexFormat
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import gay.sylv.wij.impl.scale
 import net.minecraft.block.BlockRenderType

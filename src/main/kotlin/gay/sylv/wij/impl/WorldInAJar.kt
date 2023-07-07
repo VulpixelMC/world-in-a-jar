@@ -15,7 +15,6 @@ import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.generator.VoidChunkGenerator
 import gay.sylv.wij.impl.item.group.ItemGroups
 import gay.sylv.wij.impl.network.Networking
-import gay.sylv.wij.impl.network.ServerNetworking
 import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.server.WorldInAJarServer
 import net.minecraft.registry.Registries

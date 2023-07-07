@@ -9,13 +9,8 @@ package gay.sylv.wij.impl.network.s2c
 
 import gay.sylv.wij.impl.WIJConstants.id
 import gay.sylv.wij.impl.block.entity.BlockEntityTypes
-import gay.sylv.wij.impl.block.entity.render.JarChunk
-import it.unimi.dsi.fastutil.longs.Long2ObjectArrayMap
-import net.minecraft.util.math.BlockPos
-import net.minecraft.util.math.ChunkSectionPos
 import org.quiltmc.loader.api.minecraft.ClientOnly
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
-import kotlin.math.ceil
 
 /**
  * TODO: docs
