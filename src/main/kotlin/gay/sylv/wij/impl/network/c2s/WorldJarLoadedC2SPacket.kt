@@ -1,24 +1,24 @@
-/**
- * Copyright (c) 2022 CursedMC. All rights reserved.
- *
- * World In A Jar is common software: you can redistribute it and/or modify it under the terms of the Commons Protection License as published by the Revolutionary Technical Committee.
- *
- * This program is distributed in the hope that it will be useful, but WITHOUT ANY WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the Commons Protection License for more details.
- */
 package gay.sylv.wij.impl.network.c2s
 
 import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.listener.ServerPlayPacketListener
 import net.minecraft.network.packet.Packet
 import net.minecraft.util.math.BlockPos
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
+import gay.sylv.wij.impl.network.s2c.JarWorldChunkUpdateS2CPacket
 
-class WorldJarLoadedC2SPacket(val pos: BlockPos) : Packet<ServerPlayPacketListener> {
-	constructor(buf: PacketByteBuf) : this(buf.readBlockPos())
-	
+/**
+ * This packet tells the server that the client has loaded the [WorldJarBlockEntity] and is ready to receive a [JarWorldChunkUpdateS2CPacket].
+ *
+ * **Yes, I know this is open to DDoS attacks. If you have a better solution, feel free to implement it your-fucking-self.**
+ * @param pos The [BlockPos] of the [WorldJarBlockEntity].
+ * @author sylv
+ */
+class WorldJarLoadedC2SPacket(private val pos: BlockPos) : Packet<ServerPlayPacketListener> {
 	override fun write(buf: PacketByteBuf) {
 		buf.writeBlockPos(pos)
 	}
 	
-	override fun apply(listener: ServerPlayPacketListener) {
+	override fun apply(listener: ServerPlayPacketListener?) {
 	}
 }

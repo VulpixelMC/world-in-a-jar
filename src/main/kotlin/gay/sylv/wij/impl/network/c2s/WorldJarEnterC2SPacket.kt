@@ -12,6 +12,10 @@ import net.minecraft.network.listener.ServerPlayPacketListener
 import net.minecraft.network.packet.Packet
 import net.minecraft.util.math.BlockPos
 
+/**
+ * TODO: docs
+ * @author sylv
+ */
 class WorldJarEnterC2SPacket(val pos: BlockPos) : Packet<ServerPlayPacketListener> {
 	constructor(buf: PacketByteBuf) : this(buf.readBlockPos())
 	

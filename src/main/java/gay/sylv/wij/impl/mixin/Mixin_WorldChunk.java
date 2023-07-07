@@ -29,6 +29,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+/**
+ * @author sylv
+ */
 @Mixin(WorldChunk.class)
 public abstract class Mixin_WorldChunk extends Chunk {
 	@Shadow
@@ -45,6 +48,8 @@ public abstract class Mixin_WorldChunk extends Chunk {
 	
 	/**
 	 * Send a {@link JarWorldBlockUpdateS2CPacket} to clients tracking any {@link WorldJarBlockEntity}s.
+	 * @author sylv
+	 * TODO: use a cache for jar updates
 	 */
 	@Inject(method = "setBlockState", at = @At(value = "INVOKE", target = "Lnet/minecraft/util/math/BlockPos;getX()I"), cancellable = true)
 	private void updateWorldJar(BlockPos pos, BlockState state, boolean moved, CallbackInfoReturnable<BlockState> cir) {

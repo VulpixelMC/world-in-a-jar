@@ -31,7 +31,7 @@ class JarChunk(offset: ChunkSectionPos) {
 				{ VertexBuffer(VertexBuffer.Usage.STATIC) }
 			)
 		)
-	var blockStates: PalettedContainer<BlockState> = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
+//	var blockStates: PalettedContainer<BlockState> = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
 	
 	init {
 		this.origin = BlockPos(offset.multiply(16))

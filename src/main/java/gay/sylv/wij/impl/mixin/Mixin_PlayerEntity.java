@@ -22,6 +22,9 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
+/**
+ * @author sylv
+ */
 @Mixin(value = PlayerEntity.class, priority = 1100)
 public abstract class Mixin_PlayerEntity extends LivingEntity implements PlayerWithReturnPos, PlayerWithReturnDim {
 	private RegistryKey<World> worldinajar$returnDim;

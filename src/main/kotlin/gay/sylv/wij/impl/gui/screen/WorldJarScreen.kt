@@ -11,7 +11,6 @@ import gay.sylv.wij.impl.WIJConstants.MOD_ID
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.network.c2s.WorldJarEnterC2SPacket
-import gay.sylv.wij.impl.network.c2s.WorldJarLoadedC2SPacket
 import gay.sylv.wij.impl.network.c2s.WorldJarUpdateC2SPacket
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.GuiGraphics
@@ -82,10 +81,6 @@ class WorldJarScreen(text: Text?, private var blockEntity: WorldJarBlockEntity) 
 					), this.inputScale.text.toInt(), this.blockEntity.pos
 				)
 			)
-			val buf = PacketByteBufs.create()
-			val packet = WorldJarLoadedC2SPacket(this.blockEntity.pos)
-			packet.write(buf)
-			ClientPlayNetworking.send(C2SPackets.WORLD_JAR_LOADED, buf)
 		} catch (ex: java.lang.NumberFormatException) {
 			return
 		}

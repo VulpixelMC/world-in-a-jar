@@ -9,6 +9,7 @@ package gay.sylv.wij.impl.server
 
 import gay.sylv.wij.impl.WIJConstants.MOD_ID
 import gay.sylv.wij.impl.dimension.DimensionTypes
+import gay.sylv.wij.impl.network.ServerNetworking
 import net.minecraft.server.command.ServerCommandSource
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
@@ -26,6 +27,10 @@ object WorldInAJarServer : gay.sylv.wij.api.Initializable {
 	private const val EXIT_COMMAND = "exit"
 	
 	override fun initialize() {
+		// networking
+		ServerNetworking.initialize()
+		
+		// commands
 		CommandRegistrationCallback.EVENT.register {
 				dispatcher, context, env ->
 			val backNode = dispatcher.register(

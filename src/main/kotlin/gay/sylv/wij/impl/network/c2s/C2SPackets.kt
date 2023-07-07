@@ -7,26 +7,26 @@
  */
 package gay.sylv.wij.impl.network.c2s
 
-import gay.sylv.wij.impl.block.entity.BlockEntityTypes
-import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.WIJConstants.id
-import gay.sylv.wij.impl.toPalettedContainer
-import gay.sylv.wij.impl.network.s2c.JarWorldChunkUpdateS2CPacket
-import gay.sylv.wij.impl.network.s2c.S2CPackets
+import gay.sylv.wij.impl.block.entity.BlockEntityTypes
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
+import gay.sylv.wij.impl.dimension.DimensionTypes
+import gay.sylv.wij.impl.network.ServerNetworking
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.TeleportTarget
-import org.quiltmc.qkl.library.networking.playersTracking
-import org.quiltmc.qsl.networking.api.PacketByteBufs
 import org.quiltmc.qsl.networking.api.ServerPlayNetworking
 import org.quiltmc.qsl.worldgen.dimension.api.QuiltDimensions
 
+/**
+ * TODO: docs
+ * @author sylv
+ */
 object C2SPackets : gay.sylv.wij.api.Initializable {
 	internal val WORLD_JAR_ENTER = id("world_jar_enter")
-	internal val WORLD_JAR_LOADED = id("world_jar_loaded_c2s")
 	internal val WORLD_JAR_UPDATE = id("world_jar_update")
+	internal val WORLD_JAR_LOADED = id("world_jar_loaded")
 	
-	@Suppress("NAME_SHADOWING")
 	override fun initialize() {
 		ServerPlayNetworking.registerGlobalReceiver(WORLD_JAR_ENTER) {
 				server, player, _, buf, _ ->
@@ -49,28 +49,6 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 				QuiltDimensions.teleport<ServerPlayerEntity>(player, jarWorld, TeleportTarget(Vec3d.of(entity.subPos.add(0, 1, 0)), Vec3d.ZERO, 0f, 0f))
 			}
 		}
-		ServerPlayNetworking.registerGlobalReceiver(WORLD_JAR_LOADED) {
-				server, player, _, buf, _ ->
-			println("jar loaded")
-			val packet = WorldJarLoadedC2SPacket(buf)
-			val pos = packet.pos
-			
-			server.execute {
-				val world = player.world
-				val entityOption = world.getBlockEntity(pos, BlockEntityTypes.WORLD_JAR)
-				if (entityOption.isEmpty) return@execute
-				val entity = entityOption.get()
-				
-				world.server?.let { entity.updateBlockStates(it) }
-				
-				for (player in entity.playersTracking) {
-					val buf = PacketByteBufs.create()
-					val packet = JarWorldChunkUpdateS2CPacket(pos, entity.blockStates.toPalettedContainer())
-					packet.write(buf)
-					ServerPlayNetworking.send(player, S2CPackets.JAR_WORLD_CHUNK_UPDATE, buf)
-				}
-			}
-		}
 		ServerPlayNetworking.registerGlobalReceiver(WORLD_JAR_UPDATE) {
 				server, player, _, buf, _ ->
 			val pos = buf.readBlockPos()
@@ -79,12 +57,31 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 			
 			server.execute {
 				if (player.world.getBlockEntity(entityPos)?.type == BlockEntityTypes.WORLD_JAR) {
+					// update jar properties
 					val entity = player.world.getBlockEntity(entityPos, BlockEntityTypes.WORLD_JAR).get()
 					entity.subPos = pos.mutableCopy()
 					entity.magnitude = magnitude
 					entity.markDirty()
 					entity.sync()
+					
+					// send chunk update
+					ServerNetworking.sendChunks(player.world, entity)
 				}
+			}
+		}
+		ServerPlayNetworking.registerGlobalReceiver(WORLD_JAR_LOADED) {
+			server, player, _, buf, _ ->
+			val pos = buf.readBlockPos()
+			
+			server.execute {
+				val blockEntity = player.world.getBlockEntity(pos)
+				println("$pos")
+				if (blockEntity?.type != BlockEntityTypes.WORLD_JAR) return@execute // quick check if this is a world jar
+				val jarEntity = blockEntity as WorldJarBlockEntity
+				println("entity loaded on client")
+				
+				println("sending chunks now")
+				ServerNetworking.sendChunks(player.world, jarEntity)
 			}
 		}
 	}

@@ -12,7 +12,14 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.listener.ServerPlayPacketListener
 import net.minecraft.network.packet.Packet
 import net.minecraft.util.math.BlockPos
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 
+/**
+ * This packet tells the server to update the properties of a [WorldJarBlockEntity] to the given parameters.
+ * @param pos The [BlockPos] of the target location to display in the [WorldJarBlockEntity].
+ * @param magnitude The scale of the [WorldJarBlockEntity] that will be displayed.
+ * @param entityPos The [BlockPos] of the [WorldJarBlockEntity].
+ */
 class WorldJarUpdateC2SPacket(private val pos: BlockPos, private val magnitude: Int, private val entityPos: BlockPos) : Packet<ServerPlayPacketListener> {
 	override fun write(buf: PacketByteBuf) {
 		buf.writeBlockPos(pos)
@@ -24,6 +31,10 @@ class WorldJarUpdateC2SPacket(private val pos: BlockPos, private val magnitude: 
 	}
 	
 	companion object {
+		/**
+		 * Remind me why I wrote this.
+		 * @author sylv
+		 */
 		fun buf(pos: BlockPos, magnitude: Int, entityPos: BlockPos): PacketByteBuf {
 			val byteBuf = ByteBufAllocator.DEFAULT.buffer()
 			val buf = PacketByteBuf(byteBuf)

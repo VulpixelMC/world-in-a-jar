@@ -17,6 +17,7 @@ import org.quiltmc.loader.api.minecraft.ClientOnly
 
 /**
  * A [BlockRenderView] for [JarChunk]s.
+ * TODO: use the entity world's lighting
  */
 @ClientOnly
 class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val chunks: Long2ObjectMap<JarChunk>) : BlockRenderView {

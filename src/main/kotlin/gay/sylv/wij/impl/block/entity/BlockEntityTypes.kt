@@ -20,4 +20,5 @@ object BlockEntityTypes : gay.sylv.wij.api.Initializable {
 		id("world_jar"),
 		QuiltBlockEntityTypeBuilder.create(::WorldJarBlockEntity, Blocks.WORLD_JAR).build(),
 	)
+	val WORLD_JAR_ID = id("world_jar")
 }
