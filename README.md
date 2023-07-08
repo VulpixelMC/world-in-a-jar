@@ -16,4 +16,4 @@ Make little snow globes, make a cool redstone contraption; The possibilities are
 **As of releasing the ModFest version, the jar item is currently uncraftable.<br>
 
 ## License
-World In A Jar is licensed under `LGPL-3.0-only`. See `COPYING` and `COPYING.LESSER` for details.
+World In a Jar is licensed under `LGPL-3.0-only`. See `COPYING` and `COPYING.LESSER` for details.

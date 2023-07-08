@@ -5,7 +5,7 @@
 		"id": "${id}",
 		"version": "${version}",
 		"metadata": {
-			"name": "World In A Jar",
+			"name": "World In a Jar",
 			"description": "the best of the cursed: a world in a jar.",
 			"contributors": {
 				"CursedMC": "Owner",
