@@ -61,7 +61,6 @@ object Blocks : gay.sylv.wij.api.Initializable {
 		Block(
 			QuiltBlockSettings
 				.create()
-				.sounds(BlockSoundGroup.STONE)
 				.requiresTool()
 				.strength(2.0F, 6.0F)
 				.sounds(BlockSoundGroup.STONE),
