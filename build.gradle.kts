@@ -148,11 +148,11 @@ java {
 
 // If you plan to use a different file for the license, don't forget to change the file name here!
 tasks.withType<AbstractArchiveTask> {
-	from("LICENSE") {
+	from("COPYING") {
 		rename { "${it}_${modId}" }
 	}
 	
-	from("LICENSE-APPENDIX") {
+	from("COPYING.LESSER") {
 		rename { "${it}_${modId}" }
 	}
 }

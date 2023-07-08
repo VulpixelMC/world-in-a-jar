@@ -8,13 +8,16 @@
 			"name": "World In A Jar",
 			"description": "the best of the cursed: a world in a jar.",
 			"contributors": {
-				"Sylv": "Owner"
+				"CursedMC": "Owner",
+				"Sylv": "Maintainer",
+				"Kneelawk": "Contributor"
 			},
 			"contact": {
-				"homepage": "https://cursedmc.dev/",
+				"homepage": "https://sylv.gay/",
 				"issues": "https://github.com/CursedMC/world-in-a-jar/issues",
 				"sources": "https://github.com/CursedMC/world-in-a-jar"
 			},
+			"license": "LGPL-3.0-only",
 			"icon": "assets/worldinajar/icon.png"
 		},
 		"intermediate_mappings": "net.fabricmc:intermediary",
