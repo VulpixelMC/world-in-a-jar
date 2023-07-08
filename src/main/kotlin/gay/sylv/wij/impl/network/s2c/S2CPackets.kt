@@ -41,7 +41,7 @@ object S2CPackets : gay.sylv.wij.api.Initializable {
 			if (entityOption.isEmpty) return@registerGlobalReceiver
 			val entity = entityOption.get()
 			
-			entity.blockStates[pos.asLong()] = packet.state
+			entity.setBlockState(pos, packet.state)
 			client.execute { entity.statesChanged = true }
 		}
 		ClientPlayNetworking.registerGlobalReceiver(JAR_WORLD_CHUNK_UPDATE) {

@@ -64,9 +64,9 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 				
 				val chunkMatrices = MatrixStack() // the matrices for the chunks
 				for (blockPos in BlockPos.iterate(beginPos, offset)) {
-					val state = entity.blockStates[blockPos.asLong()]
+					val state = entity.getBlockState(blockPos)
 					
-					if (state != null && state.renderType != BlockRenderType.INVISIBLE) {
+					if (state.renderType != BlockRenderType.INVISIBLE) {
 						// render block states
 						val renderLayer = RenderLayers.getBlockLayer(state)
 						val bufferBuilder = chunk.buffers.get(renderLayer)

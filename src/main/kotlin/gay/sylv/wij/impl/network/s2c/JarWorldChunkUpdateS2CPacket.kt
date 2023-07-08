@@ -17,6 +17,7 @@
  */
 package gay.sylv.wij.impl.network.s2c
 
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
@@ -27,7 +28,8 @@ import net.minecraft.util.math.BlockPos
 import net.minecraft.world.chunk.palette.PalettedContainer
 
 /**
- * Signals that a chunk (entire size of jar) has updated. This sends the [BlockPos] of the jar as well as the [PalettedContainer]<[BlockState]> of the chunk.
+ * Signals that a chunk inside the [WorldJarBlockEntity] has updated. This sends the [BlockPos] of the jar as well as the [PalettedContainer]<[BlockState]> of the chunk.
+ * TODO: make this only update a single chunk in the jar per packet
  */
 class JarWorldChunkUpdateS2CPacket(val pos: BlockPos, val blockStateContainer: PalettedContainer<BlockState>) : Packet<ClientPlayPacketListener> {
 	constructor(buf: PacketByteBuf) : this(buf.readBlockPos(), buf.run {

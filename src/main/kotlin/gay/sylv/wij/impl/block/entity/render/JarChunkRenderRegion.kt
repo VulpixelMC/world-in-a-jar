@@ -26,31 +26,39 @@ import net.minecraft.client.color.biome.BiomeColorProvider
 import net.minecraft.client.world.BiomeColorCache
 import net.minecraft.fluid.FluidState
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.ChunkSectionPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.BlockRenderView
+import net.minecraft.world.ChunkLightBlockView
+import net.minecraft.world.chunk.light.ChunkSkyLightSources
 import net.minecraft.world.chunk.light.LightingProvider
 import org.quiltmc.loader.api.minecraft.ClientOnly
+import java.util.function.BiConsumer
+import kotlin.math.ceil
+import kotlin.math.roundToInt
 
 /**
  * A [BlockRenderView] for [JarChunk]s.
  * TODO: use the entity world's lighting
+ * TODO: move the [ChunkLightBlockView] so it's both server-side and client-side
+ * @author sylv
  */
 @ClientOnly
-class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val chunks: Long2ObjectMap<JarChunk>) : BlockRenderView {
+class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val chunks: Long2ObjectMap<JarChunk>, private val lightingProvider: JarLightingProvider) : BlockRenderView, ChunkLightBlockView {
 	override fun getBlockState(pos: BlockPos): BlockState {
 		if (isOutside(pos)) {
 			return Blocks.AIR.defaultState
 		}
-//		val chunkPos = ChunkSectionPos.from(pos)
-//		return chunks[chunkPos.asLong()]?.blockStates?.get(pos.x, pos.y, pos.z)!!
-		return entity.blockStates[pos.asLong()] ?: Blocks.AIR.defaultState
+		val chunkPos = ChunkSectionPos.from(pos)
+		return chunks[chunkPos.asLong()]?.blockStates?.get(pos.x, pos.y, pos.z)!!
 	}
 	
 	override fun getFluidState(pos: BlockPos): FluidState {
 		if (isOutside(pos)) {
 			return Blocks.AIR.defaultState.fluidState
 		}
-		return entity.blockStates[pos.asLong()].fluidState
+		val chunkPos = ChunkSectionPos.from(pos)
+		return chunks[chunkPos.asLong()]?.blockStates?.get(pos.x, pos.y, pos.z)?.fluidState!!
 	}
 	
 	override fun getBlockEntity(pos: BlockPos): BlockEntity? {
@@ -73,12 +81,25 @@ class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val chunks: 
 		return 0
 	}
 	
-	override fun getLightingProvider(): LightingProvider? {
-		return entity.world?.lightingProvider
+	override fun getLightingProvider(): LightingProvider {
+		return lightingProvider
+	}
+	
+	@OptIn(ExperimentalStdlibApi::class)
+	override fun findBlockLightSources(callback: BiConsumer<BlockPos, BlockState>?) {
+		val blockPos = BlockPos.Mutable()
+		for (i in 0..<entity.getChunkHeight()) {
+			val chunkPos =
+		}
+	}
+	
+	override fun getSkyLightSources(): ChunkSkyLightSources {
+		TODO("Not yet implemented")
 	}
 	
 	/**
 	 * Determines if the [BlockPos] is outside the range of the magnitude.
+	 * @author sylv
 	 */
 	private fun isOutside(blockPos: BlockPos): Boolean {
 		return isOutsideInt(blockPos.x) || isOutsideInt(blockPos.y) || isOutsideInt(blockPos.z)
@@ -86,6 +107,7 @@ class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val chunks: 
 	
 	/**
 	 * Determines if the [Int] is outside the range of the magnitude.
+	 * @author sylv
 	 */
 	private fun isOutsideInt(x: Int): Boolean {
 		return x < 0 || x > entity.magnitude
@@ -94,6 +116,7 @@ class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val chunks: 
 	companion object {
 		/**
 		 * A dummy BiomeColorCache.
+		 * @author sylv
 		 */
 		val biomeColorCache: BiomeColorCache = BiomeColorCache {
 			return@BiomeColorCache 0

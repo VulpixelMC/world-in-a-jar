@@ -19,12 +19,15 @@ package gay.sylv.wij.impl.block.entity
 
 import gay.sylv.wij.impl.block.entity.render.JarChunk
 import gay.sylv.wij.impl.block.entity.render.JarChunkRenderRegion
+import gay.sylv.wij.impl.block.entity.render.JarLightingProvider
 import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.network.c2s.WorldJarLoadedC2SPacket
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
+import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.nbt.NbtCompound
@@ -35,9 +38,12 @@ import net.minecraft.server.MinecraftServer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkPos
 import net.minecraft.util.math.ChunkSectionPos
+import net.minecraft.world.ChunkLightBlockView
 import net.minecraft.world.World
+import net.minecraft.world.chunk.ChunkProvider
 import net.minecraft.world.chunk.palette.PalettedContainer
 import org.quiltmc.loader.api.minecraft.ClientOnly
+import org.quiltmc.qkl.library.math.toBlockPos
 import org.quiltmc.qsl.block.entity.api.QuiltBlockEntity
 import org.quiltmc.qsl.networking.api.PacketByteBufs
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
@@ -50,7 +56,7 @@ import kotlin.math.ceil
 class WorldJarBlockEntity(
 	blockPos: BlockPos?,
 	blockState: BlockState?,
-) : BlockEntity(BlockEntityTypes.WORLD_JAR, blockPos, blockState), QuiltBlockEntity, gay.sylv.wij.api.BlockPosChecker {
+) : BlockEntity(BlockEntityTypes.WORLD_JAR, blockPos, blockState), QuiltBlockEntity, gay.sylv.wij.api.BlockPosChecker, ChunkProvider {
 	/**
 	 * TODO: docs
 	 * @author sylv
@@ -63,7 +69,6 @@ class WorldJarBlockEntity(
 	val scale: Float
 		get() = 1.0f / magnitude
 	var subPos: BlockPos = BlockPos(0, -64, 0)
-	var blockStates: Long2ObjectMap<BlockState> = Long2ObjectOpenHashMap() // this is likely slower. however, i'm doing this for now to save me headaches. TODO: move to PalettedContainers in each JarChunk.
 	val blockEntities: Long2ObjectMap<BlockEntity> = Long2ObjectOpenHashMap() // TODO: implement BEs and BERs
 	
 	/**
@@ -75,10 +80,9 @@ class WorldJarBlockEntity(
 	internal var statesChanged = false
 	
 	/**
-	 * [JarChunk]s that are being rendered.
+	 * [JarChunk]s that are loaded in the [WorldJarBlockEntity].
 	 * @author sylv
 	 */
-	@ClientOnly
 	val chunks: Long2ObjectMap<JarChunk> = Long2ObjectOpenHashMap()
 	
 	/**
@@ -86,7 +90,14 @@ class WorldJarBlockEntity(
 	 * @author sylv
 	 */
 	@ClientOnly
-	val renderRegion: JarChunkRenderRegion = JarChunkRenderRegion(this, chunks)
+	val lightingProvider: JarLightingProvider = JarLightingProvider(this, hasBlockLight = true, hasSkyLight = false)
+	
+	/**
+	 * TODO: docs
+	 * @author sylv
+	 */
+	@ClientOnly
+	val renderRegion: JarChunkRenderRegion = JarChunkRenderRegion(this, chunks, lightingProvider)
 	
 	/**
 	 * TODO: docs
@@ -99,8 +110,8 @@ class WorldJarBlockEntity(
 			for (y in 1..max) { // we move up one because the lowest layer is barrier blocks
 				for (z in 0..max) {
 					val pos = BlockPos(x, y, z)
-					val state = world.getBlockState(pos.add(this.subPos))
-					blockStates[pos.asLong()] = state
+					val state = world.getBlockState(pos)
+					setBlockState(pos, state)
 				}
 			}
 		}
@@ -189,38 +200,73 @@ class WorldJarBlockEntity(
 		}
 	}
 	
+	override fun getChunk(chunkX: Int, chunkZ: Int): ChunkLightBlockView {
+		return renderRegion
+	}
+	
 	/**
 	 * This method is called upon updating a chunk on the clientside. It first remaps [BlockState]s to the given [PalettedContainer]<[BlockState]>, then recreates the [JarChunk]s, and finally marks [statesChanged] as `true`.
 	 * @author sylv
 	 */
 	@ClientOnly
 	fun onChunkUpdate(client: MinecraftClient, blockStateContainer: PalettedContainer<BlockState>) {
-		// remap block states
-		blockStates = Long2ObjectOpenHashMap()
-		
-		val max = magnitude - 1
-		for (x in 0..max) {
-			for (y in 1..max) {
-				for (z in 0..max) {
-					val blockPos = BlockPos(x, y, z)
-					val state = blockStateContainer.get(x, y, z)
-					if (state.isAir) continue
-					blockStates[blockPos.asLong()] = state
-				}
-			}
-		}
-		
 		// recreate chunks
 		chunks.clear()
-		val max1 = ceil(magnitude / 16f).toInt() // technically we include blocks that aren't in the magnitude since those are still parts of chunks
+		val max = getChunkHeight() // technically we include blocks that aren't in the magnitude since those are still parts of chunks
 		val beginPos = BlockPos(0, 0, 0)
-		val offset = BlockPos(max1, max1, max1)
-		for (blockPos in BlockPos.iterate(beginPos, offset)) { // dirty hack
-			val chunkPos = ChunkSectionPos.from(blockPos.x, blockPos.y, blockPos.z)
-			client.execute { chunks.put(chunkPos.asLong(), JarChunk(chunkPos)) }
+		val offset = BlockPos(max, max, max)
+		for (chunkBlockPos in BlockPos.iterate(beginPos, offset)) { // dirty hack
+			val chunkPos = ChunkSectionPos.from(chunkBlockPos.x, chunkBlockPos.y, chunkBlockPos.z)
+			val chunk = JarChunk(chunkPos)
+			
+			// remap block states
+			val blockPos = BlockPos.Mutable()
+			for (x in 0..15) {
+				for (y in 0..15) {
+					for (z in 0..15) {
+						blockPos.set(x, y, z)
+						val state = blockStateContainer.get(x + chunkPos.x * 16, y + chunkPos.y * 16, z + chunkPos.z * 16)
+						if (state.isAir) continue
+						chunk.blockStates.set(blockPos.x, blockPos.y, blockPos.z, state)
+					}
+				}
+			}
+			
+			// put chunk
+			client.execute { chunks.put(chunkPos.asLong(), chunk) }
 		}
 		
 		client.execute { statesChanged = true }
+	}
+	
+	/**
+	 * Sets a [BlockState] at the specified position.
+	 * @author sylv
+	 */
+	fun setBlockState(pos: BlockPos, state: BlockState) {
+		val chunkPos = ChunkSectionPos.from(pos)
+		val chunk = chunks.get(chunkPos.asLong())
+		chunk.blockStates.set(pos.x, pos.y, pos.z, state)
+	}
+	
+	/**
+	 * Gets a [BlockState] from the specified position.
+	 * @return [BlockState]
+	 * @author sylv
+	 */
+	fun getBlockState(pos: BlockPos): BlockState {
+		val chunkPos = ChunkSectionPos.from(pos)
+		val chunk = chunks.get(chunkPos.asLong())
+		return chunk.blockStates.get(pos.x, pos.y, pos.z)
+	}
+	
+	/**
+	 * Returns how many chunks high the [WorldJarBlockEntity] is. This always rounds up to include partial chunks.
+	 * @return how many chunks high the [WorldJarBlockEntity] is.
+	 * @author sylv
+	 */
+	fun getChunkHeight(): Int {
+		return ceil(magnitude / 16.0f).toInt()
 	}
 	
 	/**
@@ -258,6 +304,24 @@ class WorldJarBlockEntity(
 		
 		// put
 		INSTANCES.remove(this)
+	}
+	
+	fun toPalettedContainer(): PalettedContainer<BlockState> {
+		val palettedContainer = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
+		val blockPos = BlockPos.Mutable()
+		chunks.forEach {
+			val chunkPos = ChunkSectionPos.from(it.key)
+			val chunk = it.value
+			for (x in 0..15) {
+				for (y in 0..15) {
+					for (z in 0..15) {
+						blockPos.set(chunkPos.multiply(16), x, y, z) // we get the absolute position from our relative position (x, y, z) by doing some math
+						palettedContainer.set(blockPos.x, blockPos.y, blockPos.z, chunk.blockStates.get(x, y, z))
+					}
+				}
+			}
+		}
+		return palettedContainer
 	}
 	
 	companion object {

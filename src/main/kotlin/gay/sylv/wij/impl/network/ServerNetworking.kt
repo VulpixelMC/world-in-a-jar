@@ -41,7 +41,7 @@ object ServerNetworking : Initializable {
 		
 		for (player in entity.playersTracking) {
 			val buf = PacketByteBufs.create()
-			val packet = JarWorldChunkUpdateS2CPacket(entity.pos, entity.blockStates.toPalettedContainer())
+			val packet = JarWorldChunkUpdateS2CPacket(entity.pos, entity.toPalettedContainer())
 			packet.write(buf)
 			ServerPlayNetworking.send(player, S2CPackets.JAR_WORLD_CHUNK_UPDATE, buf)
 		}
