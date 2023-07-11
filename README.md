@@ -15,5 +15,9 @@ Make little snow globes, make a cool redstone contraption; The possibilities are
 *The world ends at the world border; it is not truly infinite.<br>
 **As of releasing the ModFest version, the jar item is currently uncraftable.<br>
 
+## Redistribution 🖍️
+CursedMC does not sanction any redistributions not hosted on its website, GitHub, or Modrinth. Do not upload this software to any other services without due credit and links to the original file from which the redistributed software was downloaded.
+You may use this software in Modpacks, given due credit and a link to download the original software.
+
 ## License
 World In a Jar is licensed under `LGPL-3.0-only`. See `COPYING` and `COPYING.LESSER` for details.
