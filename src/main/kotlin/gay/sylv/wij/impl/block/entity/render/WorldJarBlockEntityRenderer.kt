@@ -18,8 +18,10 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.VertexBuffer
 import com.mojang.blaze3d.vertex.VertexFormat
+import com.mojang.blaze3d.vertex.VertexSorting
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import gay.sylv.wij.impl.scale
 import net.minecraft.block.BlockRenderType
@@ -46,8 +48,12 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		matrices.scale(entity.scale - 0.001f) // scale + prevent z-fighting
 		matrices.translate(0.001f, -0.001f, 0.001f)
 		
+		val cameraPos = ctx.renderDispatcher.camera.pos
+		
 		if (entity.statesChanged) {
 			entity.statesChanged = false
+			
+			var sortState: BufferBuilder.SortState? = null
 			
 			entity.chunkSections.forEach {
 				// build chunks
@@ -63,6 +69,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 				}
 				
 				val chunkMatrices = MatrixStack() // the matrices for the chunks
+				var hasTranslucent = false
 				for (blockPos in BlockPos.iterate(beginPos, offset)) {
 					val state = entity.getBlockState(blockPos)
 					val fluidState = state.fluidState
@@ -70,6 +77,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 					if (!fluidState.isEmpty) {
 						val renderLayer = RenderLayers.getFluidLayer(fluidState)
 						val bufferBuilder = chunk.buffers.get(renderLayer)
+						hasTranslucent = true
 						ctx.renderManager.renderFluid(blockPos, entity.renderRegion, bufferBuilder, state, fluidState)
 					}
 					
@@ -85,10 +93,44 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 					}
 				}
 				
-				// end building and bind vertex buffers
+				if (hasTranslucent) {
+					val bufferBuilder = chunk.buffers.get(RenderLayer.getTranslucent())
+					if (!bufferBuilder.isCurrentBatchEmpty) {
+						bufferBuilder.setQuadSorting(VertexSorting.byDistanceSquared(
+							cameraPos.x.toFloat() - beginPos.x,
+							cameraPos.y.toFloat() - beginPos.y,
+							cameraPos.z.toFloat() - beginPos.z,
+						))
+						sortState = bufferBuilder.popState()
+					}
+				}
+				
+				// end building and upload vertex buffers
 				chunk.vertexBuffers.forEach { (renderLayer, buffer) ->
 					val bufferBuilder = chunk.buffers.get(renderLayer)
 					val renderedBuffer = bufferBuilder.end()
+					buffer.bind()
+					buffer.upload(renderedBuffer)
+					VertexBuffer.unbind()
+				}
+				
+				// SortTask but crab
+				if (sortState != null && hasTranslucent) {
+					val renderLayer = RenderLayer.getTranslucent()
+					val bufferBuilder = chunk.buffers.get(renderLayer)
+					bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
+					bufferBuilder.restoreState(sortState)
+					bufferBuilder.setQuadSorting(
+						VertexSorting.byDistanceSquared(
+							cameraPos.x.toFloat() - beginPos.x,
+							cameraPos.y.toFloat() - beginPos.y,
+							cameraPos.z.toFloat() - beginPos.z,
+						)
+					)
+					sortState = bufferBuilder.popState()
+					
+					val renderedBuffer = bufferBuilder.end()
+					val buffer = chunk.vertexBuffers[RenderLayer.getTranslucent()]!!
 					buffer.bind()
 					buffer.upload(renderedBuffer)
 					VertexBuffer.unbind()

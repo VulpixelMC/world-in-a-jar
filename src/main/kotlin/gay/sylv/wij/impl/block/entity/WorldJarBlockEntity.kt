@@ -225,7 +225,7 @@ class WorldJarBlockEntity(
 	}
 	
 	/**
-	 * This function always returns null. This is replaced by [getChunk].
+	 * This function always returns null.
 	 * @return null
 	 */
 	override fun getChunk(chunkX: Int, chunkZ: Int): ChunkLightBlockView? {

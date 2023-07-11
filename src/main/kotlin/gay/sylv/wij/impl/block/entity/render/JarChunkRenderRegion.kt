@@ -18,12 +18,20 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
+import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap
+import it.unimi.dsi.fastutil.objects.Object2ObjectMaps
+import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMaps
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.color.biome.BiomeColorProvider
+import net.minecraft.client.color.world.BiomeColors
 import net.minecraft.client.world.BiomeColorCache
+import net.minecraft.client.world.ClientWorld
 import net.minecraft.fluid.FluidState
+import net.minecraft.util.Unit
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkSectionPos
 import net.minecraft.util.math.Direction
@@ -39,6 +47,16 @@ import org.quiltmc.loader.api.minecraft.ClientOnly
  */
 @ClientOnly
 class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val lightingProvider: JarLightingProvider) : BlockRenderView {
+	/**
+	 * A cache of biome colors for calculating biome color.
+	 * @author sylv
+	 */
+	private val colorCache: Map<BiomeColorProvider, BiomeColorCache> = hashMapOf(
+		Pair(BiomeColors.GRASS_COLOR, BiomeColorCache { calculateColor(it, BiomeColors.GRASS_COLOR) }),
+		Pair(BiomeColors.FOLIAGE_COLOR, BiomeColorCache { calculateColor(it, BiomeColors.FOLIAGE_COLOR)}),
+		Pair(BiomeColors.WATER_COLOR, BiomeColorCache { calculateColor(it, BiomeColors.WATER_COLOR)}),
+	)
+	
 	override fun getBlockState(pos: BlockPos): BlockState {
 		if (isOutside(pos)) {
 			return Blocks.AIR.defaultState
@@ -63,7 +81,7 @@ class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val lighting
 	}
 	
 	override fun getColor(pos: BlockPos?, biomeColorProvider: BiomeColorProvider?): Int {
-		return biomeColorCache.getBiomeColor(pos)
+		return colorCache[biomeColorProvider]!!.getBiomeColor(pos)
 	}
 	
 	override fun getHeight(): Int {
@@ -92,6 +110,15 @@ class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val lighting
 	 */
 	private fun isOutsideInt(x: Int): Boolean {
 		return x < 0 || x > entity.magnitude - 1
+	}
+	
+	/**
+	 * This calls [ClientWorld.calculateColor].
+	 * @author sylv
+	 */
+	private fun calculateColor(pos: BlockPos, colorProvider: BiomeColorProvider): Int {
+		val client = MinecraftClient.getInstance()
+		return client.world!!.calculateColor(pos, colorProvider)
 	}
 	
 	companion object {
