@@ -25,14 +25,15 @@ import net.minecraft.network.PacketByteBuf
 import net.minecraft.network.listener.ClientPlayPacketListener
 import net.minecraft.network.packet.Packet
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.ChunkSectionPos
 import net.minecraft.world.chunk.palette.PalettedContainer
 
 /**
  * Signals that a chunk inside the [WorldJarBlockEntity] has updated. This sends the [BlockPos] of the jar as well as the [PalettedContainer]<[BlockState]> of the chunk.
  * TODO: make this only update a single chunk in the jar per packet
  */
-class JarWorldChunkUpdateS2CPacket(val pos: BlockPos, val blockStateContainer: PalettedContainer<BlockState>) : Packet<ClientPlayPacketListener> {
-	constructor(buf: PacketByteBuf) : this(buf.readBlockPos(), buf.run {
+class JarWorldChunkUpdateS2CPacket(val pos: BlockPos, val sectionPos: ChunkSectionPos, val blockStateContainer: PalettedContainer<BlockState>) : Packet<ClientPlayPacketListener> {
+	constructor(buf: PacketByteBuf) : this(buf.readBlockPos(), buf.readChunkSectionPos(), buf.run {
 		val container = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
 		container.readPacket(this@run)
 		container
@@ -40,6 +41,7 @@ class JarWorldChunkUpdateS2CPacket(val pos: BlockPos, val blockStateContainer: P
 	
 	override fun write(buf: PacketByteBuf) {
 		buf.writeBlockPos(pos)
+		buf.writeChunkSectionPos(sectionPos)
 		blockStateContainer.writePacket(buf)
 	}
 	

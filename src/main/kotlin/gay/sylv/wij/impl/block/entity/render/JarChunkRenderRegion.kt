@@ -18,7 +18,6 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
@@ -30,39 +29,33 @@ import net.minecraft.util.math.ChunkSectionPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.BlockRenderView
 import net.minecraft.world.ChunkLightBlockView
-import net.minecraft.world.chunk.light.ChunkSkyLightSources
 import net.minecraft.world.chunk.light.LightingProvider
 import org.quiltmc.loader.api.minecraft.ClientOnly
-import java.util.function.BiConsumer
-import kotlin.math.ceil
-import kotlin.math.roundToInt
 
 /**
- * A [BlockRenderView] for [JarChunk]s.
+ * A [BlockRenderView] for [JarChunkSection]s.
  * TODO: use the entity world's lighting
- * TODO: move the [ChunkLightBlockView] so it's both server-side and client-side
  * @author sylv
  */
 @ClientOnly
-class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val chunks: Long2ObjectMap<JarChunk>, private val lightingProvider: JarLightingProvider) : BlockRenderView, ChunkLightBlockView {
+class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val lightingProvider: JarLightingProvider) : BlockRenderView {
 	override fun getBlockState(pos: BlockPos): BlockState {
 		if (isOutside(pos)) {
 			return Blocks.AIR.defaultState
 		}
-		val chunkPos = ChunkSectionPos.from(pos)
-		return chunks[chunkPos.asLong()]?.blockStates?.get(pos.x, pos.y, pos.z)!!
+		return entity.getBlockState(pos)
 	}
 	
 	override fun getFluidState(pos: BlockPos): FluidState {
 		if (isOutside(pos)) {
 			return Blocks.AIR.defaultState.fluidState
 		}
-		val chunkPos = ChunkSectionPos.from(pos)
-		return chunks[chunkPos.asLong()]?.blockStates?.get(pos.x, pos.y, pos.z)?.fluidState!!
+		return entity.getBlockState(pos).fluidState
 	}
 	
 	override fun getBlockEntity(pos: BlockPos): BlockEntity? {
-		return entity.blockEntities[pos.asLong()]
+		val chunkPos = ChunkSectionPos.from(pos)
+		return entity.chunks[chunkPos.asLong()].getBlockEntity(pos)
 	}
 	
 	override fun getBrightness(direction: Direction?, shaded: Boolean): Float {
@@ -85,18 +78,6 @@ class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val chunks: 
 		return lightingProvider
 	}
 	
-	@OptIn(ExperimentalStdlibApi::class)
-	override fun findBlockLightSources(callback: BiConsumer<BlockPos, BlockState>?) {
-		val blockPos = BlockPos.Mutable()
-		for (i in 0..<entity.getChunkHeight()) {
-			val chunkPos =
-		}
-	}
-	
-	override fun getSkyLightSources(): ChunkSkyLightSources {
-		TODO("Not yet implemented")
-	}
-	
 	/**
 	 * Determines if the [BlockPos] is outside the range of the magnitude.
 	 * @author sylv
@@ -110,7 +91,7 @@ class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val chunks: 
 	 * @author sylv
 	 */
 	private fun isOutsideInt(x: Int): Boolean {
-		return x < 0 || x > entity.magnitude
+		return x < 0 || x > entity.magnitude - 1
 	}
 	
 	companion object {

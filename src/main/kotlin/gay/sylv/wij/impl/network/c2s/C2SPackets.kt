@@ -24,7 +24,9 @@ import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.network.ServerNetworking
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Vec3d
+import net.minecraft.world.Heightmap
 import net.minecraft.world.TeleportTarget
+import org.quiltmc.qkl.library.math.toVec3i
 import org.quiltmc.qsl.networking.api.ServerPlayNetworking
 import org.quiltmc.qsl.worldgen.dimension.api.QuiltDimensions
 
@@ -35,6 +37,7 @@ import org.quiltmc.qsl.worldgen.dimension.api.QuiltDimensions
 object C2SPackets : gay.sylv.wij.api.Initializable {
 	internal val WORLD_JAR_ENTER = id("world_jar_enter")
 	internal val WORLD_JAR_UPDATE = id("world_jar_update")
+	internal val WORLD_JAR_LOCK = id("world_jar_lock")
 	internal val WORLD_JAR_LOADED = id("world_jar_loaded")
 	
 	override fun initialize() {
@@ -56,12 +59,12 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 				returnPos.`worldinajar$setReturnPos`(player.pos)
 				returnDim.`worldinajar$setReturnDim`(player.world.registryKey)
 				
-				QuiltDimensions.teleport<ServerPlayerEntity>(player, jarWorld, TeleportTarget(Vec3d.of(entity.subPos.add(0, 1, 0)), Vec3d.ZERO, 0f, 0f))
+				QuiltDimensions.teleport<ServerPlayerEntity>(player, jarWorld, TeleportTarget(Vec3d.of(entity.subPos)?.add(7.5, 2.5, 7.5), Vec3d.ZERO, 0f, 0f))
 			}
 		}
 		ServerPlayNetworking.registerGlobalReceiver(WORLD_JAR_UPDATE) {
 				server, player, _, buf, _ ->
-			val pos = buf.readBlockPos()
+			val subPos = buf.readBlockPos()
 			val magnitude = buf.readInt()
 			val entityPos = buf.readBlockPos()
 			
@@ -69,13 +72,25 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 				if (player.world.getBlockEntity(entityPos)?.type == BlockEntityTypes.WORLD_JAR) {
 					// update jar properties
 					val entity = player.world.getBlockEntity(entityPos, BlockEntityTypes.WORLD_JAR).get()
-					entity.subPos = pos.mutableCopy()
+					if (entity.locked && !player.hasPermissionLevel(2)) return@execute
+					entity.subPos = subPos.mutableCopy()
 					entity.magnitude = magnitude
 					entity.markDirty()
 					entity.sync()
-					
-					// send chunk update
-					ServerNetworking.sendChunks(player.world, entity)
+				}
+			}
+		}
+		ServerPlayNetworking.registerGlobalReceiver(WORLD_JAR_LOCK) {
+			server, player, _, buf, _ ->
+			val pos = buf.readBlockPos()
+			val locked = buf.readBoolean()
+			
+			server.execute {
+				if (player.hasPermissionLevel(2) && player.world.getBlockEntity(pos)?.type == BlockEntityTypes.WORLD_JAR) {
+					val entity = player.world.getBlockEntity(pos, BlockEntityTypes.WORLD_JAR).get()
+					entity.locked = locked
+					entity.markDirty()
+					entity.sync()
 				}
 			}
 		}

@@ -132,6 +132,10 @@ tasks.withType<JavaCompile> {
 	options.release.set(17)
 }
 
+loom {
+	accessWidenerPath.set(file("src/main/resources/$modId.accesswidener"))
+}
+
 java {
 	// Still required by IDEs such as Eclipse and Visual Studio Code
 	sourceCompatibility = JavaVersion.VERSION_17

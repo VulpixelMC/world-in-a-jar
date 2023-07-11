@@ -21,7 +21,7 @@ import gay.sylv.wij.api.Initializable
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import gay.sylv.wij.impl.network.s2c.JarWorldChunkUpdateS2CPacket
 import gay.sylv.wij.impl.network.s2c.S2CPackets
-import gay.sylv.wij.impl.toPalettedContainer
+import net.minecraft.util.math.ChunkSectionPos
 import net.minecraft.world.World
 import org.quiltmc.qkl.library.networking.playersTracking
 import org.quiltmc.qsl.networking.api.PacketByteBufs
@@ -37,13 +37,18 @@ object ServerNetworking : Initializable {
 	 * @author sylv
 	 */
 	fun sendChunks(world: World, entity: WorldJarBlockEntity) {
-		world.server?.let { entity.updateBlockStates(it) }
+		entity.updateBlockStates(world.server!!)
 		
 		for (player in entity.playersTracking) {
-			val buf = PacketByteBufs.create()
-			val packet = JarWorldChunkUpdateS2CPacket(entity.pos, entity.toPalettedContainer())
-			packet.write(buf)
-			ServerPlayNetworking.send(player, S2CPackets.JAR_WORLD_CHUNK_UPDATE, buf)
+			entity.chunkSections.forEach {
+				val sectionPos = ChunkSectionPos.from(it.key)
+				val chunk = it.value
+				
+				val buf = PacketByteBufs.create()
+				val packet = JarWorldChunkUpdateS2CPacket(entity.pos, sectionPos, chunk.blockStates)
+				packet.write(buf)
+				ServerPlayNetworking.send(player, S2CPackets.JAR_WORLD_CHUNK_UPDATE, buf)
+			}
 		}
 	}
 }

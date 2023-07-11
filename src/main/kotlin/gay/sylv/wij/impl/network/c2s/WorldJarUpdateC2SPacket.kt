@@ -26,13 +26,13 @@ import net.minecraft.util.math.BlockPos
 
 /**
  * This packet tells the server to update the properties of a [WorldJarBlockEntity] to the given parameters.
- * @param pos The [BlockPos] of the target location to display in the [WorldJarBlockEntity].
+ * @param subPos The [BlockPos] of the target location to display in the [WorldJarBlockEntity].
  * @param magnitude The scale of the [WorldJarBlockEntity] that will be displayed.
  * @param entityPos The [BlockPos] of the [WorldJarBlockEntity].
  */
-class WorldJarUpdateC2SPacket(private val pos: BlockPos, private val magnitude: Int, private val entityPos: BlockPos) : Packet<ServerPlayPacketListener> {
+class WorldJarUpdateC2SPacket(private val subPos: BlockPos, private val magnitude: Int, private val entityPos: BlockPos) : Packet<ServerPlayPacketListener> {
 	override fun write(buf: PacketByteBuf) {
-		buf.writeBlockPos(pos)
+		buf.writeBlockPos(subPos)
 		buf.writeInt(magnitude)
 		buf.writeBlockPos(entityPos)
 	}

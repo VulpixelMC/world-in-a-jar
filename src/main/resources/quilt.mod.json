@@ -46,6 +46,7 @@
 		]
 	},
 	"mixin": "worldinajar.mixins.json",
+	"access_widener": "worldinajar.accesswidener",
 	"waila:plugins": {
 		"id": "worldinajar:wij_waila",
 		"initializer": "gay.sylv.wij.impl.plugin.wthit.WorldInAJarWailaPlugin"

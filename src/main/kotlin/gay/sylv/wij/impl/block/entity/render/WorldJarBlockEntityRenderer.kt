@@ -49,7 +49,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		if (entity.statesChanged) {
 			entity.statesChanged = false
 			
-			entity.chunks.forEach {
+			entity.chunkSections.forEach {
 				// build chunks
 				val chunk = it.value
 				val beginPos = chunk.origin
@@ -59,12 +59,19 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 				// begin building each buffer
 				RenderLayer.getBlockLayers().forEach { renderLayer ->
 					val bufferBuilder = chunk.buffers.get(renderLayer)
-					bufferBuilder.begin(VertexFormat.DrawMode.QUADS, renderLayer.vertexFormat)
+					bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
 				}
 				
 				val chunkMatrices = MatrixStack() // the matrices for the chunks
 				for (blockPos in BlockPos.iterate(beginPos, offset)) {
 					val state = entity.getBlockState(blockPos)
+					val fluidState = state.fluidState
+					
+					if (!fluidState.isEmpty) {
+						val renderLayer = RenderLayers.getFluidLayer(fluidState)
+						val bufferBuilder = chunk.buffers.get(renderLayer)
+						ctx.renderManager.renderFluid(blockPos, entity.renderRegion, bufferBuilder, state, fluidState)
+					}
 					
 					if (state.renderType != BlockRenderType.INVISIBLE) {
 						// render block states
@@ -90,7 +97,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		}
 		
 		// render each chunk
-		entity.chunks.forEach {
+		entity.chunkSections.forEach {
 			val chunk = it.value
 			
 			// render each render layer

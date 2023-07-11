@@ -21,6 +21,7 @@ import gay.sylv.wij.impl.WIJConstants.MOD_ID
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.network.c2s.WorldJarEnterC2SPacket
+import gay.sylv.wij.impl.network.c2s.WorldJarLockC2SPacket
 import gay.sylv.wij.impl.network.c2s.WorldJarUpdateC2SPacket
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.GuiGraphics
@@ -38,6 +39,7 @@ class WorldJarScreen(text: Text?, private var blockEntity: WorldJarBlockEntity) 
 	private lateinit var inputZ: TextFieldWidget
 	private lateinit var inputScale: TextFieldWidget
 	private lateinit var applyButton: ButtonWidget
+	private lateinit var lockButton: ButtonWidget
 	private lateinit var enterButton: ButtonWidget
 	
 	constructor(blockEntity: WorldJarBlockEntity) : this(SCREEN_TEXT, blockEntity)
@@ -66,6 +68,25 @@ class WorldJarScreen(text: Text?, private var blockEntity: WorldJarBlockEntity) 
 				.positionAndSize(this.width / 2 - 128, 160, BUTTON_WIDTH, BUTTON_HEIGHT)
 				.build()
 		)
+		if (this.client?.player?.hasPermissionLevel(2) == true) {
+			if (this.blockEntity.locked) {
+				this.lockButton = this.addDrawableChild(
+					ButtonWidget.builder(UNLOCK_TEXT) {
+						this.unlockWorldJar()
+					}
+						.positionAndSize(this.width / 2 - 128, 120, BUTTON_WIDTH, BUTTON_HEIGHT)
+						.build()
+				)
+			} else {
+				this.lockButton = this.addDrawableChild(
+					ButtonWidget.builder(LOCK_TEXT) {
+						this.lockWorldJar()
+					}
+						.positionAndSize(this.width / 2 - 128, 120, BUTTON_WIDTH, BUTTON_HEIGHT)
+						.build()
+				)
+			}
+		}
 		this.enterButton = this.addDrawableChild(
 			ButtonWidget.builder(ENTER_TEXT) {
 				this.enterWorldJar()
@@ -94,6 +115,25 @@ class WorldJarScreen(text: Text?, private var blockEntity: WorldJarBlockEntity) 
 		} catch (ex: java.lang.NumberFormatException) {
 			return
 		}
+	}
+	
+	private fun lockWorldJar() {
+		blockEntity.locked = true
+		sendLockStatus()
+		this.clearAndInit()
+	}
+	
+	private fun unlockWorldJar() {
+		blockEntity.locked = false
+		sendLockStatus()
+		this.clearAndInit()
+	}
+	
+	private fun sendLockStatus() {
+		val buf = PacketByteBufs.create()
+		val packet = WorldJarLockC2SPacket(blockEntity.pos, blockEntity.locked)
+		packet.write(buf)
+		ClientPlayNetworking.send(C2SPackets.WORLD_JAR_LOCK, buf)
 	}
 	
 	private fun enterWorldJar() {
@@ -146,6 +186,8 @@ class WorldJarScreen(text: Text?, private var blockEntity: WorldJarBlockEntity) 
 		val Z_POS_TEXT: Text = Text.translatable("$MOD_ID.world_jar.z_pos")
 		val SCALE_TEXT: Text = Text.translatable("$MOD_ID.world_jar.scale")
 		val APPLY_TEXT: Text = Text.translatable("$MOD_ID.world_jar.apply")
+		val LOCK_TEXT: Text = Text.translatable("$MOD_ID.world_jar.lock")
+		val UNLOCK_TEXT: Text = Text.translatable("$MOD_ID.world_jar.unlock")
 		val ENTER_TEXT: Text = Text.translatable("$MOD_ID.world_jar.enter")
 		const val INPUT_WIDTH: Int = 40
 		const val INPUT_HEIGHT: Int = 20

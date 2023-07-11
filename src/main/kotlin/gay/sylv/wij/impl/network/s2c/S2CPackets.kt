@@ -26,7 +26,6 @@ import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
  * TODO: docs
  * @author sylv
  */
-@ClientOnly
 object S2CPackets : gay.sylv.wij.api.Initializable {
 	internal val JAR_WORLD_BLOCK_UPDATE = id("jar_world_block_update")
 	internal val JAR_WORLD_CHUNK_UPDATE = id("jar_world_chunk_update")
@@ -48,6 +47,7 @@ object S2CPackets : gay.sylv.wij.api.Initializable {
 				client, _, buf, _ ->
 			val packet = JarWorldChunkUpdateS2CPacket(buf)
 			val pos = packet.pos
+			val sectionPos = packet.sectionPos
 			val blockStateContainer = packet.blockStateContainer
 			val entityOption = client.world?.getBlockEntity(pos, BlockEntityTypes.WORLD_JAR)
 			if (entityOption!!.isEmpty) { // if the jar entity doesn't exist, return
@@ -55,7 +55,7 @@ object S2CPackets : gay.sylv.wij.api.Initializable {
 			}
 			
 			val entity = entityOption.get()
-			entity.onChunkUpdate(client, blockStateContainer)
+			entity.onChunkUpdate(client, sectionPos, blockStateContainer)
 		}
 	}
 }

@@ -11,5 +11,7 @@
 	"${id}.world_jar.z_pos": "Z",
 	"${id}.world_jar.scale": "Scale",
 	"${id}.world_jar.apply": "Apply",
+	"${id}.world_jar.lock": "Lock",
+	"${id}.world_jar.unlock": "Unlock",
 	"${id}.world_jar.enter": "Enter"
 }
