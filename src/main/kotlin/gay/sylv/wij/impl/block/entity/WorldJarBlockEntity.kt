@@ -277,7 +277,7 @@ class WorldJarBlockEntity(
 	 */
 	fun getBlockState(pos: BlockPos): BlockState {
 		val chunkPos = ChunkSectionPos.from(pos)
-		val section = chunkSections[chunkPos.asLong()] ?: return Blocks.AIR.defaultState
+		val section = chunkSections[chunkPos.asLong()]
 		return section.blockStates.get(pos.x.and(15), pos.y.and(15), pos.z.and(15))
 	}
 	
@@ -333,6 +333,8 @@ class WorldJarBlockEntity(
 	 */
 	private fun initializeChunks() {
 		// initialize chunks
+		chunkSections.clear()
+		chunks.clear()
 		val max = getChunkHeight() - 1
 		val beginPos = BlockPos(0, 0, 0)
 		val offset = BlockPos(max, max, max)
@@ -359,7 +361,7 @@ class WorldJarBlockEntity(
 		 * The maximum scale of the [WorldJarBlockEntity].
 		 * @author sylv
 		 */
-		const val MAX_SCALE = 16
+		const val MAX_SCALE = 64
 		
 		/**
 		 * A list of all the instances of [WorldJarBlockEntity].

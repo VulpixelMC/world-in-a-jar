@@ -19,6 +19,7 @@ package gay.sylv.wij.impl.network.s2c
 
 import gay.sylv.wij.impl.WIJConstants.id
 import gay.sylv.wij.impl.block.entity.BlockEntityTypes
+import net.minecraft.block.BlockRenderType
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
 
 /**

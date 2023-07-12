@@ -31,8 +31,10 @@ import net.minecraft.client.render.block.entity.BlockEntityRenderer
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.BlockPos
+import net.minecraft.util.math.ChunkSectionPos
 import net.minecraft.util.random.RandomGenerator
 import org.quiltmc.loader.api.minecraft.ClientOnly
+import kotlin.math.pow
 
 @ClientOnly
 class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Context) : BlockEntityRenderer<WorldJarBlockEntity> {
@@ -44,8 +46,9 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		light: Int,
 		overlay: Int
 	) {
+		val magic = -0.0006f * entity.scale.toFloat().pow(2.0f) + 0.085f * entity.scale - 1.183f // what the fuck https://www.wolframalpha.com/input?i=find+function+%282%2C+-1%29%2C+%2816%2C+0%29%2C+%2832%2C+1%29%2C+%2864%2C+2%29 FIXME: figure out why the stuff inside the jar is 1 block high when the scale is 2 and why it starts sinking by 1 block every 16 scale.
 		matrices.scale(entity.visualScale - 0.001f) // scale + prevent z-fighting
-		matrices.translate(0.001f, -0.001f, 0.001f)
+		matrices.translate(0.001f, magic, 0.001f)
 		
 		val cameraPos = ctx.renderDispatcher.camera.pos
 		
@@ -58,7 +61,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 				// build chunks
 				val chunk = it.value
 				val origin = chunk.origin
-				val offset = BlockPos(15, 15, 15)
+				val offset = BlockPos(15, 15, 15).add(origin)
 				val randomGenerator = RandomGenerator.createLegacy()
 				
 				// begin building each buffer
@@ -70,7 +73,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 				val chunkMatrices = MatrixStack() // the matrices for the chunks
 				var hasTranslucent = false
 				for (blockPos in BlockPos.iterate(origin, offset)) {
-					val state = entity.getBlockState(blockPos.add(origin))
+					val state = entity.getBlockState(blockPos)
 					val fluidState = state.fluidState
 					
 					if (!fluidState.isEmpty) {

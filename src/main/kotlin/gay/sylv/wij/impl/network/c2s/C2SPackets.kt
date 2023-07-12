@@ -63,7 +63,7 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 		ServerPlayNetworking.registerGlobalReceiver(WORLD_JAR_UPDATE) {
 				server, player, _, buf, _ ->
 			val subPos = buf.readBlockPos()
-			val magnitude = buf.readInt()
+			val scale = buf.readInt()
 			val entityPos = buf.readBlockPos()
 			
 			server.execute {
@@ -72,7 +72,7 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 					val entity = player.world.getBlockEntity(entityPos, BlockEntityTypes.WORLD_JAR).get()
 					if (entity.locked && !player.hasPermissionLevel(2)) return@execute
 					entity.subPos = subPos.mutableCopy()
-					entity.scale = magnitude
+					entity.scale = scale
 					entity.markDirty()
 					entity.sync()
 				}

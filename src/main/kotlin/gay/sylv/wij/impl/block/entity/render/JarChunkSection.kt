@@ -45,7 +45,7 @@ class JarChunkSection(offset: ChunkSectionPos, isClient: Boolean) {
 	lateinit var buffers: BlockBufferBuilderStorage
 	@ClientOnly
 	lateinit var vertexBuffers: Map<RenderLayer, VertexBuffer>
-	var blockStates: PalettedContainer<BlockState> = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
+	lateinit var blockStates: PalettedContainer<BlockState>
 	
 	/**
 	 * Determines if any [BlockState]s adhere to the predicate.
@@ -75,6 +75,8 @@ class JarChunkSection(offset: ChunkSectionPos, isClient: Boolean) {
 						{ VertexBuffer(VertexBuffer.Usage.STATIC) }
 					)
 				)
+		} else { // we do this only on the server because it's getting replaced on the client anyway
+			blockStates = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
 		}
 	}
 }
