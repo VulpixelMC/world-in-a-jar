@@ -72,7 +72,7 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 					val entity = player.world.getBlockEntity(entityPos, BlockEntityTypes.WORLD_JAR).get()
 					if (entity.locked && !player.hasPermissionLevel(2)) return@execute
 					entity.subPos = subPos.mutableCopy()
-					entity.magnitude = magnitude
+					entity.scale = magnitude
 					entity.markDirty()
 					entity.sync()
 				}

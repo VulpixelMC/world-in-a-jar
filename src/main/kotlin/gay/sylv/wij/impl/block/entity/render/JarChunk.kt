@@ -40,7 +40,7 @@ class JarChunk(private val offset: ChunkPos, private val entity: WorldJarBlockEn
 	private val blockEntities: Long2ObjectMap<BlockEntity> = Long2ObjectOpenHashMap() // TODO: implement BEs and BERs
 	
 	override fun getHeight(): Int {
-		return entity.magnitude
+		return entity.scale
 	}
 	
 	override fun getBottomY(): Int {

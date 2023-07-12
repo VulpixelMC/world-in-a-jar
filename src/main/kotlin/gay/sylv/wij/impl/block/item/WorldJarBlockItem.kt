@@ -17,7 +17,7 @@
  */
 package gay.sylv.wij.impl.block.item
 
-import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity.Companion.DEFAULT_MAGNITUDE
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity.Companion.DEFAULT_SCALE
 import net.minecraft.block.Block
 import net.minecraft.entity.player.PlayerEntity
 import net.minecraft.item.BlockItem
@@ -35,7 +35,7 @@ class WorldJarBlockItem(block: Block?, settings: Settings?) : BlockItem(block, s
 			val nbt = item.getOrCreateSubNbt("BlockEntityTag")
 			
 			if (nbt.getInt("magnitude") == 0) {
-				nbt.putInt("magnitude", DEFAULT_MAGNITUDE)
+				nbt.putInt("magnitude", DEFAULT_SCALE)
 			}
 		}
 		

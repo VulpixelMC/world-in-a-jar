@@ -59,7 +59,7 @@ class WorldJarScreen(text: Text?, private var blockEntity: WorldJarBlockEntity) 
 		this.addSelectableChild(inputZ)
 		this.inputScale = TextFieldWidget(this.textRenderer, this.width / 2 + 32, 120, INPUT_WIDTH, INPUT_HEIGHT, SCALE_TEXT)
 		this.inputScale.setMaxLength(4)
-		this.inputScale.text = blockEntity.magnitude.toString()
+		this.inputScale.text = blockEntity.scale.toString()
 		this.addSelectableChild(this.inputScale)
 		this.applyButton = this.addDrawableChild(
 			ButtonWidget.builder(APPLY_TEXT) {
@@ -98,8 +98,8 @@ class WorldJarScreen(text: Text?, private var blockEntity: WorldJarBlockEntity) 
 	
 	private fun updateWorldJar() {
 		try {
-			if (inputScale.text.toInt() > 16) {
-				inputScale.text = "16"
+			if (inputScale.text.toInt() > WorldJarBlockEntity.MAX_SCALE) {
+				inputScale.text = WorldJarBlockEntity.MAX_SCALE.toString()
 			}
 
 			ClientPlayNetworking.send(

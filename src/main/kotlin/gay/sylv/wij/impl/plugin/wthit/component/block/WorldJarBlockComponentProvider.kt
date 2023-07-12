@@ -27,7 +27,7 @@ import net.minecraft.text.Text
 class WorldJarBlockComponentProvider : IBlockComponentProvider {
 	override fun appendBody(tooltip: ITooltip, accessor: IBlockAccessor, config: IPluginConfig) {
 		val entity = accessor.getBlockEntity<WorldJarBlockEntity>()
-		val scale = entity?.magnitude
+		val scale = entity?.scale
 		val subPos = entity?.subPos
 		
 		tooltip.addLine(Text.literal("Scale: $scale"))

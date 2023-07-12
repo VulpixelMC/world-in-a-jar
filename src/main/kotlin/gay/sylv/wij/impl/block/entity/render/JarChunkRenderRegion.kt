@@ -79,7 +79,7 @@ class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val lighting
 	}
 	
 	override fun getHeight(): Int {
-		return entity.magnitude
+		return entity.scale
 	}
 	
 	override fun getBottomY(): Int {
@@ -99,11 +99,11 @@ class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val lighting
 	}
 	
 	/**
-	 * Determines if the [Int] is outside the range of the magnitude.
+	 * Determines if the [Int] is outside the range of the scale.
 	 * @author sylv
 	 */
 	private fun isOutsideInt(x: Int): Boolean {
-		return x < 0 || x > entity.magnitude - 1
+		return x < 0 || x > entity.scale - 1
 	}
 	
 	/**

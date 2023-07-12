@@ -28,6 +28,7 @@ import gay.sylv.wij.impl.toBlockPos
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.nbt.NbtCompound
@@ -60,13 +61,13 @@ class WorldJarBlockEntity(
 	 * TODO: docs
 	 * @author sylv
 	 */
-	var magnitude: Int = -1
+	var scale: Int = -1
 	/**
 	 * TODO: docs
 	 * @author sylv
 	 */
-	val scale: Float
-		get() = 1.0f / magnitude
+	val visualScale: Float
+		get() = 1.0f / scale
 	
 	/**
 	 * Whether the [WorldJarBlockEntity] is locked for non-operators.
@@ -121,7 +122,7 @@ class WorldJarBlockEntity(
 	fun updateBlockStates(server: MinecraftServer) {
 		initializeChunks()
 		val world = server.getWorld(DimensionTypes.WORLD_JAR_WORLD)!!
-		val max = magnitude - 1
+		val max = scale - 1
 		for (x in 0..max) {
 			for (y in 0..max) {
 				for (z in 0..max) {
@@ -139,7 +140,7 @@ class WorldJarBlockEntity(
 	 * @author sylv
 	 */
 	override fun hasBlockPos(pos: BlockPos): Boolean {
-		return pos.isWithinDistance(this.pos, magnitude.toDouble())
+		return pos.isWithinDistance(this.pos, scale.toDouble())
 	}
 	
 	/**
@@ -164,12 +165,12 @@ class WorldJarBlockEntity(
 	 */
 	override fun readNbt(nbt: NbtCompound) {
 		super.readNbt(nbt)
-		magnitude = nbt.getInt("magnitude")
+		scale = nbt.getInt("magnitude")
 		subPos = nbt.getLong("pos").toBlockPos()
 		locked = nbt.getBoolean("locked")
 		
-		if (magnitude > 16) {
-			magnitude = 16
+		if (scale > MAX_SCALE) {
+			scale = MAX_SCALE
 		}
 		
 		if (world?.isClient == true) { // we're on the client
@@ -187,8 +188,8 @@ class WorldJarBlockEntity(
 	 */
 	override fun writeNbt(nbt: NbtCompound) {
 		super.writeNbt(nbt)
-		if (magnitude != -1) {
-			nbt.putInt("magnitude", magnitude)
+		if (scale != -1) {
+			nbt.putInt("magnitude", scale)
 		}
 		
 		nbt.putLong("pos", subPos.asLong())
@@ -237,8 +238,14 @@ class WorldJarBlockEntity(
 	 */
 	@ClientOnly
 	fun onChunkUpdate(client: MinecraftClient, sectionPos: ChunkSectionPos, blockStateContainer: PalettedContainer<BlockState>) {
-		// put chunk
 		client.execute {
+			// clear chunks
+			if (sectionPos.asLong() == 0L) {
+				chunkSections.clear()
+				chunks.clear()
+			}
+			
+			// put chunk
 			val chunkSection = JarChunkSection(sectionPos, true)
 			val chunkPos = ChunkPos(sectionPos.x, sectionPos.z)
 			val chunk = JarChunk(chunkPos, this)
@@ -270,7 +277,7 @@ class WorldJarBlockEntity(
 	 */
 	fun getBlockState(pos: BlockPos): BlockState {
 		val chunkPos = ChunkSectionPos.from(pos)
-		val section = chunkSections[chunkPos.asLong()]
+		val section = chunkSections[chunkPos.asLong()] ?: return Blocks.AIR.defaultState
 		return section.blockStates.get(pos.x.and(15), pos.y.and(15), pos.z.and(15))
 	}
 	
@@ -280,7 +287,7 @@ class WorldJarBlockEntity(
 	 * @author sylv
 	 */
 	fun getChunkHeight(): Int {
-		return ceil(magnitude.toDouble() / 16.0).toInt()
+		return ceil(scale.toDouble() / 16.0).toInt()
 	}
 	
 	/**
@@ -343,10 +350,17 @@ class WorldJarBlockEntity(
 	
 	companion object {
 		/**
-		 * The default scale or "magnitude" of the [WorldJarBlockEntity].
+		 * The default scale of the [WorldJarBlockEntity].
 		 * @author sylv
 		 */
-		const val DEFAULT_MAGNITUDE = 16
+		const val DEFAULT_SCALE = 16
+		
+		/**
+		 * The maximum scale of the [WorldJarBlockEntity].
+		 * @author sylv
+		 */
+		const val MAX_SCALE = 16
+		
 		/**
 		 * A list of all the instances of [WorldJarBlockEntity].
 		 * @author sylv

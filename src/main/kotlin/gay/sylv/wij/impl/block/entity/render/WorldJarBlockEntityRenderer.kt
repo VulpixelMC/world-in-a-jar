@@ -44,7 +44,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		light: Int,
 		overlay: Int
 	) {
-		matrices.scale(entity.scale - 0.001f) // scale + prevent z-fighting
+		matrices.scale(entity.visualScale - 0.001f) // scale + prevent z-fighting
 		matrices.translate(0.001f, -0.001f, 0.001f)
 		
 		val cameraPos = ctx.renderDispatcher.camera.pos
@@ -57,7 +57,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 			entity.chunkSections.forEach {
 				// build chunks
 				val chunk = it.value
-				val beginPos = chunk.origin
+				val origin = chunk.origin
 				val offset = BlockPos(15, 15, 15)
 				val randomGenerator = RandomGenerator.createLegacy()
 				
@@ -69,8 +69,8 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 				
 				val chunkMatrices = MatrixStack() // the matrices for the chunks
 				var hasTranslucent = false
-				for (blockPos in BlockPos.iterate(beginPos, offset)) {
-					val state = entity.getBlockState(blockPos)
+				for (blockPos in BlockPos.iterate(origin, offset)) {
+					val state = entity.getBlockState(blockPos.add(origin))
 					val fluidState = state.fluidState
 					
 					if (!fluidState.isEmpty) {
@@ -96,9 +96,9 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 					val bufferBuilder = chunk.buffers.get(RenderLayer.getTranslucent())
 					if (!bufferBuilder.isCurrentBatchEmpty) {
 						bufferBuilder.setQuadSorting(VertexSorting.byDistanceSquared(
-							cameraPos.x.toFloat() - beginPos.x,
-							cameraPos.y.toFloat() - beginPos.y,
-							cameraPos.z.toFloat() - beginPos.z,
+							cameraPos.x.toFloat() - origin.x,
+							cameraPos.y.toFloat() - origin.y,
+							cameraPos.z.toFloat() - origin.z,
 						))
 						sortState = bufferBuilder.popState()
 					}
@@ -121,9 +121,9 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 					bufferBuilder.restoreState(sortState)
 					bufferBuilder.setQuadSorting(
 						VertexSorting.byDistanceSquared(
-							cameraPos.x.toFloat() - beginPos.x,
-							cameraPos.y.toFloat() - beginPos.y,
-							cameraPos.z.toFloat() - beginPos.z,
+							cameraPos.x.toFloat() - origin.x,
+							cameraPos.y.toFloat() - origin.y,
+							cameraPos.z.toFloat() - origin.z,
 						)
 					)
 					sortState = bufferBuilder.popState()
