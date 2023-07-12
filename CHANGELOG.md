@@ -1,6 +1,6 @@
-* Updated icon!
-* Operators (2+) can now see if a jar is locked in its block hover tooltip when using WTHIT.
-* Fixed biome colors.
-* Misc. fixes and codebase enhancements.
+* Increased the maximum scale for world jars to 64.
+* Added a crafting recipe for world jars.
+* Fixed rendering bugs that occurred when increasing the scale of the jar past 16.
+* Fixed issue where blocks would sink to the bottom of the jar when increasing the scale.
 * Removed Pineapple.
-* World Jars no longer produce offspring.
+* Pumpkins are now restricted to level 5 personnel following repeated misuse.
