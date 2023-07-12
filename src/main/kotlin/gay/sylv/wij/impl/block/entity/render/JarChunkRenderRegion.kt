@@ -18,10 +18,6 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
-import it.unimi.dsi.fastutil.objects.Object2ObjectArrayMap
-import it.unimi.dsi.fastutil.objects.Object2ObjectMap
-import it.unimi.dsi.fastutil.objects.Object2ObjectMaps
-import it.unimi.dsi.fastutil.objects.Object2ObjectSortedMaps
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
@@ -31,12 +27,10 @@ import net.minecraft.client.color.world.BiomeColors
 import net.minecraft.client.world.BiomeColorCache
 import net.minecraft.client.world.ClientWorld
 import net.minecraft.fluid.FluidState
-import net.minecraft.util.Unit
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkSectionPos
 import net.minecraft.util.math.Direction
 import net.minecraft.world.BlockRenderView
-import net.minecraft.world.ChunkLightBlockView
 import net.minecraft.world.chunk.light.LightingProvider
 import org.quiltmc.loader.api.minecraft.ClientOnly
 

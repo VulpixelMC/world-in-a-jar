@@ -18,7 +18,6 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import com.mojang.blaze3d.vertex.VertexBuffer
-import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks

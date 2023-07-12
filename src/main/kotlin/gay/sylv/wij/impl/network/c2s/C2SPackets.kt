@@ -24,9 +24,7 @@ import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.network.ServerNetworking
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.util.math.Vec3d
-import net.minecraft.world.Heightmap
 import net.minecraft.world.TeleportTarget
-import org.quiltmc.qkl.library.math.toVec3i
 import org.quiltmc.qsl.networking.api.ServerPlayNetworking
 import org.quiltmc.qsl.worldgen.dimension.api.QuiltDimensions
 

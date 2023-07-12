@@ -18,17 +18,15 @@
 package gay.sylv.wij.impl.block.entity
 
 import gay.sylv.wij.impl.block.entity.render.JarChunk
-import gay.sylv.wij.impl.block.entity.render.JarChunkSection
 import gay.sylv.wij.impl.block.entity.render.JarChunkRenderRegion
+import gay.sylv.wij.impl.block.entity.render.JarChunkSection
 import gay.sylv.wij.impl.block.entity.render.JarLightingProvider
 import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.network.c2s.WorldJarLoadedC2SPacket
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
-import net.minecraft.block.Block
 import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.nbt.NbtCompound
@@ -44,7 +42,6 @@ import net.minecraft.world.World
 import net.minecraft.world.chunk.ChunkProvider
 import net.minecraft.world.chunk.palette.PalettedContainer
 import org.quiltmc.loader.api.minecraft.ClientOnly
-import org.quiltmc.qkl.library.math.minus
 import org.quiltmc.qsl.block.entity.api.QuiltBlockEntity
 import org.quiltmc.qsl.networking.api.PacketByteBufs
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
