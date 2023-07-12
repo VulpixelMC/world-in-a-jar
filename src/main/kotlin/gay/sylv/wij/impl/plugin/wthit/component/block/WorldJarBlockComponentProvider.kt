@@ -26,10 +26,15 @@ import net.minecraft.text.Text
 
 class WorldJarBlockComponentProvider : IBlockComponentProvider {
 	override fun appendBody(tooltip: ITooltip, accessor: IBlockAccessor, config: IPluginConfig) {
-		val scale = accessor.getBlockEntity<WorldJarBlockEntity>()?.magnitude
-		val subPos = accessor.getBlockEntity<WorldJarBlockEntity>()?.subPos
+		val entity = accessor.getBlockEntity<WorldJarBlockEntity>()
+		val scale = entity?.magnitude
+		val subPos = entity?.subPos
 		
 		tooltip.addLine(Text.literal("Scale: $scale"))
 		tooltip.addLine(Text.literal("Position: ${subPos?.toShortString()}"))
+		
+		if (accessor.player.hasPermissionLevel(2)) {
+			tooltip.addLine(Text.literal("Locked: ${entity?.locked}"))
+		}
 	}
 }
