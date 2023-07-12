@@ -114,14 +114,4 @@ class JarChunkRenderRegion(val entity: WorldJarBlockEntity, private val lighting
 		val client = MinecraftClient.getInstance()
 		return client.world!!.calculateColor(pos, colorProvider)
 	}
-	
-	companion object {
-		/**
-		 * A dummy BiomeColorCache.
-		 * @author sylv
-		 */
-		val biomeColorCache: BiomeColorCache = BiomeColorCache {
-			return@BiomeColorCache 0
-		}
-	}
 }
