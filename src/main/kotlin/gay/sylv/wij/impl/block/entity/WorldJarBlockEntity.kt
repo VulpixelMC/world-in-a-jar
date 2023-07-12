@@ -229,7 +229,8 @@ class WorldJarBlockEntity(
 	 * @return null
 	 */
 	override fun getChunk(chunkX: Int, chunkZ: Int): ChunkLightBlockView? {
-		return null
+		val chunkPos = ChunkPos.toLong(chunkX, chunkZ)
+		return chunks[chunkPos]
 	}
 	
 	/**
