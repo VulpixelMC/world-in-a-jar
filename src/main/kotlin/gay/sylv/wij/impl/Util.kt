@@ -17,13 +17,8 @@
  */
 package gay.sylv.wij.impl
 
-import it.unimi.dsi.fastutil.longs.Long2ObjectMap
-import net.minecraft.block.Block
-import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.BlockPos
-import net.minecraft.world.chunk.palette.PalettedContainer
 
 fun MatrixStack.scale(scale: Float) {
 	this.scale(scale, scale, scale)
@@ -31,14 +26,4 @@ fun MatrixStack.scale(scale: Float) {
 
 fun Long.toBlockPos(): BlockPos {
 	return BlockPos.fromLong(this)
-}
-
-fun Long2ObjectMap<BlockState>.toPalettedContainer(): PalettedContainer<BlockState> {
-	val blockStateContainer = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
-	this.forEach {
-			(posLong, state) ->
-		val pos = posLong.toBlockPos()
-		blockStateContainer.set(pos.x, pos.y, pos.z, state)
-	}
-	return blockStateContainer
 }

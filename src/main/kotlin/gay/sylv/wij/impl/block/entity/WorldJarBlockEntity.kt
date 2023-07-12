@@ -24,6 +24,7 @@ import gay.sylv.wij.impl.block.entity.render.JarLightingProvider
 import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.network.c2s.WorldJarLoadedC2SPacket
+import gay.sylv.wij.impl.toBlockPos
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import net.minecraft.block.BlockState
@@ -164,7 +165,7 @@ class WorldJarBlockEntity(
 	override fun readNbt(nbt: NbtCompound) {
 		super.readNbt(nbt)
 		magnitude = nbt.getInt("magnitude")
-		subPos = BlockPos.fromLong(nbt.getLong("pos"))
+		subPos = nbt.getLong("pos").toBlockPos()
 		locked = nbt.getBoolean("locked")
 		
 		if (magnitude > 16) {
