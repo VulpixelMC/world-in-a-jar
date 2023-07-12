@@ -18,6 +18,7 @@
 package gay.sylv.wij.impl.server
 
 import gay.sylv.wij.impl.WIJConstants.MOD_ID
+import gay.sylv.wij.impl.WorldInAJar
 import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.network.ServerNetworking
 import net.minecraft.server.command.ServerCommandSource
@@ -26,6 +27,7 @@ import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.TeleportTarget
 import org.quiltmc.qkl.library.brigadier.argument.literal
+import org.quiltmc.qkl.library.brigadier.util.sendFeedback
 import org.quiltmc.qkl.library.brigadier.util.server
 import org.quiltmc.qsl.command.api.CommandRegistrationCallback
 import org.quiltmc.qsl.worldgen.dimension.api.QuiltDimensions
@@ -42,28 +44,48 @@ object WorldInAJarServer : gay.sylv.wij.api.Initializable {
 		
 		// commands
 		CommandRegistrationCallback.EVENT.register {
-				dispatcher, context, env ->
-			val backNode = dispatcher.register(
-				literal<ServerCommandSource>(EXIT_COMMAND)
-					.builder
-					.executes {
-						if (!it.source.isPlayer) {
-							it.source.sendError(Text.translatable("command.$MOD_ID.$EXIT_COMMAND.error.source"))
-							return@executes -1
-						}
-						val player = it.source.player
-						if (player!!.world.registryKey != DimensionTypes.WORLD_JAR_WORLD) {
-							it.source.sendError(Text.translatable("command.$MOD_ID.$EXIT_COMMAND.error.dimension"))
-							return@executes -1
-						}
-						val returnPos = it.source.player as gay.sylv.wij.impl.duck.PlayerWithReturnPos
-						val returnDim = it.source.player as gay.sylv.wij.impl.duck.PlayerWithReturnDim
-						QuiltDimensions.teleport<ServerPlayerEntity>(player, it.server.getWorld(returnDim.`worldinajar$getReturnDim`()), TeleportTarget(returnPos.`worldinajar$getReturnPos`(), Vec3d.ZERO, 0f, 0f))
-						return@executes 0
+				dispatcher, _, _ ->
+			val exitNode = literal<ServerCommandSource>(EXIT_COMMAND)
+				.builder
+				.executes {
+					if (!it.source.isPlayer) {
+						it.source.sendError(Text.translatable("command.$MOD_ID.$EXIT_COMMAND.error.source"))
+						return@executes -1
 					}
-			)
+					val player = it.source.player
+					if (player!!.world.registryKey != DimensionTypes.WORLD_JAR_WORLD) {
+						it.source.sendError(Text.translatable("command.$MOD_ID.$EXIT_COMMAND.error.dimension"))
+						return@executes -1
+					}
+					val returnPos = it.source.player as gay.sylv.wij.impl.duck.PlayerWithReturnPos
+					val returnDim = it.source.player as gay.sylv.wij.impl.duck.PlayerWithReturnDim
+					QuiltDimensions.teleport<ServerPlayerEntity>(player, it.server.getWorld(returnDim.`worldinajar$getReturnDim`()), TeleportTarget(returnPos.`worldinajar$getReturnPos`(), Vec3d.ZERO, 0f, 0f))
+					return@executes 0
+				}
+				.build()
 			
-			dispatcher.register(literal<ServerCommandSource>("$MOD_ID:$EXIT_COMMAND").builder.redirect(backNode))
+			val wijNode = dispatcher.register(literal<ServerCommandSource>(MOD_ID)
+				.builder
+				.then(exitNode))
+			
+			dispatcher.register(literal<ServerCommandSource>(MOD_ID)
+				.builder
+				.executes { context ->
+					val usages = dispatcher.getSmartUsage(wijNode, context.source)
+					
+					WorldInAJar.LOGGER.info(context.nodes[0].node.toString())
+					
+					usages.forEach {
+						context.sendFeedback(Text.literal("/$MOD_ID ${it.key.usageText}"), false)
+					}
+					
+					return@executes 0
+				})
+			
+			dispatcher.register(literal<ServerCommandSource>("wij")
+				.builder
+				.executes(wijNode.command)
+				.redirect(wijNode))
 		}
 	}
 }
