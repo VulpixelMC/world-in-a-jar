@@ -22,11 +22,11 @@ import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
 import net.minecraft.client.render.RenderLayer
-import net.minecraft.client.render.chunk.BlockBufferBuilderStorage
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkSectionPos
 import net.minecraft.world.chunk.palette.PalettedContainer
 import org.quiltmc.loader.api.minecraft.ClientOnly
+import java.lang.ref.Cleaner
 import java.util.function.Predicate
 import java.util.stream.Collectors
 
@@ -42,7 +42,7 @@ class JarChunkSection(offset: ChunkSectionPos, isClient: Boolean) {
 	 */
 	val origin: BlockPos
 	@ClientOnly
-	lateinit var buffers: BlockBufferBuilderStorage
+	lateinit var cleanable: Cleaner.Cleanable
 	@ClientOnly
 	lateinit var vertexBuffers: Map<RenderLayer, VertexBuffer>
 	lateinit var blockStates: PalettedContainer<BlockState>
@@ -63,10 +63,16 @@ class JarChunkSection(offset: ChunkSectionPos, isClient: Boolean) {
 		return blockStates[x, y, z]
 	}
 	
+	@ClientOnly
+	class ClientClean(private val vertexBuffers: Map<RenderLayer, VertexBuffer>): Runnable {
+		override fun run() {
+			vertexBuffers.values.forEach(VertexBuffer::close)
+		}
+	}
+	
 	init {
 		this.origin = BlockPos(offset.multiply(16))
 		if (isClient) {
-			buffers = BlockBufferBuilderStorage()
 			vertexBuffers = RenderLayer.getBlockLayers()
 				.stream()
 				.collect(
@@ -75,8 +81,13 @@ class JarChunkSection(offset: ChunkSectionPos, isClient: Boolean) {
 						{ VertexBuffer(VertexBuffer.Usage.STATIC) }
 					)
 				)
+			cleanable = CLEANER.register(this, ClientClean(vertexBuffers))
 		} else { // we do this only on the server because it's getting replaced on the client anyway
 			blockStates = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
 		}
+	}
+	
+	companion object {
+		val CLEANER: Cleaner = Cleaner.create()
 	}
 }

@@ -29,6 +29,7 @@ import net.minecraft.client.render.RenderLayers
 import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.block.entity.BlockEntityRenderer
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
+import net.minecraft.client.render.chunk.BlockBufferBuilderStorage
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkSectionPos
@@ -46,121 +47,136 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		light: Int,
 		overlay: Int
 	) {
-		val magic = -0.0006f * entity.scale.toFloat().pow(2.0f) + 0.085f * entity.scale - 1.183f // what the fuck https://www.wolframalpha.com/input?i=find+function+%282%2C+-1%29%2C+%2816%2C+0%29%2C+%2832%2C+1%29%2C+%2864%2C+2%29 FIXME: figure out why the stuff inside the jar is 1 block high when the scale is 2 and why it starts sinking by 1 block every 16 scale.
-		matrices.scale(entity.visualScale - 0.001f) // scale + prevent z-fighting
-		matrices.translate(0.001f, magic, 0.001f)
-		
-		val cameraPos = ctx.renderDispatcher.camera.pos
-		
-		if (entity.statesChanged) {
-			entity.statesChanged = false
+		try {
+			if (isJarRendering) {
+				return
+			}
+			isJarRendering = true
+			val magic = -0.0006f * entity.scale.toFloat()
+				.pow(2.0f) + 0.085f * entity.scale - 1.183f // what the fuck https://www.wolframalpha.com/input?i=find+function+%282%2C+-1%29%2C+%2816%2C+0%29%2C+%2832%2C+1%29%2C+%2864%2C+2%29 FIXME: figure out why the stuff inside the jar is 1 block high when the scale is 2 and why it starts sinking by 1 block every 16 scale.
+			matrices.scale(entity.visualScale - 0.001f) // scale + prevent z-fighting
+			matrices.translate(0.001f, magic, 0.001f)
 			
-			var sortState: BufferBuilder.SortState? = null
+			val cameraPos = ctx.renderDispatcher.camera.pos
 			
-			entity.chunkSections.forEach {
-				// build chunks
-				val chunk = it.value
-				val origin = chunk.origin
-				val offset = BlockPos(15, 15, 15).add(origin)
-				val randomGenerator = RandomGenerator.createLegacy()
+			if (entity.statesChanged) {
+				entity.statesChanged = false
 				
-				// begin building each buffer
-				RenderLayer.getBlockLayers().forEach { renderLayer ->
-					val bufferBuilder = chunk.buffers.get(renderLayer)
-					bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
-				}
+				var sortState: BufferBuilder.SortState? = null
 				
-				val chunkMatrices = MatrixStack() // the matrices for the chunks
-				var hasTranslucent = false
-				for (blockPos in BlockPos.iterate(origin, offset)) {
-					val state = entity.getBlockState(blockPos)
-					val fluidState = state.fluidState
+				entity.chunkSections.forEach {
+					// build chunks
+					val chunk = it.value
+					val origin = chunk.origin
+					val offset = BlockPos(15, 15, 15).add(origin)
+					val randomGenerator = RandomGenerator.createLegacy()
 					
-					if (!fluidState.isEmpty) {
-						val renderLayer = RenderLayers.getFluidLayer(fluidState)
-						val bufferBuilder = chunk.buffers.get(renderLayer)
-						hasTranslucent = true
-						ctx.renderManager.renderFluid(blockPos, entity.renderRegion, bufferBuilder, state, fluidState)
+					// begin building each buffer
+					RenderLayer.getBlockLayers().forEach { renderLayer ->
+						val bufferBuilder = BUFFERS.get(renderLayer)
+						bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
 					}
 					
-					if (state.renderType != BlockRenderType.INVISIBLE) {
-						// render block states
-						val renderLayer = RenderLayers.getBlockLayer(state)
-						val bufferBuilder = chunk.buffers.get(renderLayer)
+					val chunkMatrices = MatrixStack() // the matrices for the chunks
+					var hasTranslucent = false
+					for (blockPos in BlockPos.iterate(origin, offset)) {
+						val state = entity.getBlockState(blockPos)
+						val fluidState = state.fluidState
 						
-						chunkMatrices.push()
-						chunkMatrices.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
-						ctx.renderManager.renderBlock(state, blockPos, entity.renderRegion, chunkMatrices, bufferBuilder, true, randomGenerator)
-						chunkMatrices.pop()
+						if (!fluidState.isEmpty) {
+							val renderLayer = RenderLayers.getFluidLayer(fluidState)
+							val bufferBuilder = BUFFERS.get(renderLayer)
+							hasTranslucent = true
+							ctx.renderManager.renderFluid(blockPos, entity.renderRegion, bufferBuilder, state, fluidState)
+						}
+						
+						if (state.renderType != BlockRenderType.INVISIBLE) {
+							// render block states
+							val renderLayer = RenderLayers.getBlockLayer(state)
+							val bufferBuilder = BUFFERS.get(renderLayer)
+							
+							chunkMatrices.push()
+							chunkMatrices.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
+							ctx.renderManager.renderBlock(state, blockPos, entity.renderRegion, chunkMatrices, bufferBuilder, true, randomGenerator)
+							chunkMatrices.pop()
+						}
 					}
-				}
-				
-				if (hasTranslucent) {
-					val bufferBuilder = chunk.buffers.get(RenderLayer.getTranslucent())
-					if (!bufferBuilder.isCurrentBatchEmpty) {
-						bufferBuilder.setQuadSorting(VertexSorting.byDistanceSquared(
-							cameraPos.x.toFloat() - origin.x,
-							cameraPos.y.toFloat() - origin.y,
-							cameraPos.z.toFloat() - origin.z,
-						))
-						sortState = bufferBuilder.popState()
-					}
-				}
-				
-				// end building and upload vertex buffers
-				chunk.vertexBuffers.forEach { (renderLayer, buffer) ->
-					val bufferBuilder = chunk.buffers.get(renderLayer)
-					val renderedBuffer = bufferBuilder.end()
-					buffer.bind()
-					buffer.upload(renderedBuffer)
-					VertexBuffer.unbind()
-				}
-				
-				// SortTask but crab
-				if (sortState != null && hasTranslucent) {
-					val renderLayer = RenderLayer.getTranslucent()
-					val bufferBuilder = chunk.buffers.get(renderLayer)
-					bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
-					bufferBuilder.restoreState(sortState)
-					bufferBuilder.setQuadSorting(
-						VertexSorting.byDistanceSquared(
-							cameraPos.x.toFloat() - origin.x,
-							cameraPos.y.toFloat() - origin.y,
-							cameraPos.z.toFloat() - origin.z,
-						)
-					)
-					sortState = bufferBuilder.popState()
 					
-					val renderedBuffer = bufferBuilder.end()
-					val buffer = chunk.vertexBuffers[RenderLayer.getTranslucent()]!!
-					buffer.bind()
-					buffer.upload(renderedBuffer)
-					VertexBuffer.unbind()
+					if (hasTranslucent) {
+						val bufferBuilder = BUFFERS.get(RenderLayer.getTranslucent())
+						if (!bufferBuilder.isCurrentBatchEmpty) {
+							bufferBuilder.setQuadSorting(
+								VertexSorting.byDistanceSquared(
+									cameraPos.x.toFloat() - origin.x,
+									cameraPos.y.toFloat() - origin.y,
+									cameraPos.z.toFloat() - origin.z,
+								)
+							)
+							sortState = bufferBuilder.popState()
+						}
+					}
+					
+					// end building and upload vertex buffers
+					chunk.vertexBuffers.forEach { (renderLayer, buffer) ->
+						val bufferBuilder = BUFFERS.get(renderLayer)
+						val renderedBuffer = bufferBuilder.end()
+						buffer.bind()
+						buffer.upload(renderedBuffer)
+						VertexBuffer.unbind()
+					}
+					
+					// SortTask but crab
+					if (sortState != null && hasTranslucent) {
+						val renderLayer = RenderLayer.getTranslucent()
+						val bufferBuilder = BUFFERS.get(renderLayer)
+						bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
+						bufferBuilder.restoreState(sortState)
+						bufferBuilder.setQuadSorting(
+							VertexSorting.byDistanceSquared(
+								cameraPos.x.toFloat() - origin.x,
+								cameraPos.y.toFloat() - origin.y,
+								cameraPos.z.toFloat() - origin.z,
+							)
+						)
+						sortState = bufferBuilder.popState()
+						
+						val renderedBuffer = bufferBuilder.end()
+						val buffer = chunk.vertexBuffers[RenderLayer.getTranslucent()]!!
+						buffer.bind()
+						buffer.upload(renderedBuffer)
+						VertexBuffer.unbind()
+					}
 				}
 			}
-		}
-		
-		// render each chunk
-		entity.chunkSections.forEach {
-			val chunk = it.value
 			
-			// render each render layer
-			BLOCK_LAYERS.forEach { renderLayer ->
-				// set up shader
-				renderLayer.startDrawing()
-				val shader = RenderSystem.getShader()!!
+			// render each chunk
+			entity.chunkSections.forEach {
+				val chunk = it.value
 				
-				val buffer = chunk.vertexBuffers[renderLayer]!!
-				buffer.bind()
-				buffer.draw(matrices.peek().model, RenderSystem.getProjectionMatrix(), shader)
-				
-				VertexBuffer.unbind()
-				renderLayer.endDrawing()
+				// render each render layer
+				BLOCK_LAYERS.forEach { renderLayer ->
+					// set up shader
+					renderLayer.startDrawing()
+					val shader = RenderSystem.getShader()!!
+					
+					val buffer = chunk.vertexBuffers[renderLayer]!!
+					buffer.bind()
+					buffer.draw(matrices.peek().model, RenderSystem.getProjectionMatrix(), shader)
+					
+					VertexBuffer.unbind()
+					renderLayer.endDrawing()
+				}
 			}
+		} finally {
+			isJarRendering = false
 		}
 	}
 	
 	companion object {
+		// always reuse the same BBBS because it cannot be freed so it's an insta memleak.
+		private val BUFFERS: BlockBufferBuilderStorage = BlockBufferBuilderStorage()
+		// but prevent rendering JIJs just in case
+		private var isJarRendering: Boolean = false
 		private val BLOCK_LAYERS: List<RenderLayer> = listOf(RenderLayer.getSolid(), RenderLayer.getCutoutMipped(), RenderLayer.getCutout(), RenderLayer.getTripwire(), RenderLayer.getTranslucent())
 	}
 }
