@@ -63,6 +63,10 @@ class JarChunkSection(offset: ChunkSectionPos, isClient: Boolean) {
 		return blockStates[x, y, z]
 	}
 	
+	/**
+	 * Prevents memory leaks by closing `VertexBuffer`s.
+	 * @author SoniEx2
+	 */
 	@ClientOnly
 	class ClientClean(private val vertexBuffers: Map<RenderLayer, VertexBuffer>): Runnable {
 		override fun run() {

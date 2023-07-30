@@ -245,10 +245,16 @@ class WorldJarBlockEntity(
 	@ClientOnly
 	fun onChunkUpdate(client: MinecraftClient, sectionPos: ChunkSectionPos, blockStateContainer: PalettedContainer<BlockState>) {
 		client.execute {
+			// clear chunks
+			if (sectionPos.asLong() == 0L) {
+				chunkSections.clear()
+				chunks.clear()
+			}
+			
 			// put chunk
-			val chunkSection = chunkSections[sectionPos.asLong()] ?: JarChunkSection(sectionPos, true)
+			val chunkSection = JarChunkSection(sectionPos, true)
 			val chunkPos = ChunkPos(sectionPos.x, sectionPos.z)
-			val chunk = chunks[chunkPos.toLong()] ?: JarChunk(chunkPos, this)
+			val chunk = JarChunk(chunkPos, this)
 			
 			// remap block states
 			chunkSection.blockStates = blockStateContainer
