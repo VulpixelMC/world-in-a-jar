@@ -37,11 +37,6 @@ repositories {
 	}
 	
 	maven {
-		name = "auoeke Maven"
-		url = uri("https://maven.auoeke.net")
-	}
-	
-	maven {
 		url = uri("https://maven.bai.lol")
 	}
 	
