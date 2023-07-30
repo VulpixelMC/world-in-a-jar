@@ -27,7 +27,9 @@ import gay.sylv.wij.impl.network.c2s.WorldJarLoadedC2SPacket
 import gay.sylv.wij.impl.toBlockPos
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
+import net.minecraft.block.Block
 import net.minecraft.block.BlockState
+import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.nbt.NbtCompound
@@ -86,7 +88,7 @@ class WorldJarBlockEntity(
 	 * @author sylv
 	 */
 	@ClientOnly
-	internal var statesChanged = false
+	internal var statesChanged = true
 	
 	/**
 	 * [JarChunkSection]s that are loaded in the [WorldJarBlockEntity].
@@ -200,6 +202,7 @@ class WorldJarBlockEntity(
 						}
 						if (chunkSections[sectionPos.asLong()] == null) {
 							chunkSections[sectionPos.asLong()] = JarChunkSection(sectionPos, true)
+							chunkSections[sectionPos.asLong()].blockStates = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
 						}
 					}
 				}

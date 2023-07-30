@@ -106,7 +106,10 @@ dependencies {
 	
 	modCompileOnly("mcp.mobius.waila:wthit-api:quilt-8.1.1")
 	
-	modRuntimeOnly("com.terraformersmc", "modmenu", "7.1.0")
+	modRuntimeOnly("com.terraformersmc", "modmenu", "7.1.0") {
+		exclude(group = "net.fabricmc.fabric-api")
+		exclude(group = "net.fabricmc")
+	}
 }
 
 tasks.processResources {

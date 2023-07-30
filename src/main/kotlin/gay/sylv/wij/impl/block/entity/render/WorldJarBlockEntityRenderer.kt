@@ -22,6 +22,7 @@ import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.VertexBuffer
 import com.mojang.blaze3d.vertex.VertexSorting
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
+import gay.sylv.wij.impl.client.WorldInAJarClient
 import gay.sylv.wij.impl.scale
 import net.minecraft.block.BlockRenderType
 import net.minecraft.client.render.RenderLayer
@@ -47,10 +48,10 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		overlay: Int
 	) {
 		try {
-			if (entity.isRendering) {
+			if (isJarRendering) {
 				return
 			}
-			entity.isRendering = true
+			isJarRendering = true
 			val magic = -0.0006f * entity.scale.toFloat()
 				.pow(2.0f) + 0.085f * entity.scale - 1.183f // what the fuck https://www.wolframalpha.com/input?i=find+function+%282%2C+-1%29%2C+%2816%2C+0%29%2C+%2832%2C+1%29%2C+%2864%2C+2%29 FIXME: figure out why the stuff inside the jar is 1 block high when the scale is 2 and why it starts sinking by 1 block every 16 scale.
 			matrices.scale(entity.visualScale - 0.001f) // scale + prevent z-fighting
@@ -167,7 +168,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 				}
 			}
 		} finally {
-			entity.isRendering = false
+			isJarRendering = false
 		}
 	}
 	
@@ -175,5 +176,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		// always reuse the same BBBS because it cannot be freed, so it's an insta memleak.
 		private val BUFFERS: BlockBufferBuilderStorage = BlockBufferBuilderStorage()
 		private val BLOCK_LAYERS: List<RenderLayer> = listOf(RenderLayer.getSolid(), RenderLayer.getCutoutMipped(), RenderLayer.getCutout(), RenderLayer.getTripwire(), RenderLayer.getTranslucent())
+		// this is serialized, so we use this to prevent rendering jars inside jars
+		private var isJarRendering: Boolean = false
 	}
 }
