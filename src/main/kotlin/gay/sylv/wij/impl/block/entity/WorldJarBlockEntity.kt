@@ -28,7 +28,6 @@ import gay.sylv.wij.impl.toBlockPos
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import net.minecraft.block.BlockState
-import net.minecraft.block.Blocks
 import net.minecraft.block.entity.BlockEntity
 import net.minecraft.client.MinecraftClient
 import net.minecraft.nbt.NbtCompound
@@ -114,6 +113,13 @@ class WorldJarBlockEntity(
 	 */
 	@ClientOnly
 	lateinit var renderRegion: JarChunkRenderRegion
+	
+	/**
+	 * Is the current jar rendering? This should prevent jars inside jars.
+	 * @author sylv
+	 */
+	@ClientOnly
+	var isRendering: Boolean = false
 	
 	/**
 	 * TODO: docs
@@ -239,16 +245,10 @@ class WorldJarBlockEntity(
 	@ClientOnly
 	fun onChunkUpdate(client: MinecraftClient, sectionPos: ChunkSectionPos, blockStateContainer: PalettedContainer<BlockState>) {
 		client.execute {
-			// clear chunks
-			if (sectionPos.asLong() == 0L) {
-				chunkSections.clear()
-				chunks.clear()
-			}
-			
 			// put chunk
-			val chunkSection = JarChunkSection(sectionPos, true)
+			val chunkSection = chunkSections[sectionPos.asLong()] ?: JarChunkSection(sectionPos, true)
 			val chunkPos = ChunkPos(sectionPos.x, sectionPos.z)
-			val chunk = JarChunk(chunkPos, this)
+			val chunk = chunks[chunkPos.toLong()] ?: JarChunk(chunkPos, this)
 			
 			// remap block states
 			chunkSection.blockStates = blockStateContainer
@@ -265,8 +265,8 @@ class WorldJarBlockEntity(
 	 * @author sylv
 	 */
 	fun setBlockState(pos: BlockPos, state: BlockState) {
-		val chunkPos = ChunkSectionPos.from(pos)
-		val section = chunkSections[chunkPos.asLong()]
+		val sectionPos = ChunkSectionPos.from(pos)
+		val section = chunkSections[sectionPos.asLong()]
 		section.blockStates.set(pos.x.and(15), pos.y.and(15), pos.z.and(15), state)
 	}
 	
@@ -276,8 +276,8 @@ class WorldJarBlockEntity(
 	 * @author sylv
 	 */
 	fun getBlockState(pos: BlockPos): BlockState {
-		val chunkPos = ChunkSectionPos.from(pos)
-		val section = chunkSections[chunkPos.asLong()]
+		val sectionPos = ChunkSectionPos.from(pos)
+		val section = chunkSections[sectionPos.asLong()]
 		return section.blockStates.get(pos.x.and(15), pos.y.and(15), pos.z.and(15))
 	}
 	
