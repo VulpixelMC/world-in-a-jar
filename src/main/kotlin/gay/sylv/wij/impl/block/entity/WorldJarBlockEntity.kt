@@ -180,6 +180,30 @@ class WorldJarBlockEntity(
 		}
 		
 		if (world?.isClient == true) { // we're on the client
+			// clear old chunks
+			chunks.filterTo(chunks) {
+				val chunkPos = ChunkPos(it.key)
+				return@filterTo !(chunkPos.x > scale || chunkPos.z > scale)
+			}
+			chunkSections.filterTo(chunkSections) {
+				val sectionPos = ChunkSectionPos.from(it.key)
+				return@filterTo !(sectionPos.x > scale || sectionPos.y > scale || sectionPos.z > scale)
+			}
+			// initialize phantom chunks
+			for (x in 0..scale) {
+				for (y in 0..scale) {
+					for (z in 0..scale) {
+						val chunkPos = ChunkPos(x, z)
+						val sectionPos = ChunkSectionPos.from(x, y, z)
+						if (chunks[chunkPos.toLong()] == null) {
+							chunks[chunkPos.toLong()] = JarChunk(chunkPos, this)
+						}
+						if (chunkSections[sectionPos.asLong()] == null) {
+							chunkSections[sectionPos.asLong()] = JarChunkSection(sectionPos, true)
+						}
+					}
+				}
+			}
 			// tell the server we're loaded
 			val buf = PacketByteBufs.create()
 			val packet = WorldJarLoadedC2SPacket(pos)
@@ -194,6 +218,10 @@ class WorldJarBlockEntity(
 	 */
 	override fun writeNbt(nbt: NbtCompound) {
 		super.writeNbt(nbt)
+		if (scale > MAX_SCALE) {
+			scale = MAX_SCALE
+		}
+		
 		if (scale != -1) {
 			nbt.putInt("magnitude", scale)
 		}
@@ -245,16 +273,10 @@ class WorldJarBlockEntity(
 	@ClientOnly
 	fun onChunkUpdate(client: MinecraftClient, sectionPos: ChunkSectionPos, blockStateContainer: PalettedContainer<BlockState>) {
 		client.execute {
-			// clear chunks
-			if (sectionPos.asLong() == 0L) {
-				chunkSections.clear()
-				chunks.clear()
-			}
-			
 			// put chunk
-			val chunkSection = JarChunkSection(sectionPos, true)
+			val chunkSection = chunkSections[sectionPos.asLong()]!!
 			val chunkPos = ChunkPos(sectionPos.x, sectionPos.z)
-			val chunk = JarChunk(chunkPos, this)
+			val chunk = chunks[chunkPos.toLong()]!!
 			
 			// remap block states
 			chunkSection.blockStates = blockStateContainer
