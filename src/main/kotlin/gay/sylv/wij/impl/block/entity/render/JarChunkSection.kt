@@ -21,6 +21,7 @@ import com.mojang.blaze3d.vertex.VertexBuffer
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
+import net.minecraft.client.MinecraftClient
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.math.ChunkSectionPos
@@ -71,7 +72,10 @@ class JarChunkSection(offset: ChunkSectionPos, isClient: Boolean) {
 	@ClientOnly
 	class ClientClean(private val vertexBuffers: Map<RenderLayer, VertexBuffer>): Runnable {
 		override fun run() {
-			vertexBuffers.values.forEach(VertexBuffer::close)
+			val client = MinecraftClient.getInstance()
+			client.execute {
+				vertexBuffers.values.forEach(VertexBuffer::close)
+			}
 		}
 	}
 	
