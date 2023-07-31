@@ -18,11 +18,9 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.VertexBuffer
 import com.mojang.blaze3d.vertex.VertexSorting
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
-import gay.sylv.wij.impl.client.WorldInAJarClient
 import gay.sylv.wij.impl.scale
 import net.minecraft.block.BlockRenderType
 import net.minecraft.client.render.RenderLayer
@@ -61,8 +59,6 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 			
 			if (entity.statesChanged) {
 				entity.statesChanged = false
-				
-				var sortState: BufferBuilder.SortState? = null
 				
 				entity.chunkSections.forEach {
 					// build chunks
@@ -112,7 +108,6 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 									cameraPos.z.toFloat() - origin.z,
 								)
 							)
-							sortState = bufferBuilder.popState()
 						}
 					}
 					
@@ -125,27 +120,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 						VertexBuffer.unbind()
 					}
 					
-					// SortTask but crab
-					if (sortState != null && hasTranslucent) {
-						val renderLayer = RenderLayer.getTranslucent()
-						val bufferBuilder = BUFFERS.get(renderLayer)
-						bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
-						bufferBuilder.restoreState(sortState)
-						bufferBuilder.setQuadSorting(
-							VertexSorting.byDistanceSquared(
-								cameraPos.x.toFloat() - origin.x,
-								cameraPos.y.toFloat() - origin.y,
-								cameraPos.z.toFloat() - origin.z,
-							)
-						)
-						sortState = bufferBuilder.popState()
-						
-						val renderedBuffer = bufferBuilder.end()
-						val buffer = chunk.vertexBuffers[RenderLayer.getTranslucent()]!!
-						buffer.bind()
-						buffer.upload(renderedBuffer)
-						VertexBuffer.unbind()
-					}
+					chunk.hasBuilt = true
 				}
 			}
 			
@@ -153,18 +128,20 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 			entity.chunkSections.forEach {
 				val chunk = it.value
 				
-				// render each render layer
-				BLOCK_LAYERS.forEach { renderLayer ->
-					// set up shader
-					renderLayer.startDrawing()
-					val shader = RenderSystem.getShader()!!
-					
-					val buffer = chunk.vertexBuffers[renderLayer]!!
-					buffer.bind()
-					buffer.draw(matrices.peek().model, RenderSystem.getProjectionMatrix(), shader)
-					
-					VertexBuffer.unbind()
-					renderLayer.endDrawing()
+				if (chunk.hasBuilt) {
+					// render each render layer
+					BLOCK_LAYERS.forEach { renderLayer ->
+						// set up shader
+						renderLayer.startDrawing()
+						val shader = RenderSystem.getShader()!!
+						
+						val buffer = chunk.vertexBuffers[renderLayer]!!
+						buffer.bind()
+						buffer.draw(matrices.peek().model, RenderSystem.getProjectionMatrix(), shader)
+						
+						VertexBuffer.unbind()
+						renderLayer.endDrawing()
+					}
 				}
 			}
 		} finally {

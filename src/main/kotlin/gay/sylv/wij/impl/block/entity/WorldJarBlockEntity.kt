@@ -117,13 +117,6 @@ class WorldJarBlockEntity(
 	lateinit var renderRegion: JarChunkRenderRegion
 	
 	/**
-	 * Is the current jar rendering? This should prevent jars inside jars.
-	 * @author sylv
-	 */
-	@ClientOnly
-	var isRendering: Boolean = false
-	
-	/**
 	 * TODO: docs
 	 * @author sylv
 	 */
@@ -182,31 +175,7 @@ class WorldJarBlockEntity(
 		}
 		
 		if (world?.isClient == true) { // we're on the client
-			// clear old chunks
-			chunks.filterTo(chunks) {
-				val chunkPos = ChunkPos(it.key)
-				return@filterTo !(chunkPos.x > scale || chunkPos.z > scale)
-			}
-			chunkSections.filterTo(chunkSections) {
-				val sectionPos = ChunkSectionPos.from(it.key)
-				return@filterTo !(sectionPos.x > scale || sectionPos.y > scale || sectionPos.z > scale)
-			}
-			// initialize phantom chunks
-			for (x in 0..scale) {
-				for (y in 0..scale) {
-					for (z in 0..scale) {
-						val chunkPos = ChunkPos(x, z)
-						val sectionPos = ChunkSectionPos.from(x, y, z)
-						if (chunks[chunkPos.toLong()] == null) {
-							chunks[chunkPos.toLong()] = JarChunk(chunkPos, this)
-						}
-						if (chunkSections[sectionPos.asLong()] == null) {
-							chunkSections[sectionPos.asLong()] = JarChunkSection(sectionPos, true)
-							chunkSections[sectionPos.asLong()].blockStates = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
-						}
-					}
-				}
-			}
+			initializeClientChunks()
 			// tell the server we're loaded
 			val buf = PacketByteBufs.create()
 			val packet = WorldJarLoadedC2SPacket(pos)
@@ -378,6 +347,38 @@ class WorldJarBlockEntity(
 			// put chunk
 			chunkSections.put(sectionPos.asLong(), chunkSection)
 			chunks.put(chunkPos.toLong(), chunk)
+		}
+	}
+	
+	/**
+	 * Initialize chunks on the client-side.
+	 * @author sylv
+	 */
+	private fun initializeClientChunks() {
+		// clear old chunks
+		chunks.filterTo(chunks) {
+			val chunkPos = ChunkPos(it.key)
+			return@filterTo !(chunkPos.x > scale || chunkPos.z > scale)
+		}
+		chunkSections.filterTo(chunkSections) {
+			val sectionPos = ChunkSectionPos.from(it.key)
+			return@filterTo !(sectionPos.x > scale || sectionPos.y > scale || sectionPos.z > scale)
+		}
+		// initialize phantom chunks
+		for (x in 0..scale) {
+			for (y in 0..scale) {
+				for (z in 0..scale) {
+					val chunkPos = ChunkPos(x, z)
+					val sectionPos = ChunkSectionPos.from(x, y, z)
+					if (chunks[chunkPos.toLong()] == null) {
+						chunks[chunkPos.toLong()] = JarChunk(chunkPos, this)
+					}
+					if (chunkSections[sectionPos.asLong()] == null) {
+						chunkSections[sectionPos.asLong()] = JarChunkSection(sectionPos, true)
+						chunkSections[sectionPos.asLong()].blockStates = PalettedContainer(Block.STATE_IDS, Blocks.AIR.defaultState, PalettedContainer.PaletteProvider.BLOCK_STATE)
+					}
+				}
+			}
 		}
 	}
 	

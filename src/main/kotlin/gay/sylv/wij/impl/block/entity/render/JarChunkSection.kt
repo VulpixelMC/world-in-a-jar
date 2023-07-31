@@ -45,6 +45,7 @@ class JarChunkSection(offset: ChunkSectionPos, isClient: Boolean) {
 	lateinit var cleanable: Cleaner.Cleanable
 	@ClientOnly
 	lateinit var vertexBuffers: Map<RenderLayer, VertexBuffer>
+	var hasBuilt: Boolean = false
 	lateinit var blockStates: PalettedContainer<BlockState>
 	
 	/**
