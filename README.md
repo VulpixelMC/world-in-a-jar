@@ -15,6 +15,18 @@ Make little snow globes, make a cool redstone contraption; The possibilities are
 *The world ends at the world border; it is not truly infinite.<br>
 **As of releasing the ModFest version, the jar item is currently uncraftable.<br>
 
+## FAQ
+- ### Port to NeoForge? Fabric? \<insert loader here>?
+- no
+- ### Port to 1.12.2? \<insert version here>? Update to version *X*?
+- no
+- ### There is a bug and I need to report it!
+- Please go to [the issue tracker](https://github.com/CursedMC/world-in-a-jar/issues/new) and create a bug report.
+- ### Please add *X* feature.
+- yesn't (feel free to [open an issue](https://github.com/CursedMC/world-in-a-jar/issues/new))
+- ### Can I port this mod to *X*?
+- Go ahead. The license permits doing so as long as you follow its terms. I ask that you credit the original mod and state that it is an unofficial fork, however. Forks claiming to be official will be taken down.
+
 ## Redistribution 🖍️
 CursedMC does not sanction any redistributions not hosted on its website, GitHub, or Modrinth. Do not upload this software to any other services without due credit and links to the original file from which the redistributed software was downloaded.
 You may use this software in Modpacks, given due credit and a link to download the original software.
