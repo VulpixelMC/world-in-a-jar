@@ -354,6 +354,7 @@ class WorldJarBlockEntity(
 	 * Initialize chunks on the client-side.
 	 * @author sylv
 	 */
+	@OptIn(ExperimentalStdlibApi::class)
 	private fun initializeClientChunks() {
 		// clear old chunks
 		chunks.filterTo(chunks) {
@@ -365,9 +366,9 @@ class WorldJarBlockEntity(
 			return@filterTo !(sectionPos.x > scale || sectionPos.y > scale || sectionPos.z > scale)
 		}
 		// initialize phantom chunks
-		for (x in 0..scale) {
-			for (y in 0..scale) {
-				for (z in 0..scale) {
+		for (x in 0..<scale) {
+			for (y in 0..<scale) {
+				for (z in 0..<scale) {
 					val chunkPos = ChunkPos(x, z)
 					val sectionPos = ChunkSectionPos.from(x, y, z)
 					if (chunks[chunkPos.toLong()] == null) {
