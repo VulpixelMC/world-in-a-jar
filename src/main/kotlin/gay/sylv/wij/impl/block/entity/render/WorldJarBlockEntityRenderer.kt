@@ -124,13 +124,13 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 				}
 			}
 			
-			// render each chunk
-			entity.chunkSections.forEach {
-				val chunk = it.value
-				
-				if (chunk.hasBuilt) {
-					// render each render layer
-					BLOCK_LAYERS.forEach { renderLayer ->
+			// render each render layer
+			BLOCK_LAYERS.forEach { renderLayer ->
+				// render each chunk
+				entity.chunkSections.forEach {
+					val chunk = it.value
+					
+					if (chunk.hasBuilt) {
 						// set up shader
 						renderLayer.startDrawing()
 						val shader = RenderSystem.getShader()!!

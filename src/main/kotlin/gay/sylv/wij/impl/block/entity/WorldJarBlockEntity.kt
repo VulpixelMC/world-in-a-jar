@@ -366,9 +366,9 @@ class WorldJarBlockEntity(
 			return@filterTo !(sectionPos.x > scale || sectionPos.y > scale || sectionPos.z > scale)
 		}
 		// initialize phantom chunks
-		for (x in 0..<scale) {
-			for (y in 0..<scale) {
-				for (z in 0..<scale) {
+		for (x in 0..<getChunkHeight()) {
+			for (y in 0..<getChunkHeight()) {
+				for (z in 0..<getChunkHeight()) {
 					val chunkPos = ChunkPos(x, z)
 					val sectionPos = ChunkSectionPos.from(x, y, z)
 					if (chunks[chunkPos.toLong()] == null) {
