@@ -126,13 +126,14 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 			
 			// render each render layer
 			BLOCK_LAYERS.forEach { renderLayer ->
+				renderLayer.startDrawing()
+				
 				// render each chunk
 				entity.chunkSections.forEach {
 					val chunk = it.value
 					
 					if (chunk.hasBuilt) {
 						// set up shader
-						renderLayer.startDrawing()
 						val shader = RenderSystem.getShader()!!
 						
 						val buffer = chunk.vertexBuffers[renderLayer]!!
@@ -140,9 +141,10 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 						buffer.draw(matrices.peek().model, RenderSystem.getProjectionMatrix(), shader)
 						
 						VertexBuffer.unbind()
-						renderLayer.endDrawing()
 					}
 				}
+				
+				renderLayer.endDrawing()
 			}
 		} finally {
 			isJarRendering = false
