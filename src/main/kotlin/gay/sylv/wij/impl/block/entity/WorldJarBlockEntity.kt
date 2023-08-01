@@ -48,7 +48,6 @@ import org.quiltmc.loader.api.minecraft.ClientOnly
 import org.quiltmc.qsl.block.entity.api.QuiltBlockEntity
 import org.quiltmc.qsl.networking.api.PacketByteBufs
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
-import kotlin.math.ceil
 
 /**
  * A World Jar [BlockEntity].
@@ -282,12 +281,12 @@ class WorldJarBlockEntity(
 	}
 	
 	/**
-	 * Returns how many chunks high the [WorldJarBlockEntity] is. This always rounds up to include partial chunks.
-	 * @return how many chunks high the [WorldJarBlockEntity] is.
+	 * Returns how many chunks high/wide the [WorldJarBlockEntity] is. This always rounds up to include partial chunks.
+	 * @return how many chunks high/wide the [WorldJarBlockEntity] is.
 	 * @author sylv
 	 */
-	fun getChunkHeight(): Int {
-		return ceil(scale.toDouble() / 16.0).toInt()
+	fun getChunkDiameter(): Int {
+		return ChunkSectionPos.getSectionCoord(scale)
 	}
 	
 	/**
@@ -335,7 +334,7 @@ class WorldJarBlockEntity(
 		// initialize chunks
 		chunkSections.clear()
 		chunks.clear()
-		val max = getChunkHeight() - 1
+		val max = getChunkDiameter() - 1
 		val beginPos = BlockPos(0, 0, 0)
 		val offset = BlockPos(max, max, max)
 		for (chunkBlockPos in BlockPos.iterate(beginPos, offset)) { // dirty hack
@@ -366,9 +365,9 @@ class WorldJarBlockEntity(
 			return@filterTo !(sectionPos.x > scale || sectionPos.y > scale || sectionPos.z > scale)
 		}
 		// initialize phantom chunks
-		for (x in 0..<getChunkHeight()) {
-			for (y in 0..<getChunkHeight()) {
-				for (z in 0..<getChunkHeight()) {
+		for (x in 0..<getChunkDiameter()) {
+			for (y in 0..<getChunkDiameter()) {
+				for (z in 0..<getChunkDiameter()) {
 					val chunkPos = ChunkPos(x, z)
 					val sectionPos = ChunkSectionPos.from(x, y, z)
 					if (chunks[chunkPos.toLong()] == null) {

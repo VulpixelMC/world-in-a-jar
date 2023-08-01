@@ -29,7 +29,6 @@ import net.minecraft.util.math.ChunkSectionPos
 import net.minecraft.world.ChunkLightBlockView
 import net.minecraft.world.chunk.light.ChunkSkyLightSources
 import java.util.function.BiConsumer
-import kotlin.math.ceil
 
 /**
  * A full version of [JarChunkSection]. This is used in lighting.
@@ -52,7 +51,7 @@ class JarChunk(private val offset: ChunkPos, private val entity: WorldJarBlockEn
 	}
 	
 	override fun getBlockState(pos: BlockPos): BlockState {
-		val chunkPos = ChunkSectionPos.from(offset.x, ceil(pos.y / 16.0).toInt(), offset.z)
+		val chunkPos = ChunkSectionPos.from(offset.x, ChunkSectionPos.getSectionCoord(pos.y), offset.z)
 		return entity.chunkSections[chunkPos.asLong()].blockStates[pos.x.and(15), pos.y.and(15), pos.z.and(15)]
 	}
 	
@@ -64,7 +63,7 @@ class JarChunk(private val offset: ChunkPos, private val entity: WorldJarBlockEn
 	override fun findBlockLightSources(callback: BiConsumer<BlockPos, BlockState>) {
 		val illuminates: (BlockState) -> Boolean = { state: BlockState -> state.luminance != 0 }
 		val blockPos = BlockPos.Mutable()
-		for (i in 0..<entity.getChunkHeight()) {
+		for (i in 0..<entity.getChunkDiameter()) {
 			val section = getSection(i)
 			if (section.hasAny(illuminates)) {
 				for (x in 0..15) {
