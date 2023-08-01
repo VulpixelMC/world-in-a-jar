@@ -56,8 +56,9 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 				val returnDim = player as gay.sylv.wij.impl.duck.PlayerWithReturnDim
 				returnPos.`worldinajar$setReturnPos`(player.pos)
 				returnDim.`worldinajar$setReturnDim`(player.world.registryKey)
+				val middle = entity.scale / 2.0 // the middle-point where the player spawns
 				
-				QuiltDimensions.teleport<ServerPlayerEntity>(player, jarWorld, TeleportTarget(Vec3d.of(entity.subPos)?.add(7.5, 2.5, 7.5), Vec3d.ZERO, 0f, 0f))
+				QuiltDimensions.teleport<ServerPlayerEntity>(player, jarWorld, TeleportTarget(Vec3d.of(entity.subPos)?.add(middle, 2.5, middle), Vec3d.ZERO, 0f, 0f))
 			}
 		}
 		ServerPlayNetworking.registerGlobalReceiver(WORLD_JAR_UPDATE) {
