@@ -12,5 +12,6 @@
 	"worldinajar.world_jar.apply": "Apply",
 	"worldinajar.world_jar.lock": "Lock",
 	"worldinajar.world_jar.unlock": "Unlock",
-	"worldinajar.world_jar.enter": "Enter"
+	"worldinajar.world_jar.enter": "Enter",
+	"worldinajar.world_jar.enter_message": "To exit the world jar, use the command /%s %s."
 }

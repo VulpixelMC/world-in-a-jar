@@ -15,10 +15,11 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.impl.network
+package gay.sylv.wij.impl.server.network
 
 import gay.sylv.wij.api.Initializable
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
+import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.network.s2c.JarWorldChunkUpdateS2CPacket
 import gay.sylv.wij.impl.network.s2c.S2CPackets
 import net.minecraft.util.math.ChunkSectionPos
@@ -50,5 +51,10 @@ object ServerNetworking : Initializable {
 				ServerPlayNetworking.send(player, S2CPackets.JAR_WORLD_CHUNK_UPDATE, buf)
 			}
 		}
+	}
+	
+	override fun initialize() {
+		// packets
+		C2SPackets.initialize()
 	}
 }

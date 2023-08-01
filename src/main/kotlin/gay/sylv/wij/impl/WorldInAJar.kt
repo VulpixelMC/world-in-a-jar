@@ -25,12 +25,10 @@ import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.generator.VoidChunkGenerator
 import gay.sylv.wij.impl.item.group.ItemGroups
 import gay.sylv.wij.impl.network.Networking
-import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.server.WorldInAJarServer
 import net.minecraft.registry.Registries
 import net.minecraft.registry.Registry
 import org.quiltmc.loader.api.ModContainer
-import org.quiltmc.loader.api.QuiltLoader
 import org.quiltmc.qsl.base.api.entrypoint.ModInitializer
 import org.slf4j.Logger
 import org.slf4j.LoggerFactory
@@ -39,13 +37,8 @@ class WorldInAJar : ModInitializer {
 	override fun onInitialize(mod: ModContainer) {
 		LOGGER.info("loading {}", mod.metadata().name())
 		
-		if (QuiltLoader.isModLoaded("sodium")) {
-			HAS_SODIUM = true
-		}
-		
 		// networking
 		Networking.initialize()
-		C2SPackets.initialize()
 		
 		// initialize server
 		WorldInAJarServer.initialize()
@@ -67,6 +60,5 @@ class WorldInAJar : ModInitializer {
 		// It is considered best practice to use your mod name as the logger's name.
 		// That way, it's clear which mod wrote info, warnings, and errors.
 		val LOGGER: Logger = LoggerFactory.getLogger("World In A Jar")
-		var HAS_SODIUM: Boolean = false
 	}
 }

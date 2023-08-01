@@ -120,7 +120,7 @@ class WorldJarBlockEntity(
 	 * @author sylv
 	 */
 	fun updateBlockStates(server: MinecraftServer) {
-		initializeChunks()
+		initializeServerChunks()
 		val world = server.getWorld(DimensionTypes.WORLD_JAR_WORLD)!!
 		val max = scale - 1
 		for (x in 0..max) {
@@ -286,7 +286,7 @@ class WorldJarBlockEntity(
 	 * @author sylv
 	 */
 	fun getChunkDiameter(): Int {
-		return ChunkSectionPos.getSectionCoord(scale)
+		return ChunkSectionPos.getSectionCoord(scale) + 1
 	}
 	
 	/**
@@ -330,22 +330,24 @@ class WorldJarBlockEntity(
 	 * Initializes the chunks server-side.
 	 * @author sylv
 	 */
-	private fun initializeChunks() {
+	private fun initializeServerChunks() {
 		// initialize chunks
 		chunkSections.clear()
 		chunks.clear()
 		val max = getChunkDiameter() - 1
-		val beginPos = BlockPos(0, 0, 0)
-		val offset = BlockPos(max, max, max)
-		for (chunkBlockPos in BlockPos.iterate(beginPos, offset)) { // dirty hack
-			val sectionPos = ChunkSectionPos.from(chunkBlockPos.x, chunkBlockPos.y, chunkBlockPos.z)
-			val chunkSection = JarChunkSection(sectionPos, false)
-			val chunkPos = ChunkPos(sectionPos.x, sectionPos.z)
-			val chunk = JarChunk(chunkPos, this)
-			
-			// put chunk
-			chunkSections.put(sectionPos.asLong(), chunkSection)
-			chunks.put(chunkPos.toLong(), chunk)
+		for (x in 0..max) {
+			for (y in 0..max) {
+				for (z in 0..max) {
+					val sectionPos = ChunkSectionPos.from(x, y, z)
+					val chunkSection = JarChunkSection(sectionPos, false)
+					val chunkPos = ChunkPos(sectionPos.x, sectionPos.z)
+					val chunk = JarChunk(chunkPos, this)
+					
+					// put chunk
+					chunkSections.put(sectionPos.asLong(), chunkSection)
+					chunks.put(chunkPos.toLong(), chunk)
+				}
+			}
 		}
 	}
 	

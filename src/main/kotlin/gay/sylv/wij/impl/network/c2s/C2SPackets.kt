@@ -17,19 +17,22 @@
  */
 package gay.sylv.wij.impl.network.c2s
 
+import gay.sylv.wij.impl.WIJConstants.MOD_ID
 import gay.sylv.wij.impl.WIJConstants.id
 import gay.sylv.wij.impl.block.entity.BlockEntityTypes
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import gay.sylv.wij.impl.dimension.DimensionTypes
-import gay.sylv.wij.impl.network.ServerNetworking
+import gay.sylv.wij.impl.server.command.Commands
+import gay.sylv.wij.impl.server.network.ServerNetworking
 import net.minecraft.server.network.ServerPlayerEntity
+import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3d
 import net.minecraft.world.TeleportTarget
 import org.quiltmc.qsl.networking.api.ServerPlayNetworking
 import org.quiltmc.qsl.worldgen.dimension.api.QuiltDimensions
 
 /**
- * TODO: docs
+ * Registers receivers and handles server-side C2S-related packets.
  * @author sylv
  */
 object C2SPackets : gay.sylv.wij.api.Initializable {
@@ -58,7 +61,11 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 				returnDim.`worldinajar$setReturnDim`(player.world.registryKey)
 				val middle = entity.scale / 2.0 // the middle-point where the player spawns
 				
+				// teleport the player in the middle of the jar two-and-a-half blocks above the Y of the sub-position (subPos)
 				QuiltDimensions.teleport<ServerPlayerEntity>(player, jarWorld, TeleportTarget(Vec3d.of(entity.subPos)?.add(middle, 2.5, middle), Vec3d.ZERO, 0f, 0f))
+				// tell the player that they can exit the jar using /worldinajar exit
+				// TODO: make a way for the player to exit the jar without using a command
+				player.sendSystemMessage(Text.translatable("$MOD_ID.world_jar.enter_message", Commands.ROOT_COMMAND as Any, Commands.EXIT_COMMAND))
 			}
 		}
 		ServerPlayNetworking.registerGlobalReceiver(WORLD_JAR_UPDATE) {

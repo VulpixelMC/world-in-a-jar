@@ -20,7 +20,7 @@ package gay.sylv.wij.impl.client
 
 import gay.sylv.wij.impl.block.Blocks
 import gay.sylv.wij.impl.block.entity.render.BlockEntityRenderers
-import gay.sylv.wij.impl.network.s2c.S2CPackets
+import gay.sylv.wij.impl.client.network.ClientNetworking
 import net.minecraft.client.render.RenderLayer
 import org.quiltmc.loader.api.ModContainer
 import org.quiltmc.qsl.base.api.entrypoint.client.ClientModInitializer
@@ -29,11 +29,11 @@ import org.slf4j.Logger
 import org.slf4j.LoggerFactory
 
 class WorldInAJarClient : ClientModInitializer {
-	override fun onInitializeClient(mod: ModContainer?) {
+	override fun onInitializeClient(mod: ModContainer) {
 		LOGGER.info("initialized client")
 		
 		// networking
-		S2CPackets.initialize()
+		ClientNetworking.initialize()
 		
 		// rendering
 		BlockEntityRenderers.initialize()
