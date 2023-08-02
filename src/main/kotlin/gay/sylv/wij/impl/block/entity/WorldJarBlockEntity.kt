@@ -24,7 +24,7 @@ import gay.sylv.wij.impl.block.entity.render.JarLightingProvider
 import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.network.c2s.WorldJarLoadedC2SPacket
-import gay.sylv.wij.impl.toBlockPos
+import gay.sylv.wij.impl.util.toBlockPos
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap
 import net.minecraft.block.Block

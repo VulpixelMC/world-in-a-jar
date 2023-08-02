@@ -19,6 +19,7 @@
 package gay.sylv.wij.impl
 
 import gay.sylv.wij.impl.WIJConstants.id
+import gay.sylv.wij.impl.addon.Addons
 import gay.sylv.wij.impl.block.Blocks
 import gay.sylv.wij.impl.block.entity.BlockEntityTypes
 import gay.sylv.wij.impl.dimension.DimensionTypes
@@ -36,6 +37,9 @@ import org.slf4j.LoggerFactory
 class WorldInAJar : ModInitializer {
 	override fun onInitialize(mod: ModContainer) {
 		LOGGER.info("loading {}", mod.metadata().name())
+		
+		// integration
+		Addons.initialize()
 		
 		// networking
 		Networking.initialize()

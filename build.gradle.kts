@@ -65,6 +65,14 @@ repositories {
 		name = "QuiltMC Snapshot"
 		url = uri("https://maven.quiltmc.org/repository/snapshot")
 	}
+	
+	maven {
+		name = "Fabric Permissions API Maven"
+		url = uri("https://oss.sonatype.org/content/repositories/snapshots")
+		content {
+			includeGroup("me.lucko")
+		}
+	}
 }
 
 val modImplementationInclude by configurations.register("modImplementationInclude")
@@ -104,12 +112,17 @@ dependencies {
 	modImplementation(libs.quilted.fabric.api)
 	// modImplementation libs.bundles.quilted.fabric.api // If you wish to use Fabric API's deprecated modules, you can replace the above line with this one
 	
+	// Mod Integrations
 	modCompileOnly("mcp.mobius.waila:wthit-api:quilt-8.1.1")
+	modCompileOnly("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
 	
 	modRuntimeOnly("com.terraformersmc", "modmenu", "7.1.0") {
 		exclude(group = "net.fabricmc.fabric-api")
 		exclude(group = "net.fabricmc")
 	}
+	modRuntimeOnly("maven.modrinth:luckperms:v5.4.88-fabric")
+	modRuntimeOnly("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
+	modRuntimeOnly(libs.quilted.fabric.api)
 }
 
 tasks.processResources {

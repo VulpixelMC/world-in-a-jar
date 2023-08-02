@@ -21,7 +21,7 @@ import com.mojang.blaze3d.systems.RenderSystem
 import com.mojang.blaze3d.vertex.VertexBuffer
 import com.mojang.blaze3d.vertex.VertexSorting
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
-import gay.sylv.wij.impl.scale
+import gay.sylv.wij.impl.util.scale
 import net.minecraft.block.BlockRenderType
 import net.minecraft.client.render.RenderLayer
 import net.minecraft.client.render.RenderLayers

@@ -23,6 +23,7 @@ import gay.sylv.wij.impl.network.c2s.C2SPackets
 import gay.sylv.wij.impl.network.c2s.WorldJarEnterC2SPacket
 import gay.sylv.wij.impl.network.c2s.WorldJarLockC2SPacket
 import gay.sylv.wij.impl.network.c2s.WorldJarUpdateC2SPacket
+import gay.sylv.wij.impl.util.Permissions
 import net.minecraft.client.MinecraftClient
 import net.minecraft.client.gui.GuiGraphics
 import net.minecraft.client.gui.screen.Screen
@@ -68,24 +69,22 @@ class WorldJarScreen(text: Text?, private var blockEntity: WorldJarBlockEntity) 
 				.positionAndSize(this.width / 2 - 128, 160, BUTTON_WIDTH, BUTTON_HEIGHT)
 				.build()
 		)
-		if (this.client?.player?.hasPermissionLevel(2) == true) {
-			if (this.blockEntity.locked) {
-				this.lockButton = this.addDrawableChild(
-					ButtonWidget.builder(UNLOCK_TEXT) {
-						this.unlockWorldJar()
-					}
-						.positionAndSize(this.width / 2 - 128, 120, BUTTON_WIDTH, BUTTON_HEIGHT)
-						.build()
-				)
-			} else {
-				this.lockButton = this.addDrawableChild(
-					ButtonWidget.builder(LOCK_TEXT) {
-						this.lockWorldJar()
-					}
-						.positionAndSize(this.width / 2 - 128, 120, BUTTON_WIDTH, BUTTON_HEIGHT)
-						.build()
-				)
-			}
+		if (this.blockEntity.locked) {
+			this.lockButton = this.addDrawableChild(
+				ButtonWidget.builder(UNLOCK_TEXT) {
+					this.unlockWorldJar()
+				}
+					.positionAndSize(this.width / 2 - 128, 120, BUTTON_WIDTH, BUTTON_HEIGHT)
+					.build()
+			)
+		} else {
+			this.lockButton = this.addDrawableChild(
+				ButtonWidget.builder(LOCK_TEXT) {
+					this.lockWorldJar()
+				}
+					.positionAndSize(this.width / 2 - 128, 120, BUTTON_WIDTH, BUTTON_HEIGHT)
+					.build()
+			)
 		}
 		this.enterButton = this.addDrawableChild(
 			ButtonWidget.builder(ENTER_TEXT) {

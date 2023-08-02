@@ -15,21 +15,32 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.impl.server
+package gay.sylv.wij.impl.util
 
-import gay.sylv.wij.impl.server.command.Commands
-import gay.sylv.wij.impl.server.network.ServerNetworking
+import gay.sylv.wij.impl.WIJConstants.MOD_ID
+import gay.sylv.wij.impl.addon.Addons
+import me.lucko.fabric.api.permissions.v0.Permissions
+import net.minecraft.entity.player.PlayerEntity
 
 /**
- * Integrated/Dedicated server initialization
+ * A utility object used to determine if criteria for permissions has been met.
+ * @author sylv
  */
-object WorldInAJarServer : gay.sylv.wij.api.Initializable {
+object Permissions {
+	private const val LOCK_JAR = "$MOD_ID.lock_jar"
 	
-	override fun initialize() {
-		// networking
-		ServerNetworking.initialize()
-		
-		// commands
-		Commands.initialize()
+	/**
+	 * Checks if the player can lock/unlock jars.
+	 * @author sylv
+	 */
+	fun canLockJars(player: PlayerEntity): Boolean {
+		if (Addons.HAS_FABRIC_PERMS) {
+			if (Permissions.check(player, LOCK_JAR)) {
+				return true
+			}
+		} else if (player.hasPermissionLevel(2)) {
+			return true
+		}
+		return false
 	}
 }

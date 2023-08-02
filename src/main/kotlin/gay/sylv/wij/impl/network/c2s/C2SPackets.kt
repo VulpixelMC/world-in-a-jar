@@ -24,6 +24,8 @@ import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
 import gay.sylv.wij.impl.dimension.DimensionTypes
 import gay.sylv.wij.impl.server.command.Commands
 import gay.sylv.wij.impl.server.network.ServerNetworking
+import gay.sylv.wij.impl.util.Permissions
+import gay.sylv.wij.impl.util.playerEnterJar
 import net.minecraft.server.network.ServerPlayerEntity
 import net.minecraft.text.Text
 import net.minecraft.util.math.Vec3d
@@ -48,24 +50,7 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 			val pos = packet.pos
 			
 			server.execute {
-				val world = player.world
-				val entityOption = world.getBlockEntity(pos, BlockEntityTypes.WORLD_JAR)
-				if (entityOption.isEmpty) return@execute
-				val entity = entityOption.get()
-				
-				val jarWorld = server.getWorld(DimensionTypes.WORLD_JAR_WORLD)
-				
-				val returnPos = player as gay.sylv.wij.impl.duck.PlayerWithReturnPos
-				val returnDim = player as gay.sylv.wij.impl.duck.PlayerWithReturnDim
-				returnPos.`worldinajar$setReturnPos`(player.pos)
-				returnDim.`worldinajar$setReturnDim`(player.world.registryKey)
-				val middle = entity.scale / 2.0 // the middle-point where the player spawns
-				
-				// teleport the player in the middle of the jar two-and-a-half blocks above the Y of the sub-position (subPos)
-				QuiltDimensions.teleport<ServerPlayerEntity>(player, jarWorld, TeleportTarget(Vec3d.of(entity.subPos)?.add(middle, 2.5, middle), Vec3d.ZERO, 0f, 0f))
-				// tell the player that they can exit the jar using /worldinajar exit
-				// TODO: make a way for the player to exit the jar without using a command
-				player.sendSystemMessage(Text.translatable("$MOD_ID.world_jar.enter_message", Commands.ROOT_COMMAND as Any, Commands.EXIT_COMMAND))
+				playerEnterJar(server, player, pos)
 			}
 		}
 		ServerPlayNetworking.registerGlobalReceiver(WORLD_JAR_UPDATE) {
@@ -78,7 +63,7 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 				if (player.world.getBlockEntity(entityPos)?.type == BlockEntityTypes.WORLD_JAR) {
 					// update jar properties
 					val entity = player.world.getBlockEntity(entityPos, BlockEntityTypes.WORLD_JAR).get()
-					if (entity.locked && !player.hasPermissionLevel(2)) return@execute
+					if (entity.locked && !Permissions.canLockJars(player)) return@execute
 					entity.subPos = subPos.mutableCopy()
 					entity.scale = scale
 					entity.markDirty()
@@ -92,7 +77,7 @@ object C2SPackets : gay.sylv.wij.api.Initializable {
 			val locked = buf.readBoolean()
 			
 			server.execute {
-				if (player.hasPermissionLevel(2) && player.world.getBlockEntity(pos)?.type == BlockEntityTypes.WORLD_JAR) {
+				if (Permissions.canLockJars(player) && player.world.getBlockEntity(pos)?.type == BlockEntityTypes.WORLD_JAR) {
 					val entity = player.world.getBlockEntity(pos, BlockEntityTypes.WORLD_JAR).get()
 					entity.locked = locked
 					entity.markDirty()

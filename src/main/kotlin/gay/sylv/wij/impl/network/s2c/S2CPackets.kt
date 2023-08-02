@@ -19,6 +19,9 @@ package gay.sylv.wij.impl.network.s2c
 
 import gay.sylv.wij.impl.WIJConstants.id
 import gay.sylv.wij.impl.block.entity.BlockEntityTypes
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
+import gay.sylv.wij.impl.gui.screen.WorldJarScreen
+import net.minecraft.client.MinecraftClient
 import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
 
 /**
@@ -28,6 +31,7 @@ import org.quiltmc.qsl.networking.api.client.ClientPlayNetworking
 object S2CPackets : gay.sylv.wij.api.Initializable {
 	internal val JAR_WORLD_BLOCK_UPDATE = id("jar_world_block_update")
 	internal val JAR_WORLD_CHUNK_UPDATE = id("jar_world_chunk_update")
+	internal val OPEN_JAR_SCREEN = id("open_jar_screen")
 	
 	override fun initialize() {
 		ClientPlayNetworking.registerGlobalReceiver(JAR_WORLD_BLOCK_UPDATE) {
@@ -55,6 +59,14 @@ object S2CPackets : gay.sylv.wij.api.Initializable {
 			
 			val entity = entityOption.get()
 			entity.onChunkUpdate(client, sectionPos, blockStateContainer)
+		}
+		ClientPlayNetworking.registerGlobalReceiver(OPEN_JAR_SCREEN) {
+			client, _, buf, _ ->
+			val pos = buf.readBlockPos()
+			val entity = client.world?.getBlockEntity(pos) as WorldJarBlockEntity
+			client.execute {
+				MinecraftClient.getInstance().setScreen(WorldJarScreen(entity))
+			}
 		}
 	}
 }

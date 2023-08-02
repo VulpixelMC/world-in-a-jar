@@ -15,15 +15,24 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.impl
+package gay.sylv.wij.impl.network.s2c
 
-import net.minecraft.client.util.math.MatrixStack
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
+import net.minecraft.network.PacketByteBuf
+import net.minecraft.network.listener.ClientPlayPacketListener
+import net.minecraft.network.packet.Packet
 import net.minecraft.util.math.BlockPos
 
-fun MatrixStack.scale(scale: Float) {
-	this.scale(scale, scale, scale)
-}
-
-fun Long.toBlockPos(): BlockPos {
-	return BlockPos.fromLong(this)
+/**
+ * Tells the client to open the jar screen.
+ * @param pos The position of the [WorldJarBlockEntity]
+ * @author sylv
+ */
+class OpenJarScreenS2CPacket(val pos: BlockPos) : Packet<ClientPlayPacketListener> {
+	override fun write(buf: PacketByteBuf) {
+		buf.writeBlockPos(pos)
+	}
+	
+	override fun apply(listener: ClientPlayPacketListener?) {
+	}
 }

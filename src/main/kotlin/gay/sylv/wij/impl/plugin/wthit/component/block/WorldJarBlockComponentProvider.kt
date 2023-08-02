@@ -18,6 +18,7 @@
 package gay.sylv.wij.impl.plugin.wthit.component.block
 
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
+import gay.sylv.wij.impl.util.Permissions
 import mcp.mobius.waila.api.IBlockAccessor
 import mcp.mobius.waila.api.IBlockComponentProvider
 import mcp.mobius.waila.api.IPluginConfig
@@ -33,7 +34,7 @@ class WorldJarBlockComponentProvider : IBlockComponentProvider {
 		tooltip.addLine(Text.literal("Scale: $scale"))
 		tooltip.addLine(Text.literal("Position: ${subPos?.toShortString()}"))
 		
-		if (accessor.player.hasPermissionLevel(2)) {
+		if (Permissions.canLockJars(accessor.player)) {
 			tooltip.addLine(Text.literal("Locked: ${entity?.locked}"))
 		}
 	}

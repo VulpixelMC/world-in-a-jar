@@ -15,21 +15,8 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.impl.server
+package gay.sylv.wij.impl.addon.fpa
 
-import gay.sylv.wij.impl.server.command.Commands
-import gay.sylv.wij.impl.server.network.ServerNetworking
+import gay.sylv.wij.api.Initializable
 
-/**
- * Integrated/Dedicated server initialization
- */
-object WorldInAJarServer : gay.sylv.wij.api.Initializable {
-	
-	override fun initialize() {
-		// networking
-		ServerNetworking.initialize()
-		
-		// commands
-		Commands.initialize()
-	}
-}
+object FabricPermsAddon : Initializable

@@ -15,21 +15,26 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.impl.server
+package gay.sylv.wij.impl.addon
 
-import gay.sylv.wij.impl.server.command.Commands
-import gay.sylv.wij.impl.server.network.ServerNetworking
+import gay.sylv.wij.api.Initializable
+import gay.sylv.wij.impl.addon.fpa.FabricPermsAddon
+import org.quiltmc.loader.api.QuiltLoader
 
 /**
- * Integrated/Dedicated server initialization
+ * A handler for a collection of addons (mod integrations) and contains data about addons.
+ * @author sylv
  */
-object WorldInAJarServer : gay.sylv.wij.api.Initializable {
+object Addons : Initializable {
+	val HAS_FABRIC_PERMS: Boolean
+		get() = hasFabricPerms
+	
+	private var hasFabricPerms: Boolean = false
 	
 	override fun initialize() {
-		// networking
-		ServerNetworking.initialize()
-		
-		// commands
-		Commands.initialize()
+		if (QuiltLoader.isModLoaded("fabric-permissions-api-v0")) {
+			hasFabricPerms = true
+			FabricPermsAddon.initialize()
+		}
 	}
 }
