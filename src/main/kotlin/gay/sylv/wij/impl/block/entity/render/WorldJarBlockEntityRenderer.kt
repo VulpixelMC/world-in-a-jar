@@ -18,6 +18,7 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import com.mojang.blaze3d.systems.RenderSystem
+import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.VertexBuffer
 import com.mojang.blaze3d.vertex.VertexSorting
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
@@ -51,7 +52,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 			}
 			isJarRendering = true
 			val magic = -0.0006f * entity.scale.toFloat()
-				.pow(2.0f) + 0.085f * entity.scale - 1.183f // what the fuck https://www.wolframalpha.com/input?i=find+function+%282%2C+-1%29%2C+%2816%2C+0%29%2C+%2832%2C+1%29%2C+%2864%2C+2%29 FIXME: figure out why the stuff inside the jar is 1 block high when the scale is 2 and why it starts sinking by 1 block every 16 scale.
+				.pow(2.0f) + 0.085f * entity.scale - 1.083f // what the fuck https://www.wolframalpha.com/input?i=find+function+%282%2C+-1%29%2C+%2816%2C+0%29%2C+%2832%2C+1%29%2C+%2864%2C+2%29 FIXME: figure out why the stuff inside the jar is 1 block high when the scale is 2 and why it starts sinking by 1 block every 16 scale.
 			matrices.scale(entity.visualScale - 0.001f) // scale + prevent z-fighting
 			matrices.translate(0.001f, magic, 0.001f)
 			
@@ -59,6 +60,8 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 			
 			if (entity.statesChanged) {
 				entity.statesChanged = false
+				
+				var sortState: BufferBuilder.SortState? = null
 				
 				entity.chunkSections.forEach {
 					// build chunks
@@ -108,6 +111,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 									cameraPos.z.toFloat() - origin.z,
 								)
 							)
+							sortState = bufferBuilder.popState()
 						}
 					}
 					
@@ -115,6 +119,28 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 					chunk.vertexBuffers.forEach { (renderLayer, buffer) ->
 						val bufferBuilder = BUFFERS.get(renderLayer)
 						val renderedBuffer = bufferBuilder.end()
+						buffer.bind()
+						buffer.upload(renderedBuffer)
+						VertexBuffer.unbind()
+					}
+					
+					// SortTask but crab
+					if (sortState != null && hasTranslucent) {
+						val renderLayer = RenderLayer.getTranslucent()
+						val bufferBuilder = BUFFERS.get(renderLayer)
+						bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
+						bufferBuilder.restoreState(sortState)
+						bufferBuilder.setQuadSorting(
+							VertexSorting.byDistanceSquared(
+								cameraPos.x.toFloat() - origin.x,
+								cameraPos.y.toFloat() - origin.y,
+								cameraPos.z.toFloat() - origin.z,
+							)
+						)
+						sortState = bufferBuilder.popState()
+						
+						val renderedBuffer = bufferBuilder.end()
+						val buffer = chunk.vertexBuffers[RenderLayer.getTranslucent()]!!
 						buffer.bind()
 						buffer.upload(renderedBuffer)
 						VertexBuffer.unbind()
