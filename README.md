@@ -15,6 +15,11 @@ Make little snow globes, make a cool redstone contraption; The possibilities are
 *The world ends at the world border; it is not truly infinite.<br>
 **As of releasing the ModFest version, the jar item is currently uncraftable.<br>
 
+## Permissions
+The number stated after the permission ID is the minimum OP level that users will need to have the permission. This mod can also use permissions with mods compatible with Fabric Permissions API (such as LuckPerms). The permission ID and OP level are written respectively (in that order).
+- `worldinajar.lock_jar` `2`
+  - Allows a user to lock/unlock a jar. A locked jar cannot be edited. When right-clicked, a locked jar simply teleports the player if they do not have this permission.
+
 ## FAQ
 - ### Port to NeoForge? Fabric? \<insert loader here>?
 - no
