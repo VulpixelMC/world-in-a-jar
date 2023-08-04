@@ -18,6 +18,8 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import com.mojang.blaze3d.vertex.VertexBuffer
+import gay.sylv.wij.impl.mixin.client.Accessor_ChunkData
+import it.unimi.dsi.fastutil.objects.ReferenceArraySet
 import net.minecraft.block.Block
 import net.minecraft.block.BlockState
 import net.minecraft.block.Blocks
@@ -46,6 +48,10 @@ class JarChunkSection(offset: ChunkSectionPos, isClient: Boolean) {
 	lateinit var cleanable: Cleaner.Cleanable
 	@ClientOnly
 	lateinit var vertexBuffers: Map<RenderLayer, VertexBuffer>
+	@ClientOnly
+	var data: Accessor_ChunkData? = null
+	@ClientOnly
+	var renderedLayers: ReferenceArraySet<RenderLayer> = ReferenceArraySet(RenderLayer.getBlockLayers().size)
 	var hasBuilt: Boolean = false
 	lateinit var blockStates: PalettedContainer<BlockState>
 	

@@ -18,10 +18,10 @@
 package gay.sylv.wij.impl.block.entity.render
 
 import com.mojang.blaze3d.systems.RenderSystem
-import com.mojang.blaze3d.vertex.BufferBuilder
 import com.mojang.blaze3d.vertex.VertexBuffer
 import com.mojang.blaze3d.vertex.VertexSorting
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity
+import gay.sylv.wij.impl.mixin.client.Accessor_ChunkData
 import gay.sylv.wij.impl.util.scale
 import net.minecraft.block.BlockRenderType
 import net.minecraft.client.render.RenderLayer
@@ -30,6 +30,7 @@ import net.minecraft.client.render.VertexConsumerProvider
 import net.minecraft.client.render.block.entity.BlockEntityRenderer
 import net.minecraft.client.render.block.entity.BlockEntityRendererFactory
 import net.minecraft.client.render.chunk.BlockBufferBuilderStorage
+import net.minecraft.client.render.chunk.ChunkBuilder
 import net.minecraft.client.util.math.MatrixStack
 import net.minecraft.util.math.BlockPos
 import net.minecraft.util.random.RandomGenerator
@@ -61,31 +62,37 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 			if (entity.statesChanged) {
 				entity.statesChanged = false
 				
-				var sortState: BufferBuilder.SortState? = null
-				
 				entity.chunkSections.forEach {
 					// build chunks
-					val chunk = it.value
-					val origin = chunk.origin
+					val section = it.value
+					val origin = section.origin
 					val offset = BlockPos(15, 15, 15).add(origin)
 					val randomGenerator = RandomGenerator.createLegacy()
 					
-					// begin building each buffer
-					RenderLayer.getBlockLayers().forEach { renderLayer ->
-						val bufferBuilder = BUFFERS.get(renderLayer)
-						bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
-					}
+					@Suppress("KotlinConstantConditions")
+					section.data = ChunkBuilder.ChunkData() as Accessor_ChunkData
+					section.data?.blockEntities?.clear()
+					section.renderedLayers.clear()
 					
 					val chunkMatrices = MatrixStack() // the matrices for the chunks
-					var hasTranslucent = false
 					for (blockPos in BlockPos.iterate(origin, offset)) {
 						val state = entity.getBlockState(blockPos)
 						val fluidState = state.fluidState
 						
+						if (state.hasBlockEntity()) {
+							val blockEntity = entity.renderRegion.getBlockEntity(blockPos)
+							if (blockEntity != null) {
+								section.data?.blockEntities?.add(blockEntity)
+							}
+						}
+						
 						if (!fluidState.isEmpty) {
 							val renderLayer = RenderLayers.getFluidLayer(fluidState)
 							val bufferBuilder = BUFFERS.get(renderLayer)
-							hasTranslucent = true
+							if (section.renderedLayers.add(renderLayer)) {
+								beginBufferBuilding(renderLayer)
+							}
+							
 							ctx.renderManager.renderFluid(blockPos, entity.renderRegion, bufferBuilder, state, fluidState)
 						}
 						
@@ -93,6 +100,9 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 							// render block states
 							val renderLayer = RenderLayers.getBlockLayer(state)
 							val bufferBuilder = BUFFERS.get(renderLayer)
+							if (section.renderedLayers.add(renderLayer)) {
+								beginBufferBuilding(renderLayer)
+							}
 							
 							chunkMatrices.push()
 							chunkMatrices.translate(blockPos.x.toFloat(), blockPos.y.toFloat(), blockPos.z.toFloat())
@@ -101,7 +111,7 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 						}
 					}
 					
-					if (hasTranslucent) {
+					if (section.renderedLayers.contains(RenderLayer.getTranslucent())) {
 						val bufferBuilder = BUFFERS.get(RenderLayer.getTranslucent())
 						if (!bufferBuilder.isCurrentBatchEmpty) {
 							bufferBuilder.setQuadSorting(
@@ -111,12 +121,13 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 									cameraPos.z.toFloat() - origin.z,
 								)
 							)
-							sortState = bufferBuilder.popState()
+							section.data?.bufferState = bufferBuilder.popState()
 						}
 					}
 					
 					// end building and upload vertex buffers
-					chunk.vertexBuffers.forEach { (renderLayer, buffer) ->
+					for (renderLayer in section.renderedLayers) {
+						val buffer = section.vertexBuffers[renderLayer]!!
 						val bufferBuilder = BUFFERS.get(renderLayer)
 						val renderedBuffer = bufferBuilder.end()
 						buffer.bind()
@@ -125,11 +136,11 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 					}
 					
 					// SortTask but crab
-					if (sortState != null && hasTranslucent) {
+					if (section.data?.bufferState != null) {
 						val renderLayer = RenderLayer.getTranslucent()
 						val bufferBuilder = BUFFERS.get(renderLayer)
 						bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
-						bufferBuilder.restoreState(sortState)
+						bufferBuilder.restoreState(section.data?.bufferState)
 						bufferBuilder.setQuadSorting(
 							VertexSorting.byDistanceSquared(
 								cameraPos.x.toFloat() - origin.x,
@@ -137,16 +148,16 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 								cameraPos.z.toFloat() - origin.z,
 							)
 						)
-						sortState = bufferBuilder.popState()
+						section.data?.bufferState = bufferBuilder.popState()
 						
 						val renderedBuffer = bufferBuilder.end()
-						val buffer = chunk.vertexBuffers[RenderLayer.getTranslucent()]!!
+						val buffer = section.vertexBuffers[RenderLayer.getTranslucent()]!!
 						buffer.bind()
 						buffer.upload(renderedBuffer)
 						VertexBuffer.unbind()
 					}
 					
-					chunk.hasBuilt = true
+					section.hasBuilt = true
 				}
 			}
 			
@@ -158,10 +169,10 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 				
 				// render each chunk
 				entity.chunkSections.forEach {
-					val chunk = it.value
+					val section = it.value
 					
-					if (chunk.hasBuilt) {
-						val buffer = chunk.vertexBuffers[renderLayer]!!
+					if (section.hasBuilt && section.renderedLayers.contains(renderLayer)) {
+						val buffer = section.vertexBuffers[renderLayer]!!
 						buffer.bind()
 						buffer.draw(matrices.peek().model, RenderSystem.getProjectionMatrix(), shader)
 						
@@ -182,5 +193,10 @@ class WorldJarBlockEntityRenderer(private val ctx: BlockEntityRendererFactory.Co
 		private val BLOCK_LAYERS: List<RenderLayer> = listOf(RenderLayer.getSolid(), RenderLayer.getCutoutMipped(), RenderLayer.getCutout(), RenderLayer.getTripwire(), RenderLayer.getTranslucent())
 		// this is serialized, so we use this to prevent rendering jars inside jars
 		private var isJarRendering: Boolean = false
+		
+		private fun beginBufferBuilding(renderLayer: RenderLayer) {
+			val bufferBuilder = BUFFERS.get(renderLayer)
+			bufferBuilder.begin(renderLayer.drawMode, renderLayer.vertexFormat)
+		}
 	}
 }
