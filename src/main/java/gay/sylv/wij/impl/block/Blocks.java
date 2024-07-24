@@ -25,6 +25,7 @@ import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.renderer.blockentity.BlockEntityRenderers;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.world.item.BlockItem;
@@ -128,7 +129,7 @@ public final class Blocks implements Initializable {
 		}
 		
 		private static <I extends Item, BE extends BlockEntity> void register(@NotNull BlockEntityHolder<I, BE> holder, BlockEntityRendererProvider<BE> rendererProvider) {
-			net.minecraft.client.renderer.blockentity.BlockEntityRenderers.register(holder.type(), rendererProvider);
+			BlockEntityRenderers.register(holder.type(), rendererProvider);
 		}
 		
 		private static void addCutout(Block block) {
