@@ -33,7 +33,7 @@ The number stated after the permission ID is the minimum OP level that users wil
 - Go ahead. The license permits doing so as long as you follow its terms. I ask that you credit the original mod and state that it is an unofficial fork, however. Forks claiming to be official will be taken down.
 
 ## Redistribution 🖍️
-CursedMC does not sanction any redistributions not hosted on its website, GitHub, or Modrinth. Do not upload this software to any other services without due credit and links to the original file from which the redistributed software was downloaded.
+Vulpixel does not sanction any redistributions not hosted on its website, GitHub, or Modrinth. Do not upload this software to any other services without due credit and links to the original file from which the redistributed software was downloaded.
 You may use this software in Modpacks, given due credit and a link to download the original software.
 
 ## License

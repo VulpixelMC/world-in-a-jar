@@ -4,7 +4,6 @@ import nl.javadude.gradle.plugins.license.License
 
 plugins {
 	id("com.github.hierynomus.license").version("0.16.1")
-	id("org.jetbrains.kotlin.jvm").version(libs.versions.kotlin)
 	alias(libs.plugins.quilt.loom)
 	`maven-publish`
 }
@@ -13,7 +12,7 @@ val modVersion: String by project
 val mavenGroup: String by project
 val modId: String by project
 
-base.archivesBaseName = modId
+base.archivesName = modId
 version = modVersion
 group = mavenGroup
 
@@ -23,55 +22,28 @@ repositories {
 	// Loom adds the essential maven repositories to download Minecraft and libraries from automatically.
 	// See https://docs.gradle.org/current/userguide/declaring_repositories.html
 	// for more information about repositories.
+	
+	mavenCentral()
+	
+	maven {
+		name = "ParchmentMC"
+		url = uri("https://maven.parchmentmc.org")
+	}
+	
+	// Mod Artifacts
+	
+	maven {
+		name = "WTHIT Maven"
+		url = uri("https://maven2.bai.lol")
+		content {
+			includeGroup("lol.bai")
+			includeGroup("mcp.mobius.waila")
+		}
+	}
+	
 	maven {
 		name = "TerraformersMC"
 		url = uri("https://maven.terraformersmc.com/")
-	}
-	
-	maven {
-		name = "Modrinth"
-		url = uri("https://api.modrinth.com/maven")
-		content {
-			includeGroup("maven.modrinth")
-		}
-	}
-	
-	maven {
-		url = uri("https://maven.bai.lol")
-	}
-	
-	maven {
-		name = "Cursed Maven"
-		url = uri("https://cursemaven.com")
-		content {
-			includeGroup("curse.maven")
-		}
-	}
-	
-	maven {
-		url = uri("https://repo.minelittlepony-mod.com/maven/release")
-	}
-	
-	maven {
-		name = "Gegy"
-		url = uri("https://maven.gegy.dev")
-	}
-	
-	maven {
-		url = uri("https://nexus.velocitypowered.com/repository/maven-public/")
-	}
-	
-	maven {
-		name = "QuiltMC Snapshot"
-		url = uri("https://maven.quiltmc.org/repository/snapshot")
-	}
-	
-	maven {
-		name = "Fabric Permissions API Maven"
-		url = uri("https://oss.sonatype.org/content/repositories/snapshots")
-		content {
-			includeGroup("me.lucko")
-		}
 	}
 }
 
@@ -82,53 +54,46 @@ val modImplementationInclude by configurations.register("modImplementationInclud
 dependencies {
 	minecraft(libs.minecraft)
 	mappings(loom.layered {
-		mappings("org.quiltmc:quilt-mappings:${libs.versions.quilt.mappings.get()}:intermediary-v2")
+		officialMojangMappings()
+		parchment(libs.parchment)
 	})
-	modImplementation(libs.quilt.loader)
-	modImplementation(libs.quilt.lang.kotlin) {
-		exclude(group = "org.quiltmc.qsl.item")
-		exclude(group = "org.quiltmc.qsl.entity")
-	}
 	
-	modImplementation(libs.core.qsl.base)
-	modImplementation(libs.core.networking)
+	// Loader
+	modImplementation(libs.fabric.loader)
 	
-	modImplementation(libs.block.entity)
-	modImplementation(libs.block.extensions)
-	
-	modImplementation(libs.item.content.registry)
-	modImplementation(libs.item.setting)
-	
-//	implementation(include("net.auoeke", "reflect", "5.+"))
-//	implementation(include("net.gudenau.lib", "unsafe", "latest.release"))
-//	implementation(include("org.objenesis", "objenesis", "3.3"))
-	
-//	implementation("net.bytebuddy", "byte-buddy-agent", "1.12.+")
-//	modImplementation("maven.modrinth", "yqh", "0.1.2")
-//	modImplementation("maven.modrinth", "sodium", "mc1.19.4-0.4.10")
-	
-	// QSL is not a complete API; You will need Quilted Fabric API to fill in the gaps.
-	// Quilted Fabric API will automatically pull in the correct QSL version.
-	modImplementation(libs.quilted.fabric.api)
-	// modImplementation libs.bundles.quilted.fabric.api // If you wish to use Fabric API's deprecated modules, you can replace the above line with this one
+	// Libraries
+	modImplementation(libs.fabric.api)
 	
 	// Mod Integrations
-	modCompileOnly("mcp.mobius.waila:wthit-api:quilt-8.1.1")
-	modCompileOnly("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
-	
-	modRuntimeOnly("com.terraformersmc", "modmenu", "7.1.0") {
+	modCompileOnly(libs.wthit.api)
+	modCompileOnly(libs.lucko.fabric.permissions) {
 		exclude(group = "net.fabricmc.fabric-api")
 		exclude(group = "net.fabricmc")
 	}
-	modRuntimeOnly("maven.modrinth:luckperms:v5.4.88-fabric")
-	modRuntimeOnly("me.lucko:fabric-permissions-api:0.2-SNAPSHOT")
-	modRuntimeOnly(libs.quilted.fabric.api)
+	
+	modRuntimeOnly(libs.wthit)
+	modRuntimeOnly(libs.modmenu) {
+		exclude(group = "net.fabricmc.fabric-api")
+		exclude(group = "net.fabricmc")
+	}
+	modRuntimeOnly(libs.luckperms)
+	modRuntimeOnly(libs.lucko.fabric.permissions) {
+		exclude(group = "net.fabricmc.fabric-api")
+		exclude(group = "net.fabricmc")
+	}
+}
+
+configurations {
+	runtimeClasspath {
+		// remove duplicate fabric-loader
+		exclude(group = "net.fabricmc", module = "fabric-loader")
+	}
 }
 
 tasks.processResources {
 	inputs.property("version", version)
 	
-	filesMatching("quilt.mod.json") {
+	filesMatching("fabric.mod.json") {
 		expand("group" to mavenGroup, "id" to modId, "version" to version)
 	}
 	
@@ -139,8 +104,8 @@ tasks.processResources {
 
 tasks.withType<JavaCompile> {
 	options.encoding = "UTF-8"
-	// Minecraft 1.18 (1.18-pre2) upwards uses Java 17.
-	options.release.set(17)
+	// Minecraft 1.21 upwards uses Java 21.
+	options.release.set(21)
 }
 
 loom {
@@ -149,8 +114,8 @@ loom {
 
 java {
 	// Still required by IDEs such as Eclipse and Visual Studio Code
-	sourceCompatibility = JavaVersion.VERSION_17
-	targetCompatibility = JavaVersion.VERSION_17
+	sourceCompatibility = JavaVersion.VERSION_21
+	targetCompatibility = JavaVersion.VERSION_21
 	
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task if it is present.
 	// If you remove this line, sources will not be generated.

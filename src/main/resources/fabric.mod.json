@@ -1,0 +1,41 @@
+{
+	"schemaVersion": 1,
+	"id": "${id}",
+	"version": "${version}",
+	"name": "World In a Jar",
+	"description": "the best of the cursed: a world in a jar.",
+	"authors": [
+		"Vulpixel",
+		"Sylv",
+		"Kneelawk"
+	],
+	"contact": {
+		"homepage": "https://sylv.gay/vulpixel",
+		"sources": "https://github.com/VulpixelMC/world-in-a-jar"
+	},
+	"license": "LGPL-3.0-only",
+	"icon": "assets/worldinajar/icon.png",
+	"environment": "*",
+	"entrypoints": {
+		"main": [
+			"gay.sylv.wij.impl.Main"
+		],
+		"client": [
+			"gay.sylv.wij.impl.client.MainClient"
+		]
+	},
+	"mixins": [
+		"worldinajar.mixins.json"
+	],
+	"depends": {
+		"fabricloader": ">=0.15.11",
+		"minecraft": "1.21",
+		"java": ">=21",
+		"fabric-api": "*"
+	},
+	"suggests": {
+		"luckperms": "*",
+		"wthit": "~fabric-12.2.2",
+		"modmenu": ">=11.0.1"
+	}
+}

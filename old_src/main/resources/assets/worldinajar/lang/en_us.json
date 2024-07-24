@@ -1,8 +1,6 @@
 {
 	"block.worldinajar.world_jar": "World Jar",
 	"block.worldinajar.sussystone": "Sussystone",
-	"block.worldinajar.reinforced_echnoplast": "Reinforced Echnoplast",
-	"block.worldinajar.cork_block": "Cork Block",
 	"worldinajar.world_jar_group": "World In A Jar",
 	"command.worldinajar.exit.error.source": "This command must be run by a player!",
 	"command.worldinajar.exit.error.dimension": "This command must be run inside of a World Jar!",

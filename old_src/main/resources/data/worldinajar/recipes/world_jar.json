@@ -1,0 +1,23 @@
+{
+	"type": "minecraft:crafting_shaped",
+	"group": "misc",
+	"pattern": [
+		"OOO",
+		"OWO",
+		"###"
+	],
+	"key": {
+		"#": {
+			"item": "minecraft:stone"
+		},
+		"O": {
+			"item": "minecraft:glass"
+		},
+		"W": {
+			"item": "minecraft:ender_eye"
+		}
+	},
+	"result": {
+		"item": "worldinajar:world_jar"
+	}
+}

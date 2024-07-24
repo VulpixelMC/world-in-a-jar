@@ -1,16 +1,13 @@
 {
 	"required": true,
 	"minVersion": "0.8",
-	"package": "gay.sylv.wij.impl.mixin",
-	"compatibilityLevel": "JAVA_17",
+	"package": "gay.sylv.wij.mixin",
+	"compatibilityLevel": "JAVA_21",
 	"mixins": [
-		"Mixin_PlayerEntity",
-		"Mixin_WorldChunk"
+	],
+	"client": [
 	],
 	"injectors": {
 		"defaultRequire": 1
-	},
-	"client": [
-		"client.Accessor_ChunkData"
-	]
+	}
 }

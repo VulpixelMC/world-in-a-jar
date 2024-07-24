@@ -1,38 +1,39 @@
 [versions]
 # The latest versions are available at https://lambdaurora.dev/tools/import_quilt.html
-kotlin = "1.8.22"
+# https://fabricmc.net/develop/ for fabric
 
-minecraft = "1.20.1"
-quilt_mappings = "1.20.1+build.7"
-quilt_loader = "0.19.1"
+# Base
+minecraft = "1.21"
+parchment = "2024.07.07"
+fabric_loader = "0.15.11"
 
-quilted_fabric_api = "7.0.4+0.84.0-1.20.1"
-qsl = "6.0.3+1.20.1"
+# Libraries
+fabric_api = "0.100.7+1.21"
+fabric_permissions = "0.3.1"
 
-fabric_lang_kotlin = "1.9.2+kotlin.1.8.10"
-quilt_lang_kotlin = "2.1.0+kt.1.8.22+flk.1.9.4"
+# Mod Integrations
+wthit = "fabric-12.2.2"
+modmenu = "11.0.1"
+luckperms = "5.4"
 
 [libraries]
+# Base
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
-quilt_mappings = { module = "org.quiltmc:quilt-mappings", version.ref = "quilt_mappings" }
-quilt_loader = { module = "org.quiltmc:quilt-loader", version.ref = "quilt_loader" }
+parchment = { module = "org.parchmentmc.data:parchment-1.21", version.ref = "parchment" }
+fabric_loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric_loader" }
 
-quilted_fabric_api = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api", version.ref = "quilted_fabric_api" }
-quilted_fabric_api_deprecated = { module = "org.quiltmc.quilted-fabric-api:quilted-fabric-api-deprecated", version.ref = "quilted_fabric_api" }
-core_qsl_base = { module = "org.quiltmc.qsl.core:qsl_base", version.ref = "qsl" }
-core_networking = { module = "org.quiltmc.qsl.core:networking", version.ref = "qsl" }
-block_entity = { module = "org.quiltmc.qsl.block:block_entity", version.ref = "qsl" }
-block_extensions = { module = "org.quiltmc.qsl.block:block_extensions", version.ref = "qsl" }
-item_content_registry = { module = "org.quiltmc.qsl.item:item_content_registry", version.ref = "qsl" }
-item_setting = { module = "org.quiltmc.qsl.item:item_setting", version.ref = "qsl" }
+# Libraries
+fabric_api = { module = "net.fabricmc.fabric-api:fabric-api", version.ref = "fabric_api" }
+lucko_fabric_permissions = { module = "me.lucko:fabric-permissions-api", version.ref = "fabric_permissions" }
 
-quilt_lang_kotlin = { module = "org.quiltmc.quilt-kotlin-libraries:quilt-kotlin-libraries", version.ref = "quilt_lang_kotlin" }
-
-fabric_lang_kotlin = { module = "net.fabricmc:fabric-language-kotlin", version.ref = "fabric_lang_kotlin" }
+# Mod Integrations
+wthit = { module = "mcp.mobius.waila:wthit", version.ref = "wthit" }
+wthit_api = { module = "mcp.mobius.waila:wthit-api", version.ref = "wthit" }
+modmenu = { module = "com.terraformersmc:modmenu", version.ref = "modmenu" }
+luckperms = { module = "net.luckperms:api", version.ref = "luckperms" }
 
 # If you have multiple similar dependencies, you can declare a dependency bundle and reference it on the build script with "libs.bundles.example".
 [bundles]
-quilted_fabric_api = ["quilted_fabric_api", "quilted_fabric_api_deprecated"]
 
 [plugins]
 quilt_loom = { id = "org.quiltmc.loom", version = "1.+" }
