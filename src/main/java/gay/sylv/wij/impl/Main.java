@@ -18,6 +18,7 @@
 package gay.sylv.wij.impl;
 
 import gay.sylv.wij.impl.block.Blocks;
+import gay.sylv.wij.impl.item.Items;
 import gay.sylv.wij.impl.network.Networking;
 import gay.sylv.wij.impl.util.Constants;
 import net.fabricmc.api.EnvType;
@@ -39,6 +40,8 @@ public final class Main implements ModInitializer {
 		
 		Blocks.INSTANCE.initialize();
 		
+		Items.INSTANCE.initialize();
+		
 		Networking.INSTANCE.initialize();
 		
 		LOGGER.info("Finished loading {}", Constants.MOD_NAME);
@@ -49,7 +52,7 @@ public final class Main implements ModInitializer {
 	}
 	
 	public static boolean isEnvType(EnvType type) {
-		return environment == type;
+		return getEnvironment().orElseThrow() == type;
 	}
 	
 	public static boolean isClient() {

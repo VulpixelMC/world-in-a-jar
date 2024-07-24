@@ -32,7 +32,6 @@ import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.SoundType;
-import net.minecraft.world.level.block.TransparentBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
@@ -58,26 +57,27 @@ public final class Blocks implements Initializable {
 			WorldJarBlockEntity::new
 	);
 	
-	public static final BlockHolder<BlockItem> SUSSYSTONE = registerItem(
+	public static final BlockHolder<BlockItem> SUSSYSTONE = register(
 			"sussystone",
 			new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.COBBLESTONE))
 	);
 	
-	public static final BlockHolder<BlockItem> REINFORCED_ECHNOPLAST = registerItem(
+	public static final BlockHolder<BlockItem> REINFORCED_ECHNOPLAST = register(
 			"reinforced_echnoplast",
-			new TransparentBlock(
+			new TransparentJarContainmentBlock(
 					BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.GLASS)
 							.mapColor(MapColor.COLOR_GRAY)
 							.strength(42.0F, (float) Math.pow(6.0D, 12.0D))
 			)
 	);
 	
-	public static final BlockHolder<BlockItem> CORK_BLOCK = registerItem(
+	public static final BlockHolder<BlockItem> CORK_BLOCK = register(
 			"cork_block",
-			new Block(
+			new TransparentJarContainmentBlock(
 					BlockBehaviour.Properties.of()
 							.mapColor(MapColor.WOOD)
 							.sound(SoundType.NETHER_WOOD)
+							.noOcclusion()
 							.strength(REINFORCED_ECHNOPLAST.block().defaultDestroyTime(), REINFORCED_ECHNOPLAST.block().getExplosionResistance())
 							.isRedstoneConductor(net.minecraft.world.level.block.Blocks::never)
 			)
@@ -89,18 +89,18 @@ public final class Blocks implements Initializable {
 		return Registry.register(BuiltInRegistries.BLOCK, modId(id), block);
 	}
 	
-	private static BlockHolder<BlockItem> registerItem(@NotNull String id, Block block) {
-		return registerItem(id, block, new BlockItem(block, new Item.Properties()));
+	private static BlockHolder<BlockItem> register(@NotNull String id, Block block) {
+		return register(id, block, new BlockItem(block, new Item.Properties()));
 	}
 	
-	private static <I extends Item> BlockHolder<I> registerItem(@NotNull String id, Block block, I item) {
+	private static <I extends Item> BlockHolder<I> register(@NotNull String id, Block block, I item) {
 		block = registerBlock(id, block);
 		item = Registry.register(BuiltInRegistries.ITEM, modId(id), item);
 		return new BlockHolder<>(block, item);
 	}
 	
 	private static <I extends Item, BE extends BlockEntity> BlockEntityHolder<I, BE> registerBlockEntityItem(@NotNull String id, Block block, BlockEntityType.BlockEntitySupplier<BE> supplier, I item) {
-		BlockHolder<I> holder = registerItem(id, block, item);
+		BlockHolder<I> holder = register(id, block, item);
 		BlockEntityType<BE> type = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, modId(id), BlockEntityType.Builder.of(supplier, block).build());
 		return Conversions.convert(holder, type);
 	}
@@ -124,16 +124,16 @@ public final class Blocks implements Initializable {
 		@Override
 		public void initialize() {
 			register(WORLD_JAR, WorldJarBlockEntity.WorldJarRenderer::new);
-			addCutout(WORLD_JAR.block());
-			addCutout(REINFORCED_ECHNOPLAST.block());
+			addRenderType(WORLD_JAR.block(), RenderType.cutout());
+			addRenderType(REINFORCED_ECHNOPLAST.block(), RenderType.translucent());
 		}
 		
 		private static <I extends Item, BE extends BlockEntity> void register(@NotNull BlockEntityHolder<I, BE> holder, BlockEntityRendererProvider<BE> rendererProvider) {
 			BlockEntityRenderers.register(holder.type(), rendererProvider);
 		}
 		
-		private static void addCutout(Block block) {
-			BlockRenderLayerMap.INSTANCE.putBlock(block, RenderType.cutout());
+		private static void addRenderType(Block block, RenderType renderType) {
+			BlockRenderLayerMap.INSTANCE.putBlock(block, renderType);
 		}
 	}
 }
