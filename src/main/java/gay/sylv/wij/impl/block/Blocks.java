@@ -43,47 +43,62 @@ import static gay.sylv.wij.impl.util.Constants.modId;
 public final class Blocks implements Initializable {
 	public static final Blocks INSTANCE = new Blocks();
 	
-	public static final BlockEntityHolder<BlockItem, WorldJarBlockEntity> WORLD_JAR = registerBlockEntityItem(
-			"world_jar",
-			new WorldJarBlockEntity.WorldJarBlock(
-					BlockBehaviour.Properties.of()
-							.mapColor(MapColor.STONE)
-							.strength(3.0F)
-							.sound(SoundType.METAL)
-							.noOcclusion()
-							.isRedstoneConductor(net.minecraft.world.level.block.Blocks::never)
-							.isViewBlocking(net.minecraft.world.level.block.Blocks::never)
-			),
-			WorldJarBlockEntity::new
-	);
+	public static BlockEntityHolder<BlockItem, WorldJarBlockEntity> WORLD_JAR;
 	
-	public static final BlockHolder<BlockItem> SUSSYSTONE = register(
-			"sussystone",
-			new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.COBBLESTONE))
-	);
+	public static BlockHolder<BlockItem> SUSSYSTONE;
 	
-	public static final BlockHolder<BlockItem> REINFORCED_ECHNOPLAST = register(
-			"reinforced_echnoplast",
-			new TransparentJarContainmentBlock(
-					BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.GLASS)
-							.mapColor(MapColor.COLOR_GRAY)
-							.strength(42.0F, (float) Math.pow(6.0D, 12.0D))
-			)
-	);
+	public static BlockHolder<BlockItem> REINFORCED_ECHNOPLAST;
 	
-	public static final BlockHolder<BlockItem> CORK_BLOCK = register(
-			"cork_block",
-			new TransparentJarContainmentBlock(
-					BlockBehaviour.Properties.of()
-							.mapColor(MapColor.WOOD)
-							.sound(SoundType.NETHER_WOOD)
-							.noOcclusion()
-							.strength(REINFORCED_ECHNOPLAST.block().defaultDestroyTime(), REINFORCED_ECHNOPLAST.block().getExplosionResistance())
-							.isRedstoneConductor(net.minecraft.world.level.block.Blocks::never)
-			)
-	);
+	public static BlockHolder<BlockItem> CORK_BLOCK;
 	
 	private Blocks() {}
+	
+	@Override
+	public void initialize() {
+		WORLD_JAR = registerBlockEntityItem(
+				"world_jar",
+				new WorldJarBlockEntity.WorldJarBlock(
+						BlockBehaviour.Properties.of()
+								.mapColor(MapColor.STONE)
+								.strength(3.0F)
+								.sound(SoundType.METAL)
+								.noOcclusion()
+								.isRedstoneConductor(net.minecraft.world.level.block.Blocks::never)
+								.isViewBlocking(net.minecraft.world.level.block.Blocks::never)
+				),
+				WorldJarBlockEntity::new
+		);
+		
+		SUSSYSTONE = register(
+				"sussystone",
+				new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.COBBLESTONE))
+		);
+		
+		REINFORCED_ECHNOPLAST = register(
+				"reinforced_echnoplast",
+				new TransparentJarContainmentBlock(
+						BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.GLASS)
+								.mapColor(MapColor.COLOR_GRAY)
+								.strength(42.0F, (float) Math.pow(6.0D, 12.0D))
+				)
+		);
+		
+		CORK_BLOCK = register(
+				"cork_block",
+				new TransparentJarContainmentBlock(
+						BlockBehaviour.Properties.of()
+								.mapColor(MapColor.WOOD)
+								.sound(SoundType.NETHER_WOOD)
+								.noOcclusion()
+								.strength(REINFORCED_ECHNOPLAST.block().defaultDestroyTime(), REINFORCED_ECHNOPLAST.block().getExplosionResistance())
+								.isRedstoneConductor(net.minecraft.world.level.block.Blocks::never)
+				)
+		);
+		
+		if (Main.isClient()) {
+			BlockRendering.INSTANCE.initialize();
+		}
+	}
 	
 	private static Block registerBlock(@NotNull String id, Block block) {
 		return Registry.register(BuiltInRegistries.BLOCK, modId(id), block);
@@ -107,13 +122,6 @@ public final class Blocks implements Initializable {
 	
 	private static <BE extends BlockEntity> BlockEntityHolder<BlockItem, BE> registerBlockEntityItem(@NotNull String id, Block block, BlockEntityType.BlockEntitySupplier<BE> supplier) {
 		return registerBlockEntityItem(id, block, supplier, new BlockItem(block, new Item.Properties()));
-	}
-	
-	@Override
-	public void initialize() {
-		if (Main.isClient()) {
-			BlockRendering.INSTANCE.initialize();
-		}
 	}
 	
 	public static final class BlockRendering implements Initializable {

@@ -14,26 +14,33 @@ import static gay.sylv.wij.impl.util.Constants.modId;
 public final class Items implements Initializable {
 	public static final Items INSTANCE = new Items();
 	
-	public static final Item BEDROCK_PICKAXE = register(
-			"bedrock_pickaxe",
-			new PickaxeItem(
-					BedrockTier.INSTANCE,
-					new Item.Properties()
-							.rarity(Rarity.UNCOMMON)
-							.attributes(PickaxeItem.createAttributes(BedrockTier.INSTANCE, 1.0F, -2.8F))
-			)
-	);
+	public static Item BEDROCK_PICKAXE;
 	
-	public static final Item BEDROCK_SHARD = register(
-			"bedrock_shard",
-			new Item(
-					new Item.Properties()
-							.fireResistant()
-							.rarity(Rarity.UNCOMMON)
-			)
-	);
+	public static Item BEDROCK_SHARD;
 	
 	private Items() {}
+	
+	@Override
+	public void initialize() {
+		BEDROCK_PICKAXE = register(
+				"bedrock_pickaxe",
+				new PickaxeItem(
+						BedrockTier.INSTANCE,
+						new Item.Properties()
+								.rarity(Rarity.UNCOMMON)
+								.attributes(PickaxeItem.createAttributes(BedrockTier.INSTANCE, 1.0F, -2.8F))
+				)
+		);
+		
+		BEDROCK_SHARD = register(
+				"bedrock_shard",
+				new Item(
+						new Item.Properties()
+								.fireResistant()
+								.rarity(Rarity.UNCOMMON)
+				)
+		);
+	}
 	
 	private static <I extends Item> I register(@NotNull String id, I item) {
 		return Registry.register(BuiltInRegistries.ITEM, modId(id), item);
