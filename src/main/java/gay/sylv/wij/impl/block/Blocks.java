@@ -35,6 +35,7 @@ import net.minecraft.world.level.block.SoundType;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockBehaviour;
+import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,6 +51,8 @@ public final class Blocks implements Initializable {
 	public static BlockHolder<BlockItem> REINFORCED_ECHNOPLAST;
 	
 	public static BlockHolder<BlockItem> CORK_BLOCK;
+	
+	public static BlockHolder<BlockItem> CRACKED_BEDROCK;
 	
 	private Blocks() {}
 	
@@ -92,6 +95,17 @@ public final class Blocks implements Initializable {
 								.noOcclusion()
 								.strength(REINFORCED_ECHNOPLAST.block().defaultDestroyTime(), REINFORCED_ECHNOPLAST.block().getExplosionResistance())
 								.isRedstoneConductor(net.minecraft.world.level.block.Blocks::never)
+				)
+		);
+		
+		CRACKED_BEDROCK = register(
+				"cracked_bedrock",
+				new Block(
+						BlockBehaviour.Properties.of()
+								.mapColor(MapColor.STONE)
+								.instrument(NoteBlockInstrument.BASEDRUM)
+								.strength(-1.0F, 3600000.0F)
+								.isValidSpawn(net.minecraft.world.level.block.Blocks::never)
 				)
 		);
 		
