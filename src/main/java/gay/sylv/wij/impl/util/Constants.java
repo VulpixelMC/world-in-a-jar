@@ -22,6 +22,8 @@ import net.minecraft.resources.ResourceLocation;
 public final class Constants {
 	public static final String MOD_ID = "worldinajar";
 	public static final String MOD_NAME = "World In a Jar";
+	// destroy speed for unbreakable blocks
+	public static final float UNBREAKABLE_DESTROY_SPEED = 75.0F;
 	
 	private Constants() {}
 	

@@ -65,6 +65,7 @@ dependencies {
 	modImplementation(libs.fabric.api)
 	
 	// Mod Integrations
+	modCompileOnly(libs.wthit)
 	modCompileOnly(libs.wthit.api)
 	modCompileOnly(libs.lucko.fabric.permissions) {
 		exclude(group = "net.fabricmc.fabric-api")
@@ -112,6 +113,10 @@ loom {
 	accessWidenerPath.set(file("src/main/resources/$modId.accesswidener"))
 }
 
+fabricApi {
+	configureDataGeneration()
+}
+
 java {
 	// Still required by IDEs such as Eclipse and Visual Studio Code
 	sourceCompatibility = JavaVersion.VERSION_21
@@ -137,7 +142,14 @@ tasks.withType<AbstractArchiveTask> {
 	}
 }
 
+tasks.license.configure {
+	mustRunAfter(tasks.licenseFormat)
+}
+
 tasks.build {
+	dependsOn(tasks.named("runDatagen"))
+	
+	dependsOn(tasks.licenseFormat)
 	dependsOn(tasks.license)
 }
 

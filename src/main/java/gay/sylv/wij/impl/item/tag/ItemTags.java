@@ -15,13 +15,18 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.api.block;
+package gay.sylv.wij.impl.item.tag;
 
-/**
- * A block that is used in a jar structure. These do not get rendered by the world jar by default.
- */
-public interface JarContainmentBlock {
-	default boolean renderInJar() {
-		return false;
+import net.minecraft.core.registries.Registries;
+import net.minecraft.tags.TagKey;
+import net.minecraft.world.item.Item;
+
+import static gay.sylv.wij.impl.util.Constants.modId;
+
+public final class ItemTags {
+	public static final TagKey<Item> DESTROYS_UNBREAKABLE = create("destroys_unbreakable");
+	
+	private static TagKey<Item> create(String id) {
+		return TagKey.create(Registries.ITEM, modId(id));
 	}
 }

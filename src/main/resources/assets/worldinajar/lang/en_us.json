@@ -6,6 +6,7 @@
 	"block.worldinajar.cracked_bedrock": "Cracked Bedrock",
 	"item.worldinajar.bedrock_pickaxe": "Bedrock Pickaxe",
 	"item.worldinajar.bedrock_shard": "Bedrock Shard",
+	"tag.item.worldinajar.destroys_unbreakable": "Destroys Unbreakable Blocks",
 	"worldinajar.world_jar_group": "World In A Jar",
 	"command.worldinajar.exit.error.source": "This command must be run by a player!",
 	"command.worldinajar.exit.error.dimension": "This command must be run inside of a World Jar!",

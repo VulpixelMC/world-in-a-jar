@@ -5,7 +5,7 @@
 # Base
 minecraft = "1.21"
 parchment = "2024.07.07"
-fabric_loader = "0.15.11"
+fabric_loader = "0.16.0"
 
 # Libraries
 fabric_api = "0.100.7+1.21"

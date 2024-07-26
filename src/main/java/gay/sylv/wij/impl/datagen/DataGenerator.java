@@ -1,0 +1,105 @@
+/**
+ * World In a Jar
+ * Copyright (C) 2024  VulpixelMC
+ * <p>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package gay.sylv.wij.impl.datagen;
+
+import gay.sylv.wij.impl.block.Blocks;
+import gay.sylv.wij.impl.block.tag.BlockTags;
+import gay.sylv.wij.impl.item.Items;
+import gay.sylv.wij.impl.item.tag.ItemTags;
+import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
+import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
+import net.minecraft.core.HolderLookup;
+
+import java.util.concurrent.CompletableFuture;
+
+public final class DataGenerator implements DataGeneratorEntrypoint {
+	@Override
+	public void onInitializeDataGenerator(FabricDataGenerator generator) {
+		FabricDataGenerator.Pack pack = generator.createPack();
+		pack.addProvider(BlockTagGenerator::new);
+		pack.addProvider(ItemTagGenerator::new);
+		pack.addProvider(BlockLootTableGenerator::new);
+	}
+	
+	private static final class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
+		public BlockTagGenerator(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+			super(output, registriesFuture);
+		}
+		
+		@Override
+		protected void addTags(HolderLookup.Provider wrapperLookup) {
+			getOrCreateTagBuilder(net.minecraft.tags.BlockTags.MINEABLE_WITH_PICKAXE)
+					.add(Blocks.WORLD_JAR.block())
+					.add(Blocks.SUSSYSTONE.block())
+					.add(net.minecraft.world.level.block.Blocks.BEDROCK);
+			
+			getOrCreateTagBuilder(net.minecraft.tags.BlockTags.NEEDS_IRON_TOOL)
+					.add(Blocks.WORLD_JAR.block())
+					.add(Blocks.SUSSYSTONE.block());
+			getOrCreateTagBuilder(BlockTags.NEEDS_BEDROCK_TOOL)
+					.add(net.minecraft.world.level.block.Blocks.BEDROCK);
+			
+			getOrCreateTagBuilder(BlockTags.UNBREAKABLE)
+					.add(net.minecraft.world.level.block.Blocks.BEDROCK);
+			
+			getOrCreateTagBuilder(net.minecraft.tags.BlockTags.INCORRECT_FOR_WOODEN_TOOL)
+					.addTag(BlockTags.NEEDS_BEDROCK_TOOL);
+			getOrCreateTagBuilder(net.minecraft.tags.BlockTags.INCORRECT_FOR_STONE_TOOL)
+					.addTag(BlockTags.NEEDS_BEDROCK_TOOL);
+			getOrCreateTagBuilder(net.minecraft.tags.BlockTags.INCORRECT_FOR_IRON_TOOL)
+					.addTag(BlockTags.NEEDS_BEDROCK_TOOL);
+			getOrCreateTagBuilder(net.minecraft.tags.BlockTags.INCORRECT_FOR_GOLD_TOOL)
+					.addTag(BlockTags.NEEDS_BEDROCK_TOOL);
+			getOrCreateTagBuilder(net.minecraft.tags.BlockTags.INCORRECT_FOR_DIAMOND_TOOL)
+					.addTag(BlockTags.NEEDS_BEDROCK_TOOL);
+			getOrCreateTagBuilder(net.minecraft.tags.BlockTags.INCORRECT_FOR_NETHERITE_TOOL)
+					.addTag(BlockTags.NEEDS_BEDROCK_TOOL);
+			getOrCreateTagBuilder(BlockTags.INCORRECT_FOR_BEDROCK_TOOL);
+		}
+	}
+	
+	private static final class ItemTagGenerator extends FabricTagProvider.ItemTagProvider {
+		public ItemTagGenerator(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> completableFuture) {
+			super(output, completableFuture);
+		}
+		
+		@Override
+		protected void addTags(HolderLookup.Provider wrapperLookup) {
+			getOrCreateTagBuilder(ItemTags.DESTROYS_UNBREAKABLE)
+					.add(Items.BEDROCK_PICKAXE);
+			
+			getOrCreateTagBuilder(net.minecraft.tags.ItemTags.PICKAXES)
+					.add(Items.BEDROCK_PICKAXE);
+		}
+	}
+	
+	private static final class BlockLootTableGenerator extends FabricBlockLootTableProvider {
+		public BlockLootTableGenerator(FabricDataOutput dataOutput, CompletableFuture<HolderLookup.Provider> registryLookup) {
+			super(dataOutput, registryLookup);
+		}
+		
+		@Override
+		public void generate() {
+			dropSelf(Blocks.CORK_BLOCK.block());
+			dropSelf(Blocks.WORLD_JAR.block());
+		}
+	}
+}
