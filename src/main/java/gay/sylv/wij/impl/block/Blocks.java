@@ -20,6 +20,7 @@ package gay.sylv.wij.impl.block;
 import gay.sylv.wij.impl.Main;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.block.entity.type.BlockEntityHolder;
+import gay.sylv.wij.impl.block.item.CreativePlacedBlockItem;
 import gay.sylv.wij.impl.util.Conversions;
 import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -77,7 +78,7 @@ public final class Blocks implements Initializable {
 				new Block(BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.COBBLESTONE))
 		);
 		
-		REINFORCED_ECHNOPLAST = register(
+		REINFORCED_ECHNOPLAST = registerCreativePlaced(
 				"reinforced_echnoplast",
 				new TransparentJarContainmentBlock(
 						BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.GLASS)
@@ -86,7 +87,7 @@ public final class Blocks implements Initializable {
 				)
 		);
 		
-		CORK_BLOCK = register(
+		CORK_BLOCK = registerCreativePlaced(
 				"cork_block",
 				new TransparentJarContainmentBlock(
 						BlockBehaviour.Properties.of()
@@ -116,6 +117,10 @@ public final class Blocks implements Initializable {
 	
 	private static Block registerBlock(@NotNull String id, Block block) {
 		return Registry.register(BuiltInRegistries.BLOCK, modId(id), block);
+	}
+	
+	private static BlockHolder<BlockItem> registerCreativePlaced(@NotNull String id, Block block) {
+		return register(id, block, new CreativePlacedBlockItem(block, new Item.Properties()));
 	}
 	
 	private static BlockHolder<BlockItem> register(@NotNull String id, Block block) {
