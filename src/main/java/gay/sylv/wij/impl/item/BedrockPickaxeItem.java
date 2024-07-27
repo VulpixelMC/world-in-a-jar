@@ -57,7 +57,7 @@ public class BedrockPickaxeItem extends PickaxeItem {
 					.create(LootContextParamSets.BLOCK);
 			LootContext lootContext = new LootContext.Builder(lootParams).create(Optional.empty());
 			Block.popResource(level, pos, new ItemStack(Items.BEDROCK_SHARD, UniformGenerator.between(0.0F, 2.0F).getInt(lootContext)));
-			level.playSound(null, pos, SoundEvents.WITHER_BREAK_BLOCK, SoundSource.BLOCKS, 3.0F, 1.0F);
+			level.playSound(null, pos, SoundEvents.WITHER_BREAK_BLOCK, SoundSource.BLOCKS, 1.5F, 1.0F);
 		}
 		return super.mineBlock(stack, level, state, pos, miningEntity);
 	}
