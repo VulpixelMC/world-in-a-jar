@@ -17,6 +17,7 @@
  */
 package gay.sylv.wij.impl.client;
 
+import gay.sylv.wij.impl.datagen.DynamicDataGenerator;
 import gay.sylv.wij.impl.network.client.ClientPackets;
 import gay.sylv.wij.impl.util.Constants;
 import net.fabricmc.api.ClientModInitializer;
@@ -29,6 +30,8 @@ public final class MainClient implements ClientModInitializer {
 	@Override
 	public void onInitializeClient() {
 		LOGGER.info("Initializing {}/Client", Constants.MOD_NAME);
+		
+		DynamicDataGenerator.INSTANCE.initialize();
 		
 		ClientPackets.INSTANCE.initialize();
 		

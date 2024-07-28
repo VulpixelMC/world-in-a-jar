@@ -45,15 +45,15 @@ public class RuntimeResourcePack implements PackResources, ModResourcePack {
 	public static final PackSelectionConfig BUILT_IN_SELECTION_CONFIG = new PackSelectionConfig(true, Pack.Position.TOP, false);
 	public static final Pack.ResourcesSupplier FIXED_RESOURCES = fixedResources();
 	
-	private static final PackLocationInfo LOCATION = new PackLocationInfo(PACK_ID, Component.literal(Constants.MOD_NAME), PackSource.BUILT_IN, Optional.empty());
+	private static final PackLocationInfo LOCATION = new PackLocationInfo(PACK_ID, Component.literal(Constants.MOD_NAME + " RRP"), PackSource.BUILT_IN, Optional.empty());
 	private static final Map<ResourceLocation, NativeImage> TEXTURES = new HashMap<>();
-	
-	public static void addTexture(ResourceLocation id, NativeImage image) {
-		TEXTURES.put(id, image);
-	}
 	
 	public static Set<Map.Entry<ResourceLocation, NativeImage>> getTextures() {
 		return TEXTURES.entrySet();
+	}
+	
+	static void addTexture(ResourceLocation id, NativeImage image) {
+		TEXTURES.put(id, image);
 	}
 	
 	private static Pack.ResourcesSupplier fixedResources() {

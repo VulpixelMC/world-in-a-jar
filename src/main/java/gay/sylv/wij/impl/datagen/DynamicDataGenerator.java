@@ -18,24 +18,53 @@
 package gay.sylv.wij.impl.datagen;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import gay.sylv.wij.impl.Main;
+import gay.sylv.wij.impl.util.Constants;
 import gay.sylv.wij.impl.util.Initializable;
+import gay.sylv.wij.impl.util.MapWithException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.texture.TextureManager;
-import net.minecraft.core.HolderLookup;
 import net.minecraft.resources.ResourceLocation;
 
-import java.util.concurrent.CompletableFuture;
+import java.io.IOException;
+import java.io.InputStream;
+
+import static gay.sylv.wij.impl.util.Constants.modId;
 
 public class DynamicDataGenerator implements Initializable {
+	public static final DynamicDataGenerator INSTANCE = new DynamicDataGenerator();
+	
+	private DynamicDataGenerator() {}
+	
+	@Override
+	public void initialize() {
+		if (Main.isClient()) {
+			TextureGenerator.INSTANCE.initialize();
+		}
+	}
+	
 	@Environment(EnvType.CLIENT)
-	private static final class TextureGenerator {
-		public TextureGenerator(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registryLookup) {
+	private static final class TextureGenerator implements Initializable {
+		static final TextureGenerator INSTANCE = new TextureGenerator();
+		
+		private TextureGenerator() {}
+		
+		@Override
+		public void initialize() {
+			this.generate(Minecraft.getInstance().getTextureManager());
 		}
 		
 		public void generate(TextureManager manager) {
-//			ClientPackSource
+			InputStream inputStream = Main.getModContainer().findPath("assets/" + Constants.MOD_ID + "/icon.png").map(MapWithException::newInputStream).orElse(null);
+			if (inputStream != null) {
+				try {
+					add(modId("icon"), NativeImage.read(inputStream));
+				} catch (IOException e) {
+					throw new RuntimeException(e);
+				}
+			}
 		}
 		
 		private void add(ResourceLocation id, NativeImage image) {

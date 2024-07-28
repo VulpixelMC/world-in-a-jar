@@ -1,6 +1,6 @@
 {
 	"pack": {
 		"pack_format": 34,
-		"description": "World In a Jar dynamically generated built-in resources."
+		"description": "World In a Jar runtime resource pack."
 	}
 }
