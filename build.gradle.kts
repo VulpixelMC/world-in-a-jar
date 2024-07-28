@@ -45,6 +45,14 @@ repositories {
 		name = "TerraformersMC"
 		url = uri("https://maven.terraformersmc.com/")
 	}
+	
+	maven {
+		name = "Modrinth"
+		url = uri("https://api.modrinth.com/maven")
+		content {
+			includeGroup("maven.modrinth")
+		}
+	}
 }
 
 val modImplementationInclude by configurations.register("modImplementationInclude")
@@ -82,6 +90,7 @@ dependencies {
 		exclude(group = "net.fabricmc.fabric-api")
 		exclude(group = "net.fabricmc")
 	}
+	modRuntimeOnly(libs.resource.explorer)
 }
 
 configurations {

@@ -25,8 +25,12 @@ import net.fabricmc.fabric.api.datagen.v1.DataGeneratorEntrypoint;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataGenerator;
 import net.fabricmc.fabric.api.datagen.v1.FabricDataOutput;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
+import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.data.recipes.RecipeCategory;
+import net.minecraft.data.recipes.RecipeOutput;
+import net.minecraft.data.recipes.ShapedRecipeBuilder;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -37,6 +41,7 @@ public final class DataGenerator implements DataGeneratorEntrypoint {
 		pack.addProvider(BlockTagGenerator::new);
 		pack.addProvider(ItemTagGenerator::new);
 		pack.addProvider(BlockLootTableGenerator::new);
+//		pack.addProvider()
 	}
 	
 	private static final class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
@@ -100,6 +105,21 @@ public final class DataGenerator implements DataGeneratorEntrypoint {
 		public void generate() {
 			dropSelf(Blocks.CORK_BLOCK.block());
 			dropSelf(Blocks.WORLD_JAR.block());
+		}
+	}
+	
+	private static final class RecipeGenerator extends FabricRecipeProvider {
+		public RecipeGenerator(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
+			super(output, registriesFuture);
+		}
+		
+		@Override
+		public void buildRecipes(RecipeOutput exporter) {
+			ShapedRecipeBuilder
+					.shaped(RecipeCategory.MISC, Blocks.CORK_BLOCK.item())
+					.unlockedBy("has_ender_eye", has(net.minecraft.world.item.Items.ENDER_EYE))
+					.unlockedBy("has_bedrock_shard", has(Items.BEDROCK_SHARD))
+					.save(exporter);
 		}
 	}
 }

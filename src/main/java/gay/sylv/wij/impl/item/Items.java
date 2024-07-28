@@ -32,7 +32,6 @@ public final class Items implements Initializable {
 	public static final Items INSTANCE = new Items();
 	
 	public static Item BEDROCK_PICKAXE;
-	
 	public static Item BEDROCK_SHARD;
 	
 	private Items() {}

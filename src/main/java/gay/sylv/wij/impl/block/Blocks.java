@@ -44,15 +44,12 @@ import static gay.sylv.wij.impl.util.Constants.modId;
 
 public final class Blocks implements Initializable {
 	public static final Blocks INSTANCE = new Blocks();
+	public static final float INFINITE_EXPLOSION_RESISTANCE = 3_600_000;
 	
 	public static BlockEntityHolder<BlockItem, WorldJarBlockEntity> WORLD_JAR;
-	
 	public static BlockHolder<BlockItem> SUSSYSTONE;
-	
 	public static BlockHolder<BlockItem> REINFORCED_ECHNOPLAST;
-	
 	public static BlockHolder<BlockItem> CORK_BLOCK;
-	
 	public static BlockHolder<BlockItem> CRACKED_BEDROCK;
 	
 	private Blocks() {}
@@ -83,7 +80,7 @@ public final class Blocks implements Initializable {
 				new TransparentJarContainmentBlock(
 						BlockBehaviour.Properties.ofFullCopy(net.minecraft.world.level.block.Blocks.GLASS)
 								.mapColor(MapColor.COLOR_GRAY)
-								.strength(42.0F, (float) Math.pow(6.0D, 12.0D))
+								.strength(-1.0F, INFINITE_EXPLOSION_RESISTANCE)
 				)
 		);
 		

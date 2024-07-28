@@ -1,12 +1,12 @@
-// 1.21	2024-07-26T01:00:42.8884437	World In a Jar/Tags for minecraft:block
-8abc78cadd7fe3e57300039b26e6178ac5cf285c data\minecraft\tags\block\needs_iron_tool.json
-cfab2ab481bf476a645d326b87627918009b9e50 data\worldinajar\tags\block\needs_bedrock_tool.json
-f3a783d9d15974534af0a9799fbf38542d9e09e8 data\minecraft\tags\block\incorrect_for_wooden_tool.json
-cfab2ab481bf476a645d326b87627918009b9e50 data\worldinajar\tags\block\unbreakable.json
-35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data\worldinajar\tags\block\incorrect_for_bedrock_tool.json
-f3a783d9d15974534af0a9799fbf38542d9e09e8 data\minecraft\tags\block\incorrect_for_stone_tool.json
-f3a783d9d15974534af0a9799fbf38542d9e09e8 data\minecraft\tags\block\incorrect_for_gold_tool.json
-f3a783d9d15974534af0a9799fbf38542d9e09e8 data\minecraft\tags\block\incorrect_for_iron_tool.json
-86fb60e915e8e84d7148e47eb38aaf4dbf760d6a data\minecraft\tags\block\mineable\pickaxe.json
-f3a783d9d15974534af0a9799fbf38542d9e09e8 data\minecraft\tags\block\incorrect_for_diamond_tool.json
-f3a783d9d15974534af0a9799fbf38542d9e09e8 data\minecraft\tags\block\incorrect_for_netherite_tool.json
+// 1.21	2024-07-27T21:09:23.42137	World In a Jar/Tags for minecraft:block
+cfab2ab481bf476a645d326b87627918009b9e50 data/worldinajar/tags/block/needs_bedrock_tool.json
+35133e95f1c8fdd7a1c21afcc231fc0bffefb9a8 data/worldinajar/tags/block/incorrect_for_bedrock_tool.json
+8abc78cadd7fe3e57300039b26e6178ac5cf285c data/minecraft/tags/block/needs_iron_tool.json
+86fb60e915e8e84d7148e47eb38aaf4dbf760d6a data/minecraft/tags/block/mineable/pickaxe.json
+f3a783d9d15974534af0a9799fbf38542d9e09e8 data/minecraft/tags/block/incorrect_for_gold_tool.json
+f3a783d9d15974534af0a9799fbf38542d9e09e8 data/minecraft/tags/block/incorrect_for_iron_tool.json
+f3a783d9d15974534af0a9799fbf38542d9e09e8 data/minecraft/tags/block/incorrect_for_wooden_tool.json
+f3a783d9d15974534af0a9799fbf38542d9e09e8 data/minecraft/tags/block/incorrect_for_netherite_tool.json
+f3a783d9d15974534af0a9799fbf38542d9e09e8 data/minecraft/tags/block/incorrect_for_diamond_tool.json
+cfab2ab481bf476a645d326b87627918009b9e50 data/worldinajar/tags/block/unbreakable.json
+f3a783d9d15974534af0a9799fbf38542d9e09e8 data/minecraft/tags/block/incorrect_for_stone_tool.json

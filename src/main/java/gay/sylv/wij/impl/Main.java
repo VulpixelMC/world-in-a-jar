@@ -24,6 +24,7 @@ import gay.sylv.wij.impl.util.Constants;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
+import net.fabricmc.loader.api.ModContainer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,5 +58,9 @@ public final class Main implements ModInitializer {
 	
 	public static boolean isClient() {
 		return isEnvType(EnvType.CLIENT);
+	}
+	
+	public static ModContainer getModContainer() {
+		return FabricLoader.getInstance().getModContainer(Constants.MOD_ID).orElseThrow();
 	}
 }

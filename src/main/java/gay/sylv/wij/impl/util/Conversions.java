@@ -17,16 +17,41 @@
  */
 package gay.sylv.wij.impl.util;
 
+import com.mojang.blaze3d.platform.NativeImage;
 import gay.sylv.wij.impl.block.BlockHolder;
 import gay.sylv.wij.impl.block.entity.type.BlockEntityHolder;
+import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
+import org.jetbrains.annotations.NotNull;
+
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.InputStream;
 
 public final class Conversions {
 	private Conversions() {}
 	
 	public static <I extends Item, BE extends BlockEntity> BlockEntityHolder<I, BE> convert(BlockHolder<I> holder, BlockEntityType<BE> type) {
 		return new BlockEntityHolder<>(holder.block(), holder.item(), type);
+	}
+	
+	public static IoSupplier<InputStream> convert(NativeImage image) {
+		return new IoSupplier<>() {
+			@Override
+			public @NotNull InputStream get() throws IOException {
+				return new ByteArrayInputStream(image.asByteArray());
+			}
+		};
+	}
+	
+	public static IoSupplier<InputStream> convert(InputStream inputStream) {
+		return new IoSupplier<>() {
+			@Override
+			public @NotNull InputStream get() {
+				return inputStream;
+			}
+		};
 	}
 }

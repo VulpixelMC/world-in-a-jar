@@ -16,6 +16,9 @@ wthit = "fabric-12.2.2"
 modmenu = "11.0.1"
 luckperms = "5.4"
 
+# Runtime Mods
+resource_explorer = "RuU8ZS7y"
+
 [libraries]
 # Base
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
@@ -31,6 +34,9 @@ wthit = { module = "mcp.mobius.waila:wthit", version.ref = "wthit" }
 wthit_api = { module = "mcp.mobius.waila:wthit-api", version.ref = "wthit" }
 modmenu = { module = "com.terraformersmc:modmenu", version.ref = "modmenu" }
 luckperms = { module = "net.luckperms:api", version.ref = "luckperms" }
+
+# Runtime Mods
+resource_explorer = { module = "maven.modrinth:resource_explorer", version.ref = "resource_explorer" }
 
 # If you have multiple similar dependencies, you can declare a dependency bundle and reference it on the build script with "libs.bundles.example".
 [bundles]

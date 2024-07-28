@@ -8,6 +8,8 @@
     "HarvestProviderMixin"
   ],
   "client": [
+    "client.ClientPackSourceMixin",
+	  "client.ClientPackSourceMixin$Parent"
   ],
   "injectors": {
     "defaultRequire": 1
