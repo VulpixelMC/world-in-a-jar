@@ -1,6 +1,6 @@
 package gay.sylv.wij.mixin.client;
 
-import gay.sylv.wij.impl.datagen.RuntimeResourcePack;
+import gay.sylv.wij.impl.datagen.RuntimeResourcePackImpl;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.repository.BuiltInPackSource;
 import net.minecraft.server.packs.repository.Pack;
@@ -26,6 +26,6 @@ public abstract class BuiltInPackSourceMixin {
 	@Unique
 	@Nullable
 	private Pack createBuiltinPack() {
-		return Pack.readMetaAndCreate(RuntimeResourcePack.INSTANCE.location(), RuntimeResourcePack.FIXED_RESOURCES, PackType.CLIENT_RESOURCES, RuntimeResourcePack.BUILT_IN_SELECTION_CONFIG);
+		return Pack.readMetaAndCreate(RuntimeResourcePackImpl.INSTANCE.location(), RuntimeResourcePackImpl.FIXED_RESOURCES, PackType.CLIENT_RESOURCES, RuntimeResourcePackImpl.BUILT_IN_SELECTION_CONFIG);
 	}
 }

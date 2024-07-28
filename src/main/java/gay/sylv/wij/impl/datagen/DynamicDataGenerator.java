@@ -24,8 +24,6 @@ import gay.sylv.wij.impl.util.Initializable;
 import gay.sylv.wij.impl.util.MapWithException;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.texture.TextureManager;
 import net.minecraft.resources.ResourceLocation;
 
 import java.io.IOException;
@@ -47,16 +45,16 @@ public class DynamicDataGenerator implements Initializable {
 	
 	@Environment(EnvType.CLIENT)
 	private static final class TextureGenerator implements Initializable {
-		static final TextureGenerator INSTANCE = new TextureGenerator();
+		public static final TextureGenerator INSTANCE = new TextureGenerator();
 		
 		private TextureGenerator() {}
 		
 		@Override
 		public void initialize() {
-			this.generate(Minecraft.getInstance().getTextureManager());
+			this.generate();
 		}
 		
-		public void generate(TextureManager manager) {
+		public void generate() {
 			InputStream inputStream = Main.getModContainer().findPath("assets/" + Constants.MOD_ID + "/icon.png").map(MapWithException::newInputStream).orElse(null);
 			if (inputStream != null) {
 				try {
@@ -68,7 +66,7 @@ public class DynamicDataGenerator implements Initializable {
 		}
 		
 		private void add(ResourceLocation id, NativeImage image) {
-			RuntimeResourcePack.addTexture(id, image);
+			RuntimeResourcePackImpl.addTexture(id, image);
 		}
 	}
 }

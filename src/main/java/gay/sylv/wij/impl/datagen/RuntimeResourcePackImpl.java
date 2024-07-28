@@ -18,6 +18,7 @@
 package gay.sylv.wij.impl.datagen;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import gay.sylv.wij.api.datagen.RuntimeResourcePack;
 import gay.sylv.wij.impl.Main;
 import gay.sylv.wij.impl.util.Constants;
 import gay.sylv.wij.impl.util.Conversions;
@@ -39,8 +40,8 @@ import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
 
-public class RuntimeResourcePack implements PackResources, ModResourcePack {
-	public static final RuntimeResourcePack INSTANCE = new RuntimeResourcePack();
+public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResources, ModResourcePack {
+	public static final RuntimeResourcePackImpl INSTANCE = new RuntimeResourcePackImpl();
 	public static final String PACK_ID = Constants.MOD_ID + "_rrp";
 	public static final PackSelectionConfig BUILT_IN_SELECTION_CONFIG = new PackSelectionConfig(true, Pack.Position.TOP, false);
 	public static final Pack.ResourcesSupplier FIXED_RESOURCES = fixedResources();
@@ -48,8 +49,8 @@ public class RuntimeResourcePack implements PackResources, ModResourcePack {
 	private static final PackLocationInfo LOCATION = new PackLocationInfo(PACK_ID, Component.literal(Constants.MOD_NAME + " RRP"), PackSource.BUILT_IN, Optional.empty());
 	private static final Map<ResourceLocation, NativeImage> TEXTURES = new HashMap<>();
 	
-	public static Set<Map.Entry<ResourceLocation, NativeImage>> getTextures() {
-		return TEXTURES.entrySet();
+	public static Map<ResourceLocation, NativeImage> getTextures() {
+		return TEXTURES;
 	}
 	
 	static void addTexture(ResourceLocation id, NativeImage image) {
@@ -77,7 +78,7 @@ public class RuntimeResourcePack implements PackResources, ModResourcePack {
 	
 	@Override
 	public ModResourcePack createOverlay(String overlay) {
-		return new RuntimeResourcePack();
+		return new RuntimeResourcePackImpl();
 	}
 	
 	@Nullable

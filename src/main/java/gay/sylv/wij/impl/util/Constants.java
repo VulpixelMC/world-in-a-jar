@@ -30,4 +30,8 @@ public final class Constants {
 	public static ResourceLocation modId(String path) {
 		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
 	}
+	
+	public static ResourceLocation vanilla(String path) {
+		return ResourceLocation.withDefaultNamespace(path);
+	}
 }
