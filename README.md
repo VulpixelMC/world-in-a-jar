@@ -21,14 +21,16 @@ The number stated after the permission ID is the minimum OP level that users wil
   - Allows a user to lock/unlock a jar. A locked jar cannot be edited. When right-clicked, a locked jar simply teleports the player if they do not have this permission.
 
 ## FAQ
-- ### Port to NeoForge? Fabric? \<insert loader here>?
+- ### Is Quilt supported? / The mod doesn't work on Quilt!
+- Yes, Quilt is officially supported. Report any incompatibilities in [the issue tracker](https://github.com/VulpixelMC/world-in-a-jar/issues/new).
+- ### Port to NeoForge? \<insert loader here>?
 - no
 - ### Port to 1.12.2? \<insert version here>? Update to version *X*?
 - no
 - ### There is a bug and I need to report it!
-- Please go to [the issue tracker](https://github.com/CursedMC/world-in-a-jar/issues/new) and create a bug report.
+- Please go to [the issue tracker](https://github.com/VulpixelMC/world-in-a-jar/issues/new) and create a bug report.
 - ### Please add *X* feature.
-- yesn't (feel free to [open an issue](https://github.com/CursedMC/world-in-a-jar/issues/new))
+- yesn't (feel free to [open an issue](https://github.com/VulpixelMC/world-in-a-jar/issues/new))
 - ### Can I port this mod to *X*?
 - Go ahead. The license permits doing so as long as you follow its terms. I ask that you credit the original mod and state that it is an unofficial fork, however. Forks claiming to be official will be taken down.
 
