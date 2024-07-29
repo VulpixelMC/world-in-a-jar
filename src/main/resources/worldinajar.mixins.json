@@ -1,18 +1,19 @@
 {
-  "required": true,
-  "minVersion": "0.8",
-  "package": "gay.sylv.wij.mixin",
-  "compatibilityLevel": "JAVA_21",
-  "mixins": [
-    "BlockBehaviourMixin",
-    "HarvestProviderMixin"
-  ],
-  "client": [
-    "client.BuiltInPackSourceMixin",
-    "client.FontManagerMixin",
-    "client.MinecraftMixin"
-  ],
-  "injectors": {
-    "defaultRequire": 1
+	"required": true,
+	"minVersion": "0.8",
+	"package": "gay.sylv.wij.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"AxeItemMixin",
+		"BlockBehaviourMixin",
+		"HarvestProviderMixin"
+	],
+	"client": [
+		"client.BuiltInPackSourceMixin",
+		"client.FontManagerMixin",
+		"client.MinecraftMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
 	}
 }
