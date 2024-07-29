@@ -17,6 +17,7 @@
  */
 package gay.sylv.wij.impl.item;
 
+import gay.sylv.wij.api.block.BarkType;
 import gay.sylv.wij.impl.item.tool.tier.BedrockTier;
 import gay.sylv.wij.impl.util.Initializable;
 import net.minecraft.core.Registry;
@@ -26,11 +27,15 @@ import net.minecraft.world.item.PickaxeItem;
 import net.minecraft.world.item.Rarity;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import static gay.sylv.wij.impl.util.Constants.modId;
 
 public final class Items implements Initializable {
 	public static final Items INSTANCE = new Items();
 	
+	public static Map<BarkType, Item> BARK = new HashMap<>();
 	public static Item BEDROCK_PICKAXE;
 	public static Item BEDROCK_SHARD;
 	

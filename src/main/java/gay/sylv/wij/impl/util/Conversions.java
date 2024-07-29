@@ -18,6 +18,7 @@
 package gay.sylv.wij.impl.util;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import gay.sylv.wij.api.block.BarkType;
 import gay.sylv.wij.impl.block.BlockHolder;
 import gay.sylv.wij.impl.block.entity.type.BlockEntityHolder;
 import net.minecraft.server.packs.resources.IoSupplier;
@@ -29,6 +30,8 @@ import org.jetbrains.annotations.NotNull;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.lang.reflect.Field;
+import java.nio.charset.StandardCharsets;
 
 public final class Conversions {
 	private Conversions() {}
@@ -46,6 +49,10 @@ public final class Conversions {
 		};
 	}
 	
+	public static IoSupplier<InputStream> convert(String string) {
+		return convert(new ByteArrayInputStream(string.getBytes(StandardCharsets.UTF_8)));
+	}
+	
 	public static IoSupplier<InputStream> convert(InputStream inputStream) {
 		return new IoSupplier<>() {
 			@Override
@@ -53,5 +60,9 @@ public final class Conversions {
 				return inputStream;
 			}
 		};
+	}
+	
+	public static BarkType convert(Field field) throws IllegalAccessException {
+		return (BarkType) field.get(null);
 	}
 }

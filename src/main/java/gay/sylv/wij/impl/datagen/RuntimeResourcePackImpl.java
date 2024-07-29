@@ -26,6 +26,7 @@ import net.fabricmc.fabric.api.resource.ModResourcePack;
 import net.fabricmc.loader.api.metadata.ModMetadata;
 import net.minecraft.FileUtil;
 import net.minecraft.network.chat.Component;
+import net.minecraft.resources.FileToIdConverter;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.*;
 import net.minecraft.server.packs.metadata.MetadataSectionSerializer;
@@ -48,13 +49,34 @@ public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResourc
 	
 	private static final PackLocationInfo LOCATION = new PackLocationInfo(PACK_ID, Component.literal(Constants.MOD_NAME + " RRP"), PackSource.BUILT_IN, Optional.empty());
 	private static final Map<ResourceLocation, NativeImage> TEXTURES = new HashMap<>();
+	private static final Map<ResourceLocation, String> MODELS = new HashMap<>();
+	private static final FileToIdConverter PNG_LISTER = new FileToIdConverter("textures", ".png");
+	private static final FileToIdConverter JSON_MODEL_LISTER = new FileToIdConverter("models", ".json");
 	
-	public static Map<ResourceLocation, NativeImage> getTextures() {
+	@Override
+	public Map<ResourceLocation, String> getModels() {
+		return MODELS;
+	}
+	
+	@Override
+	public void addModel(ResourceLocation id, String modelJson) {
+		MODELS.put(JSON_MODEL_LISTER.idToFile(id), modelJson);
+	}
+	
+	@Override
+	public Map<ResourceLocation, NativeImage> getTextures() {
 		return TEXTURES;
 	}
 	
-	static void addTexture(ResourceLocation id, NativeImage image) {
-		TEXTURES.put(id, image);
+	@Override
+	public void addTexture(ResourceLocation id, NativeImage image) {
+		TEXTURES.put(PNG_LISTER.idToFile(id), image);
+	}
+	
+	@Nullable
+	@Override
+	public IoSupplier<InputStream> getResource(ResourceLocation id) {
+		return getResource(PackType.CLIENT_RESOURCES, id);
 	}
 	
 	private static Pack.ResourcesSupplier fixedResources() {
@@ -92,17 +114,24 @@ public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResourc
 	@Nullable
 	@Override
 	public IoSupplier<InputStream> getResource(PackType packType, ResourceLocation id) {
-		if (packType == PackType.CLIENT_RESOURCES && TEXTURES.containsKey(id)) {
-			return Conversions.convert(TEXTURES.get(id));
-		} else {
-			return null;
+		if (packType == PackType.CLIENT_RESOURCES) {
+			if (TEXTURES.containsKey(id)) {
+				return Conversions.convert(TEXTURES.get(id));
+			} else if (MODELS.containsKey(id)) {
+				return Conversions.convert(MODELS.get(id));
+			}
 		}
+		
+		return null;
 	}
 	
 	@Override
 	public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
 		if (Objects.equals(namespace, Constants.MOD_ID) && packType == PackType.CLIENT_RESOURCES) {
 			for (var entry : TEXTURES.entrySet()) {
+				resourceOutput.accept(entry.getKey(), Conversions.convert(entry.getValue()));
+			}
+			for (var entry : MODELS.entrySet()) {
 				resourceOutput.accept(entry.getKey(), Conversions.convert(entry.getValue()));
 			}
 		}

@@ -18,12 +18,19 @@
 package gay.sylv.wij.impl.util;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.util.FastColor;
 
 public final class Constants {
 	public static final String MOD_ID = "worldinajar";
 	public static final String MOD_NAME = "World In a Jar";
-	// destroy speed for unbreakable blocks
+	/**
+	 * destroy speed for unbreakable blocks
+	 */
 	public static final float UNBREAKABLE_DESTROY_SPEED = 75.0F;
+	/**
+	 * The color of the default texture mask used.
+	 */
+	public static final int TEXTURE_MASK = FastColor.ABGR32.color(255, 255, 0, 255);
 	
 	private Constants() {}
 	

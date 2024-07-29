@@ -8,7 +8,9 @@
     "HarvestProviderMixin"
   ],
   "client": [
-	  "client.BuiltInPackSourceMixin"
+    "client.BuiltInPackSourceMixin",
+    "client.FontManagerMixin",
+    "client.MinecraftMixin"
   ],
   "injectors": {
     "defaultRequire": 1

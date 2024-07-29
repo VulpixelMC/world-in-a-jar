@@ -5,7 +5,10 @@ import gay.sylv.wij.impl.datagen.RuntimeResourcePackImpl;
 import net.fabricmc.fabric.api.resource.ModResourcePack;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.resources.IoSupplier;
+import org.jetbrains.annotations.Nullable;
 
+import java.io.InputStream;
 import java.util.Map;
 
 public interface RuntimeResourcePack extends PackResources, ModResourcePack {
@@ -13,7 +16,14 @@ public interface RuntimeResourcePack extends PackResources, ModResourcePack {
 		return RuntimeResourcePackImpl.INSTANCE;
 	}
 	
-	static Map<ResourceLocation, NativeImage> getTextures() {
-		return RuntimeResourcePackImpl.getTextures();
-	}
+	Map<ResourceLocation, String> getModels();
+	
+	void addModel(ResourceLocation id, String modelJson);
+	
+	Map<ResourceLocation, NativeImage> getTextures();
+	
+	void addTexture(ResourceLocation id, NativeImage image);
+	
+	@Nullable
+	IoSupplier<InputStream> getResource(ResourceLocation id);
 }

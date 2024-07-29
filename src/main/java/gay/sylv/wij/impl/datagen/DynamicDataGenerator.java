@@ -18,18 +18,33 @@
 package gay.sylv.wij.impl.datagen;
 
 import com.mojang.blaze3d.platform.NativeImage;
+import gay.sylv.wij.api.block.BarkType;
+import gay.sylv.wij.api.datagen.RuntimeResourcePack;
 import gay.sylv.wij.impl.Main;
+import gay.sylv.wij.impl.item.BarkItem;
+import gay.sylv.wij.impl.item.Items;
 import gay.sylv.wij.impl.util.Constants;
 import gay.sylv.wij.impl.util.Initializable;
-import gay.sylv.wij.impl.util.MapWithException;
+import gay.sylv.wij.impl.util.Pair;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.minecraft.core.Registry;
+import net.minecraft.core.component.DataComponents;
+import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.resources.IoSupplier;
+import net.minecraft.server.packs.resources.ResourceManager;
+import net.minecraft.util.FastColor;
+import net.minecraft.world.item.Item;
+import net.minecraft.world.item.component.ItemLore;
+import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
-
-import static gay.sylv.wij.impl.util.Constants.modId;
+import java.util.List;
+import java.util.Objects;
+import java.util.concurrent.atomic.AtomicInteger;
 
 public class DynamicDataGenerator implements Initializable {
 	public static final DynamicDataGenerator INSTANCE = new DynamicDataGenerator();
@@ -39,34 +54,113 @@ public class DynamicDataGenerator implements Initializable {
 	@Override
 	public void initialize() {
 		if (Main.isClient()) {
-			TextureGenerator.INSTANCE.initialize();
+			BarkType.registerAll(BarkType.class);
+		}
+	}
+	
+	public static final class ItemGenerator {
+		private ItemGenerator() {}
+		
+		public static void registerBark(BarkType type) {
+			Item barkItem = Registry.register(
+					BuiltInRegistries.ITEM,
+					type.getIdentifier(),
+					new BarkItem(
+							new Item.Properties()
+									.component(DataComponents.LORE, new ItemLore(List.of(Component.translatable("worldinajar.lore.bark")))),
+							type
+					)
+			);
+			Items.BARK.put(type, barkItem);
+		}
+		
+		public static void generateModel(BarkType type) {
+			RuntimeResourcePack.getInstance().addModel(type.getResourceIdentifier("item"), generatedModel(type.getResourceIdentifier("item")));
+		}
+		
+		private static String generatedModel(ResourceLocation id) {
+			return String.format("""
+              {
+              	"parent": "item/generated",
+              	"textures": {
+              		"layer0": "%1$s"
+              	}
+              }
+              """, id.toString());
 		}
 	}
 	
 	@Environment(EnvType.CLIENT)
-	private static final class TextureGenerator implements Initializable {
-		public static final TextureGenerator INSTANCE = new TextureGenerator();
-		
+	public static final class TextureGenerator {
 		private TextureGenerator() {}
 		
-		@Override
-		public void initialize() {
-			this.generate();
+		public static void generate(RuntimeResourcePack rrp, ResourceManager manager) {
+			NativeImage barkMask = getTexture(rrp, "bark.png");
+			
+			BarkType.getTypes().stream()
+					.filter(BarkType::strippable)
+					.map(type -> {
+						NativeImage log;
+						try {
+							log = NativeImage.read(manager.getResourceOrThrow(type.toFilePath()).open());
+						} catch (IOException e) {
+							throw new RuntimeException(e);
+						}
+						
+						return new Pair<>(maskImage(barkMask, log), type);
+					})
+					.forEach((pair) -> {
+						NativeImage barkImage = pair.first();
+						BarkType type = pair.second();
+						rrp.addTexture(type.getResourceIdentifier("item"), barkImage);
+					});
 		}
 		
-		public void generate() {
-			InputStream inputStream = Main.getModContainer().findPath("assets/" + Constants.MOD_ID + "/icon.png").map(MapWithException::newInputStream).orElse(null);
-			if (inputStream != null) {
-				try {
-					add(modId("icon"), NativeImage.read(inputStream));
-				} catch (IOException e) {
-					throw new RuntimeException(e);
-				}
+		private static @NotNull NativeImage getTexture(RuntimeResourcePack rrp, String texture) {
+			IoSupplier<InputStream> inputStream = Objects.requireNonNull(rrp.getRootResource(texture));
+			NativeImage barkMask;
+			try {
+				barkMask = NativeImage.read(inputStream.get());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
 			}
+			
+			if (barkMask.format() != NativeImage.Format.RGBA) {
+				throwError(texture);
+			}
+			return barkMask;
 		}
 		
-		private void add(ResourceLocation id, NativeImage image) {
-			RuntimeResourcePackImpl.addTexture(id, image);
+		private static void throwError(String maskName) {
+			throw new RuntimeException("World In a Jar's runtime resource generation has failed due to an incorrect image format! Please check ensure that `src/main/resources/rrp/" + maskName + "` is in RGBA format.");
+		}
+		
+		public static NativeImage maskImage(NativeImage mask, NativeImage texture) {
+			return maskImage(mask, texture, Constants.TEXTURE_MASK);
+		}
+		
+		public static NativeImage maskImage(NativeImage mask, NativeImage texture, int maskColor) {
+			int maskRed = FastColor.ABGR32.red(maskColor);
+			int maskGreen = FastColor.ABGR32.green(maskColor);
+			int maskBlue = FastColor.ABGR32.blue(maskColor);
+			int maskAlpha = FastColor.ABGR32.alpha(maskColor);
+			
+			int[] pixels = texture.getPixelsRGBA();
+			AtomicInteger index = new AtomicInteger();
+			return mask.mappedCopy(pixel -> {
+				index.getAndIncrement();
+				
+				int red = FastColor.ABGR32.red(pixel);
+				int green = FastColor.ABGR32.green(pixel);
+				int blue = FastColor.ABGR32.blue(pixel);
+				int alpha = FastColor.ABGR32.alpha(pixel);
+				
+				if (red == maskRed && green == maskGreen && blue == maskBlue && alpha == maskAlpha) {
+					return pixels[index.get()];
+				} else {
+					return pixel;
+				}
+			});
 		}
 	}
 }
