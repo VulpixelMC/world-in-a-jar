@@ -118,17 +118,17 @@ public class DynamicDataGenerator implements Initializable {
 		
 		private static @NotNull NativeImage getTexture(RuntimeResourcePack rrp, String texture) {
 			IoSupplier<InputStream> inputStream = Objects.requireNonNull(rrp.getRootResource(texture));
-			NativeImage barkMask;
+			NativeImage image;
 			try {
-				barkMask = NativeImage.read(inputStream.get());
+				image = NativeImage.read(inputStream.get());
 			} catch (IOException e) {
 				throw new RuntimeException(e);
 			}
 			
-			if (barkMask.format() != NativeImage.Format.RGBA) {
+			if (image.format() != NativeImage.Format.RGBA) {
 				throwError(texture);
 			}
-			return barkMask;
+			return image;
 		}
 		
 		private static void throwError(String maskName) {
