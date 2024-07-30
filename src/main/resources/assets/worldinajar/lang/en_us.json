@@ -14,6 +14,8 @@
 	"item.worldinajar.bark.minecraft.mangrove": "Mangrove Bark",
 	"item.worldinajar.bark.minecraft.oak": "Oak Bark",
 	"item.worldinajar.bark.minecraft.spruce": "Spruce Bark",
+	"item.worldinajar.bark.minecraft.warped": "Warped Bark",
+	"item.worldinajar.bark.minecraft.crimson": "Crimson Bark",
 	"worldinajar.lore.bark": "The bark of a tree, obtained by stripping a tree's log.",
 	"tag.item.worldinajar.destroys_unbreakable": "Destroys Unbreakable Blocks",
 	"tag.item.worldinajar.bark": "Bark",

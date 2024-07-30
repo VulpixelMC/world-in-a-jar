@@ -23,7 +23,6 @@ import gay.sylv.wij.api.block.BarkType;
 import gay.sylv.wij.impl.item.Items;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
@@ -58,7 +57,7 @@ public final class AxeItemMixin {
 		
 		if (newState.isPresent() && level instanceof ServerLevel serverLevel && player != null) {
 			BarkType.getTypes().stream()
-					.filter(type -> state.is(BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(type.logTextureId().getNamespace(), type.logTextureId().getPath().replaceFirst("block/", "")))))
+					.filter(type -> state.is(BuiltInRegistries.BLOCK.get(type.getLogBlockId())) || state.is(BuiltInRegistries.BLOCK.get(type.getWoodBlockId())))
 					.forEach(type -> {
 						LootParams lootParams = new LootParams.Builder(serverLevel)
 								.withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))

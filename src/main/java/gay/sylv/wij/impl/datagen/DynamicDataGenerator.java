@@ -106,7 +106,6 @@ public final class DynamicDataGenerator implements Initializable {
 			NativeImage barkMask = getTexture(rrp, "bark.png");
 			
 			BarkType.getTypes().stream()
-					.filter(BarkType::strippable)
 					.map(type -> {
 						NativeImage log;
 						try {

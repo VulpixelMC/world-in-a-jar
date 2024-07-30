@@ -35,29 +35,29 @@ import static gay.sylv.wij.impl.util.Constants.vanilla;
  * A type of wood's bark.
  * @param logTextureId The path to the block's log side / bark texture.
  * @param woodName The name of the wood (without the log/stem part).
- * @param strippable If the wood can be stripped with an axe or should be treated as such.
+ * @param fullWoodName The name of the fully bark-sided wood, usually the "wood" variant of a log.
  */
-public record BarkType(ResourceLocation logTextureId, String woodName, boolean strippable) implements GroupedIdentifier {
-	public static final BarkType ACACIA = new BarkType(vanilla("block/acacia_log"));
-	public static final BarkType BIRCH = new BarkType(vanilla("block/birch_log"));
-	public static final BarkType CHERRY = new BarkType(vanilla("block/cherry_log"));
-	public static final BarkType DARK_OAK = new BarkType(vanilla("block/dark_oak_log"));
-	public static final BarkType JUNGLE = new BarkType(vanilla("block/jungle_log"));
-	public static final BarkType MANGROVE = new BarkType(vanilla("block/mangrove_log"));
-	public static final BarkType OAK = new BarkType(vanilla("block/oak_log"));
-	public static final BarkType SPRUCE = new BarkType(vanilla("block/spruce_log"));
-	public static final BarkType WARPED = new BarkType(vanilla("block/warped_stem"), false);
-	public static final BarkType CRIMSON = new BarkType(vanilla("block/crimson_stem"), false);
+public record BarkType(ResourceLocation logTextureId, String woodName, String fullWoodName) implements GroupedIdentifier {
+	public static final BarkType ACACIA = new BarkType(vanilla("acacia_log"));
+	public static final BarkType BIRCH = new BarkType(vanilla("birch_log"));
+	public static final BarkType CHERRY = new BarkType(vanilla("cherry_log"));
+	public static final BarkType DARK_OAK = new BarkType(vanilla("dark_oak_log"));
+	public static final BarkType JUNGLE = new BarkType(vanilla("jungle_log"));
+	public static final BarkType MANGROVE = new BarkType(vanilla("mangrove_log"));
+	public static final BarkType OAK = new BarkType(vanilla("oak_log"));
+	public static final BarkType SPRUCE = new BarkType(vanilla("spruce_log"));
+	public static final BarkType WARPED = new BarkType(vanilla("warped_stem"), "hyphae");
+	public static final BarkType CRIMSON = new BarkType(vanilla("crimson_stem"), "hyphae");
 	
 	private static final List<BarkType> TYPES = new ArrayList<>();
-	private static final FileToIdConverter PNG_LISTER = new FileToIdConverter("textures", ".png");
+	private static final FileToIdConverter PNG_LISTER = new FileToIdConverter("textures/block", ".png");
 	
 	private BarkType(ResourceLocation id) {
-		this(id, true);
+		this(id, "wood");
 	}
 	
-	private BarkType(ResourceLocation id, boolean strippable) {
-		this(id, defaultWoodName(id), strippable);
+	private BarkType(ResourceLocation id, String fullWoodName) {
+		this(id, defaultWoodName(id), fullWoodName);
 	}
 	
 	/**
@@ -66,6 +66,14 @@ public record BarkType(ResourceLocation logTextureId, String woodName, boolean s
 	 */
 	public ResourceLocation toFilePath() {
 		return PNG_LISTER.idToFile(logTextureId);
+	}
+	
+	public ResourceLocation getLogBlockId() {
+		return logTextureId;
+	}
+	
+	public ResourceLocation getWoodBlockId() {
+		return logTextureId.withPath(woodName + "_" + fullWoodName);
 	}
 	
 	@Override
@@ -92,7 +100,6 @@ public record BarkType(ResourceLocation logTextureId, String woodName, boolean s
 				.filter(field -> SafeMap.isStaticAccessible(field, BarkType.class))
 				.map(MapWithException::convert)
 				.peek(BarkType::register)
-				.filter(BarkType::strippable)
 				.peek(DynamicDataGenerator.ItemGenerator::generateModel)
 				.peek(DynamicDataGenerator.ItemGenerator::generateBarkTag)
 				.forEach(DynamicDataGenerator.ItemGenerator::registerBark);
