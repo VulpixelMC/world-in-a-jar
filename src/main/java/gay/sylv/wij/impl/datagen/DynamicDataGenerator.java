@@ -151,7 +151,6 @@ public final class DynamicDataGenerator implements Initializable {
 			int maskRed = FastColor.ABGR32.red(maskColor);
 			int maskGreen = FastColor.ABGR32.green(maskColor);
 			int maskBlue = FastColor.ABGR32.blue(maskColor);
-			int maskAlpha = FastColor.ABGR32.alpha(maskColor);
 			
 			int[] pixels = texture.getPixelsRGBA();
 			AtomicInteger index = new AtomicInteger();
@@ -163,8 +162,12 @@ public final class DynamicDataGenerator implements Initializable {
 				int blue = FastColor.ABGR32.blue(pixel);
 				int alpha = FastColor.ABGR32.alpha(pixel);
 				
-				if (red == maskRed && green == maskGreen && blue == maskBlue && alpha == maskAlpha) {
-					return pixels[index.get()];
+				if (red == maskRed && green == maskGreen && blue == maskBlue) {
+					int color = pixels[index.get()];
+					int newRed = FastColor.ABGR32.red(color);
+					int newGreen = FastColor.ABGR32.green(color);
+					int newBlue = FastColor.ABGR32.blue(color);
+					return FastColor.ABGR32.color(alpha, newBlue, newGreen, newRed);
 				} else {
 					return pixel;
 				}
