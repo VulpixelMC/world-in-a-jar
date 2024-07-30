@@ -17,6 +17,10 @@
  */
 package gay.sylv.wij.impl.datagen;
 
+import com.google.gson.Gson;
+import com.google.gson.JsonArray;
+import com.google.gson.JsonElement;
+import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.NativeImage;
 import gay.sylv.wij.api.datagen.RuntimeResourcePack;
 import gay.sylv.wij.impl.Main;
@@ -40,6 +44,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.nio.file.Path;
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResources, ModResourcePack {
 	public static final RuntimeResourcePackImpl INSTANCE = new RuntimeResourcePackImpl();
@@ -48,10 +53,39 @@ public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResourc
 	public static final Pack.ResourcesSupplier FIXED_RESOURCES = fixedResources();
 	
 	private static final PackLocationInfo LOCATION = new PackLocationInfo(PACK_ID, Component.literal(Constants.MOD_NAME + " RRP"), PackSource.BUILT_IN, Optional.empty());
-	private static final Map<ResourceLocation, NativeImage> TEXTURES = new HashMap<>();
+	private static final Map<ResourceLocation, NativeImage> ITEM_TEXTURES = new HashMap<>();
 	private static final Map<ResourceLocation, String> MODELS = new HashMap<>();
-	private static final FileToIdConverter PNG_LISTER = new FileToIdConverter("textures", ".png");
+	private static final Map<ResourceLocation, String> ITEM_TAGS = new HashMap<>();
+	private static final FileToIdConverter ITEM_PNG_LISTER = new FileToIdConverter("textures/item", ".png");
 	private static final FileToIdConverter JSON_MODEL_LISTER = new FileToIdConverter("models", ".json");
+	private static final FileToIdConverter JSON_ITEM_TAG_LISTER = FileToIdConverter.json("tags/item");
+	
+	@Override
+	public Map<ResourceLocation, String> getItemTags() {
+		return ITEM_TAGS;
+	}
+	
+	@Override
+	public void addItemTag(ResourceLocation id, String tagJson) {
+		if (!ITEM_TAGS.containsKey(JSON_ITEM_TAG_LISTER.idToFile(id))) {
+			ITEM_TAGS.put(JSON_ITEM_TAG_LISTER.idToFile(id), tagJson);
+		} else {
+			Gson gson = new Gson();
+			JsonObject element = gson.fromJson(tagJson, JsonElement.class).getAsJsonObject();
+			JsonArray newTags = element.get("values").getAsJsonArray();
+			
+			String oldTagJson = ITEM_TAGS.get(JSON_ITEM_TAG_LISTER.idToFile(id));
+			JsonObject oldElement = gson.fromJson(oldTagJson, JsonElement.class).getAsJsonObject();
+			JsonArray oldTags = oldElement.get("values").getAsJsonArray();
+			
+			newTags.addAll(oldTags);
+			Collection<ResourceLocation> ids = newTags.asList().stream()
+					.map(JsonElement::getAsString)
+					.map(ResourceLocation::tryParse)
+					.collect(Collectors.toCollection(ArrayList::new));
+			ITEM_TAGS.put(JSON_ITEM_TAG_LISTER.idToFile(id), generatedTag(ids, false));
+		}
+	}
 	
 	@Override
 	public Map<ResourceLocation, String> getModels() {
@@ -64,19 +98,34 @@ public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResourc
 	}
 	
 	@Override
-	public Map<ResourceLocation, NativeImage> getTextures() {
-		return TEXTURES;
+	public Map<ResourceLocation, NativeImage> getItemTextures() {
+		return ITEM_TEXTURES;
 	}
 	
 	@Override
-	public void addTexture(ResourceLocation id, NativeImage image) {
-		TEXTURES.put(PNG_LISTER.idToFile(id), image);
+	public void addItemTexture(ResourceLocation id, NativeImage image) {
+		ITEM_TEXTURES.put(ITEM_PNG_LISTER.idToFile(id), image);
 	}
 	
 	@Nullable
 	@Override
 	public IoSupplier<InputStream> getResource(ResourceLocation id) {
-		return getResource(PackType.CLIENT_RESOURCES, id);
+		IoSupplier<InputStream> supplier = getResource(PackType.CLIENT_RESOURCES, id);
+		if (supplier == null) {
+			return getResource(PackType.SERVER_DATA, id);
+		} else {
+			return supplier;
+		}
+	}
+	
+	public static String generatedTag(Collection<ResourceLocation> ids, boolean replace) {
+		Gson gson = new Gson();
+		return String.format("""
+			{
+				"replace": %s,
+				"values": %s
+			}
+			""", replace, gson.toJson(ids.stream().map(ResourceLocation::toString).collect(Collectors.toList())));
 	}
 	
 	private static Pack.ResourcesSupplier fixedResources() {
@@ -115,10 +164,14 @@ public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResourc
 	@Override
 	public IoSupplier<InputStream> getResource(PackType packType, ResourceLocation id) {
 		if (packType == PackType.CLIENT_RESOURCES) {
-			if (TEXTURES.containsKey(id)) {
-				return Conversions.convert(TEXTURES.get(id));
+			if (ITEM_TEXTURES.containsKey(id)) {
+				return Conversions.convert(ITEM_TEXTURES.get(id));
 			} else if (MODELS.containsKey(id)) {
 				return Conversions.convert(MODELS.get(id));
+			}
+		} else if (packType == PackType.SERVER_DATA) {
+			if (ITEM_TAGS.containsKey(id)) {
+				return Conversions.convert(ITEM_TAGS.get(id));
 			}
 		}
 		
@@ -127,19 +180,30 @@ public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResourc
 	
 	@Override
 	public void listResources(PackType packType, String namespace, String path, ResourceOutput resourceOutput) {
-		if (Objects.equals(namespace, Constants.MOD_ID) && packType == PackType.CLIENT_RESOURCES) {
-			for (var entry : TEXTURES.entrySet()) {
-				resourceOutput.accept(entry.getKey(), Conversions.convert(entry.getValue()));
-			}
-			for (var entry : MODELS.entrySet()) {
-				resourceOutput.accept(entry.getKey(), Conversions.convert(entry.getValue()));
+		if (Objects.equals(namespace, Constants.MOD_ID)) {
+			if (packType == PackType.CLIENT_RESOURCES) {
+				if (path.equals("textures/item")) {
+					for (var entry : ITEM_TEXTURES.entrySet()) {
+						resourceOutput.accept(entry.getKey(), Conversions.convert(entry.getValue()));
+					}
+				} else if (path.equals("models")) {
+					for (var entry : MODELS.entrySet()) {
+						resourceOutput.accept(entry.getKey(), Conversions.convert(entry.getValue()));
+					}
+				}
+			} else if (packType == PackType.SERVER_DATA) {
+				if (path.equals("tags/item")) {
+					for (var entry : ITEM_TAGS.entrySet()) {
+						resourceOutput.accept(entry.getKey(), Conversions.convert(entry.getValue()));
+					}
+				}
 			}
 		}
 	}
 	
 	@Override
 	public @NotNull Set<String> getNamespaces(PackType type) {
-		if (type == PackType.CLIENT_RESOURCES) {
+		if (type == PackType.CLIENT_RESOURCES || type == PackType.SERVER_DATA) {
 			return Set.of(Constants.MOD_ID);
 		} else {
 			return Set.of();

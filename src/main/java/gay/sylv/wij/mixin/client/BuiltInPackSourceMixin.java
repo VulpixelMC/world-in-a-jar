@@ -1,3 +1,20 @@
+/**
+ * World In a Jar
+ * Copyright (C) 2024  VulpixelMC
+ * <p>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package gay.sylv.wij.mixin.client;
 
 import gay.sylv.wij.impl.datagen.RuntimeResourcePackImpl;
@@ -20,12 +37,13 @@ public abstract class BuiltInPackSourceMixin {
 			at = @At("RETURN")
 	)
 	private void addBuiltinResourcePacks(Consumer<Pack> packConsumer, CallbackInfo ci) {
-		packConsumer.accept(createBuiltinPack());
+		packConsumer.accept(createBuiltinPack(PackType.CLIENT_RESOURCES));
+		packConsumer.accept(createBuiltinPack(PackType.SERVER_DATA));
 	}
 	
 	@Unique
 	@Nullable
-	private Pack createBuiltinPack() {
-		return Pack.readMetaAndCreate(RuntimeResourcePackImpl.INSTANCE.location(), RuntimeResourcePackImpl.FIXED_RESOURCES, PackType.CLIENT_RESOURCES, RuntimeResourcePackImpl.BUILT_IN_SELECTION_CONFIG);
+	private Pack createBuiltinPack(PackType type) {
+		return Pack.readMetaAndCreate(RuntimeResourcePackImpl.INSTANCE.location(), RuntimeResourcePackImpl.FIXED_RESOURCES, type, RuntimeResourcePackImpl.BUILT_IN_SELECTION_CONFIG);
 	}
 }

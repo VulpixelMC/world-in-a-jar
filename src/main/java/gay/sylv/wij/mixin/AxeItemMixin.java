@@ -1,3 +1,20 @@
+/**
+ * World In a Jar
+ * Copyright (C) 2024  VulpixelMC
+ * <p>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
 package gay.sylv.wij.mixin;
 
 import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
@@ -41,7 +58,7 @@ public final class AxeItemMixin {
 		
 		if (newState.isPresent() && level instanceof ServerLevel serverLevel && player != null) {
 			BarkType.getTypes().stream()
-					.filter(type -> state.is(BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(type.id().getNamespace(), type.id().getPath().replaceFirst("block/", "")))))
+					.filter(type -> state.is(BuiltInRegistries.BLOCK.get(ResourceLocation.fromNamespaceAndPath(type.logTextureId().getNamespace(), type.logTextureId().getPath().replaceFirst("block/", "")))))
 					.forEach(type -> {
 						LootParams lootParams = new LootParams.Builder(serverLevel)
 								.withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))

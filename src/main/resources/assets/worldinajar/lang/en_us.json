@@ -16,6 +16,7 @@
 	"item.worldinajar.bark.minecraft.spruce": "Spruce Bark",
 	"worldinajar.lore.bark": "The bark of a tree, obtained by stripping a tree's log.",
 	"tag.item.worldinajar.destroys_unbreakable": "Destroys Unbreakable Blocks",
+	"tag.item.worldinajar.bark": "Bark",
 	"worldinajar.world_jar_group": "World In A Jar",
 	"command.worldinajar.exit.error.source": "This command must be run by a player!",
 	"command.worldinajar.exit.error.dimension": "This command must be run inside of a World Jar!",

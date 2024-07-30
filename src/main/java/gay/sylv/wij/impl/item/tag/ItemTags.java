@@ -25,6 +25,7 @@ import static gay.sylv.wij.impl.util.Constants.modId;
 
 public final class ItemTags {
 	public static final TagKey<Item> DESTROYS_UNBREAKABLE = create("destroys_unbreakable");
+	public static final TagKey<Item> BARK = create("bark");
 	
 	private static TagKey<Item> create(String id) {
 		return TagKey.create(Registries.ITEM, modId(id));

@@ -46,7 +46,10 @@ import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
 
-public class DynamicDataGenerator implements Initializable {
+import static gay.sylv.wij.impl.datagen.RuntimeResourcePackImpl.generatedTag;
+import static gay.sylv.wij.impl.util.Constants.modId;
+
+public final class DynamicDataGenerator implements Initializable {
 	public static final DynamicDataGenerator INSTANCE = new DynamicDataGenerator();
 	
 	private DynamicDataGenerator() {}
@@ -72,6 +75,11 @@ public class DynamicDataGenerator implements Initializable {
 					)
 			);
 			Items.BARK.put(type, barkItem);
+		}
+		
+		public static void generateBarkTag(BarkType type) {
+			String generatedTag = generatedTag(List.of(type.getIdentifier()), false);
+			RuntimeResourcePack.getInstance().addItemTag(modId("bark"), generatedTag);
 		}
 		
 		public static void generateModel(BarkType type) {
@@ -112,7 +120,7 @@ public class DynamicDataGenerator implements Initializable {
 					.forEach((pair) -> {
 						NativeImage barkImage = pair.first();
 						BarkType type = pair.second();
-						rrp.addTexture(type.getResourceIdentifier("item"), barkImage);
+						rrp.addItemTexture(type.getIdentifier(), barkImage);
 					});
 		}
 		

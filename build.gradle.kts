@@ -156,8 +156,6 @@ tasks.license.configure {
 }
 
 tasks.build {
-	dependsOn(tasks.named("runDatagen"))
-	
 	dependsOn(tasks.licenseFormat)
 	dependsOn(tasks.license)
 }

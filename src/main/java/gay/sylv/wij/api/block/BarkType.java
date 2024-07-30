@@ -33,11 +33,11 @@ import static gay.sylv.wij.impl.util.Constants.vanilla;
 
 /**
  * A type of wood's bark.
- * @param id The path to the block's log side / bark texture.
+ * @param logTextureId The path to the block's log side / bark texture.
  * @param woodName The name of the wood (without the log/stem part).
  * @param strippable If the wood can be stripped with an axe or should be treated as such.
  */
-public record BarkType(ResourceLocation id, String woodName, boolean strippable) implements GroupedIdentifier {
+public record BarkType(ResourceLocation logTextureId, String woodName, boolean strippable) implements GroupedIdentifier {
 	public static final BarkType ACACIA = new BarkType(vanilla("block/acacia_log"));
 	public static final BarkType BIRCH = new BarkType(vanilla("block/birch_log"));
 	public static final BarkType CHERRY = new BarkType(vanilla("block/cherry_log"));
@@ -65,7 +65,7 @@ public record BarkType(ResourceLocation id, String woodName, boolean strippable)
 	 * @return a fully qualified {@link ResourceLocation}.
 	 */
 	public ResourceLocation toFilePath() {
-		return PNG_LISTER.idToFile(id);
+		return PNG_LISTER.idToFile(logTextureId);
 	}
 	
 	@Override
@@ -75,7 +75,7 @@ public record BarkType(ResourceLocation id, String woodName, boolean strippable)
 	
 	@Override
 	public String getNamespace() {
-		return id.getNamespace();
+		return logTextureId.getNamespace();
 	}
 	
 	@Override
@@ -94,6 +94,7 @@ public record BarkType(ResourceLocation id, String woodName, boolean strippable)
 				.peek(BarkType::register)
 				.filter(BarkType::strippable)
 				.peek(DynamicDataGenerator.ItemGenerator::generateModel)
+				.peek(DynamicDataGenerator.ItemGenerator::generateBarkTag)
 				.forEach(DynamicDataGenerator.ItemGenerator::registerBark);
 	}
 	

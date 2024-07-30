@@ -41,7 +41,7 @@ public final class DataGenerator implements DataGeneratorEntrypoint {
 		pack.addProvider(BlockTagGenerator::new);
 		pack.addProvider(ItemTagGenerator::new);
 		pack.addProvider(BlockLootTableGenerator::new);
-//		pack.addProvider()
+		pack.addProvider(RecipeGenerator::new);
 	}
 	
 	private static final class BlockTagGenerator extends FabricTagProvider.BlockTagProvider {
@@ -109,16 +109,24 @@ public final class DataGenerator implements DataGeneratorEntrypoint {
 	}
 	
 	private static final class RecipeGenerator extends FabricRecipeProvider {
+		
 		public RecipeGenerator(FabricDataOutput output, CompletableFuture<HolderLookup.Provider> registriesFuture) {
 			super(output, registriesFuture);
 		}
 		
 		@Override
 		public void buildRecipes(RecipeOutput exporter) {
-			ShapedRecipeBuilder
-					.shaped(RecipeCategory.MISC, Blocks.CORK_BLOCK.item())
-					.unlockedBy("has_ender_eye", has(net.minecraft.world.item.Items.ENDER_EYE))
-					.unlockedBy("has_bedrock_shard", has(Items.BEDROCK_SHARD))
+//			ShapedRecipeBuilder
+//					.shaped(RecipeCategory.MISC, Blocks.WORLD_JAR.item())
+//					.unlockedBy("has_ender_eye", has(net.minecraft.world.item.Items.ENDER_EYE))
+//					.unlockedBy("has_bedrock_shard", has(Items.BEDROCK_SHARD))
+//					.save(exporter);
+			ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Blocks.CORK_BLOCK.item())
+					.unlockedBy("has_bark", has(ItemTags.BARK))
+					.define('/', ItemTags.BARK)
+					.pattern("///")
+					.pattern("///")
+					.pattern("///")
 					.save(exporter);
 		}
 	}
