@@ -116,17 +116,34 @@ public final class DataGenerator implements DataGeneratorEntrypoint {
 		
 		@Override
 		public void buildRecipes(RecipeOutput exporter) {
-//			ShapedRecipeBuilder
-//					.shaped(RecipeCategory.MISC, Blocks.WORLD_JAR.item())
-//					.unlockedBy("has_ender_eye", has(net.minecraft.world.item.Items.ENDER_EYE))
-//					.unlockedBy("has_bedrock_shard", has(Items.BEDROCK_SHARD))
-//					.save(exporter);
+			ShapedRecipeBuilder
+					.shaped(RecipeCategory.MISC, Blocks.WORLD_JAR.item())
+					.unlockedBy("has_ender_eye", has(net.minecraft.world.item.Items.ENDER_EYE))
+					.unlockedBy("has_reinforced_echnoplast", has(Blocks.REINFORCED_ECHNOPLAST.item()))
+					.unlockedBy("has_cork_block", has(Blocks.CORK_BLOCK.item()))
+					.define('o', net.minecraft.world.item.Items.ENDER_EYE)
+					.define('O', Blocks.REINFORCED_ECHNOPLAST.item())
+					.define('#', Blocks.CORK_BLOCK.item())
+					.pattern("O#O")
+					.pattern("OoO")
+					.pattern("OOO")
+					.save(exporter);
 			ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Blocks.CORK_BLOCK.item())
 					.unlockedBy("has_bark", has(ItemTags.BARK))
 					.define('/', ItemTags.BARK)
 					.pattern("///")
 					.pattern("///")
 					.pattern("///")
+					.save(exporter);
+			ShapedRecipeBuilder.shaped(RecipeCategory.MISC, Blocks.REINFORCED_ECHNOPLAST.item())
+					.unlockedBy("has_bedrock_shard", has(Items.BEDROCK_SHARD))
+					.unlockedBy("has_amethyst_shard", has(net.minecraft.world.item.Items.AMETHYST_SHARD))
+					.define('%', Items.BEDROCK_SHARD)
+					.define('/', net.minecraft.world.item.Items.AMETHYST_SHARD)
+					.define('O', net.minecraft.world.item.Items.GLASS)
+					.pattern("%/%")
+					.pattern("/O/")
+					.pattern("%/%")
 					.save(exporter);
 		}
 	}

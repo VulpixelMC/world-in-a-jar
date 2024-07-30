@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "#": {
+      "item": "worldinajar:cork_block"
+    },
+    "O": {
+      "item": "worldinajar:reinforced_echnoplast"
+    },
+    "o": {
+      "item": "minecraft:ender_eye"
+    }
+  },
+  "pattern": [
+    "O#O",
+    "OoO",
+    "OOO"
+  ],
+  "result": {
+    "count": 1,
+    "id": "worldinajar:world_jar"
+  }
+}

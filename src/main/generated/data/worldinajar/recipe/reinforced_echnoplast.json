@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "%": {
+      "item": "worldinajar:bedrock_shard"
+    },
+    "/": {
+      "item": "minecraft:amethyst_shard"
+    },
+    "O": {
+      "item": "minecraft:glass"
+    }
+  },
+  "pattern": [
+    "%/%",
+    "/O/",
+    "%/%"
+  ],
+  "result": {
+    "count": 1,
+    "id": "worldinajar:reinforced_echnoplast"
+  }
+}

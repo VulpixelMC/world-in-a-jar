@@ -1,0 +1,54 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_cork_block": {
+      "conditions": {
+        "items": [
+          {
+            "items": "worldinajar:cork_block"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_ender_eye": {
+      "conditions": {
+        "items": [
+          {
+            "items": "minecraft:ender_eye"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_reinforced_echnoplast": {
+      "conditions": {
+        "items": [
+          {
+            "items": "worldinajar:reinforced_echnoplast"
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "worldinajar:world_jar"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_the_recipe",
+      "has_ender_eye",
+      "has_reinforced_echnoplast",
+      "has_cork_block"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "worldinajar:world_jar"
+    ]
+  }
+}
