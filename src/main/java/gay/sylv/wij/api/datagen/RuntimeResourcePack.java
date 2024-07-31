@@ -33,6 +33,10 @@ public interface RuntimeResourcePack extends PackResources, ModResourcePack {
 		return RuntimeResourcePackImpl.INSTANCE;
 	}
 	
+	Map<ResourceLocation, String> getItemMcmeta();
+	
+	void addItemMcmeta(ResourceLocation id, String mcmetaJson);
+	
 	Map<ResourceLocation, String> getItemTags();
 	
 	void addItemTag(ResourceLocation id, String tagJson);

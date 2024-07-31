@@ -37,7 +37,7 @@ import static gay.sylv.wij.impl.util.Constants.vanilla;
  * @param woodName The name of the wood (without the log/stem part).
  * @param fullWoodName The name of the fully bark-sided wood, usually the "wood" variant of a log.
  */
-public record BarkType(ResourceLocation logTextureId, String woodName, String fullWoodName) implements GroupedIdentifier {
+public record BarkType(ResourceLocation logTextureId, String woodName, String fullWoodName, int frames) implements GroupedIdentifier {
 	public static final BarkType ACACIA = new BarkType(vanilla("acacia_log"));
 	public static final BarkType BIRCH = new BarkType(vanilla("birch_log"));
 	public static final BarkType CHERRY = new BarkType(vanilla("cherry_log"));
@@ -46,8 +46,8 @@ public record BarkType(ResourceLocation logTextureId, String woodName, String fu
 	public static final BarkType MANGROVE = new BarkType(vanilla("mangrove_log"));
 	public static final BarkType OAK = new BarkType(vanilla("oak_log"));
 	public static final BarkType SPRUCE = new BarkType(vanilla("spruce_log"));
-	public static final BarkType WARPED = new BarkType(vanilla("warped_stem"), "hyphae");
-	public static final BarkType CRIMSON = new BarkType(vanilla("crimson_stem"), "hyphae");
+	public static final BarkType WARPED = new BarkType(vanilla("warped_stem"), "hyphae", 5);
+	public static final BarkType CRIMSON = new BarkType(vanilla("crimson_stem"), "hyphae", 5);
 	
 	private static final List<BarkType> TYPES = new ArrayList<>();
 	private static final FileToIdConverter PNG_LISTER = new FileToIdConverter("textures/block", ".png");
@@ -56,8 +56,16 @@ public record BarkType(ResourceLocation logTextureId, String woodName, String fu
 		this(id, "wood");
 	}
 	
+	private BarkType(ResourceLocation id, String fullWoodName, int frames) {
+		this(id, defaultWoodName(id), fullWoodName, frames);
+	}
+	
 	private BarkType(ResourceLocation id, String fullWoodName) {
-		this(id, defaultWoodName(id), fullWoodName);
+		this(id, fullWoodName, 1);
+	}
+	
+	public boolean isAnimated() {
+		return frames > 1;
 	}
 	
 	/**

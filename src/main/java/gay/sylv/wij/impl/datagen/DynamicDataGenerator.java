@@ -42,6 +42,7 @@ import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.Objects;
 import java.util.concurrent.atomic.AtomicInteger;
@@ -113,8 +114,22 @@ public final class DynamicDataGenerator implements Initializable {
 						} catch (IOException e) {
 							throw new RuntimeException(e);
 						}
+						NativeImage darkenedLog = multiplyBrightness(log, 0.85f);
 						
-						return new Pair<>(maskImage(barkMask, log), type);
+						if (type.isAnimated()) {
+							try (var inputStream = manager.getResourceOrThrow(type.toFilePath().withSuffix(".mcmeta")).open()) {
+								rrp.addItemMcmeta(type.getIdentifier(), new String(inputStream.readAllBytes(), StandardCharsets.UTF_8));
+							} catch (IOException e) {
+								throw new RuntimeException(e);
+							}
+						}
+						
+						NativeImage expandedMask = expand(barkMask, log.getWidth(), log.getHeight());
+						int shadowMask = FastColor.ABGR32.color(255, 0, 0, 255);
+						maskImage(expandedMask, log);
+						maskImage(log, darkenedLog, shadowMask);
+						
+						return new Pair<>(darkenedLog, type);
 					})
 					.forEach((pair) -> {
 						NativeImage barkImage = pair.first();
@@ -142,33 +157,75 @@ public final class DynamicDataGenerator implements Initializable {
 			throw new RuntimeException("World In a Jar's runtime resource generation has failed due to an incorrect image format! Please check ensure that `src/main/resources/rrp/" + maskName + "` is in RGBA format.");
 		}
 		
-		public static NativeImage maskImage(NativeImage mask, NativeImage texture) {
-			return maskImage(mask, texture, Constants.TEXTURE_MASK);
+		public static NativeImage expand(NativeImage mask, int width, int height) {
+			if (width == mask.getWidth() && height == mask.getHeight()) {
+				return mask;
+			}
+			
+			NativeImage newMask = new NativeImage(mask.format(), width, height, false);
+			int[] pixels = mask.getPixelsRGBA();
+			AtomicInteger index = new AtomicInteger();
+			newMask.applyToAllPixels(pixel -> {
+				int i = index.getAndIncrement();
+				if (i + 1 > mask.getWidth() * mask.getHeight()) {
+					index.set(1);
+					i = 0;
+				}
+				
+				return pixels[i];
+			});
+			
+			return newMask;
 		}
 		
-		public static NativeImage maskImage(NativeImage mask, NativeImage texture, int maskColor) {
-			int maskRed = FastColor.ABGR32.red(maskColor);
-			int maskGreen = FastColor.ABGR32.green(maskColor);
-			int maskBlue = FastColor.ABGR32.blue(maskColor);
-			
-			int[] pixels = texture.getPixelsRGBA();
-			AtomicInteger index = new AtomicInteger();
-			return mask.mappedCopy(pixel -> {
-				index.getAndIncrement();
-				
+		public static void replaceColor(NativeImage texture, int maskColor, int color) {
+			texture.applyToAllPixels(pixel -> {
+				if (pixel == maskColor) {
+					return color;
+				} else {
+					return pixel;
+				}
+			});
+		}
+		
+		public static NativeImage multiplyBrightness(NativeImage texture, float multiply) {
+			return texture.mappedCopy(pixel -> {
 				int red = FastColor.ABGR32.red(pixel);
 				int green = FastColor.ABGR32.green(pixel);
 				int blue = FastColor.ABGR32.blue(pixel);
 				int alpha = FastColor.ABGR32.alpha(pixel);
+				return FastColor.ABGR32.color(alpha, (int) (blue * multiply), (int) (green * multiply), (int) (red * multiply));
+			});
+		}
+		
+		public static void maskImage(NativeImage mask, NativeImage texture) {
+			maskImage(mask, texture, Constants.TEXTURE_MASK);
+		}
+		
+		public static void maskImage(NativeImage mask, NativeImage texture, int maskColor) {
+			int maskRed = FastColor.ABGR32.red(maskColor);
+			int maskGreen = FastColor.ABGR32.green(maskColor);
+			int maskBlue = FastColor.ABGR32.blue(maskColor);
+			
+			int[] pixels = mask.getPixelsRGBA();
+			AtomicInteger index = new AtomicInteger();
+			texture.applyToAllPixels(pixel -> {
+				int i = index.getAndIncrement();
+				
+				int newRed = FastColor.ABGR32.red(pixel);
+				int newGreen = FastColor.ABGR32.green(pixel);
+				int newBlue = FastColor.ABGR32.blue(pixel);
+				
+				int color = pixels[i];
+				int red = FastColor.ABGR32.red(color);
+				int green = FastColor.ABGR32.green(color);
+				int blue = FastColor.ABGR32.blue(color);
+				int alpha = FastColor.ABGR32.alpha(color);
 				
 				if (red == maskRed && green == maskGreen && blue == maskBlue) {
-					int color = pixels[index.get()];
-					int newRed = FastColor.ABGR32.red(color);
-					int newGreen = FastColor.ABGR32.green(color);
-					int newBlue = FastColor.ABGR32.blue(color);
 					return FastColor.ABGR32.color(alpha, newBlue, newGreen, newRed);
 				} else {
-					return pixel;
+					return color;
 				}
 			});
 		}

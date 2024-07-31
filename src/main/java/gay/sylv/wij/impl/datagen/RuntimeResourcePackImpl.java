@@ -54,11 +54,23 @@ public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResourc
 	
 	private static final PackLocationInfo LOCATION = new PackLocationInfo(PACK_ID, Component.literal(Constants.MOD_NAME + " RRP"), PackSource.BUILT_IN, Optional.empty());
 	private static final Map<ResourceLocation, NativeImage> ITEM_TEXTURES = new HashMap<>();
+	private static final Map<ResourceLocation, String> ITEM_TEXTURE_MCMETA = new HashMap<>();
 	private static final Map<ResourceLocation, String> MODELS = new HashMap<>();
 	private static final Map<ResourceLocation, String> ITEM_TAGS = new HashMap<>();
 	private static final FileToIdConverter ITEM_PNG_LISTER = new FileToIdConverter("textures/item", ".png");
+	private static final FileToIdConverter ITEM_PNG_MCMETA_LISTER = new FileToIdConverter("textures/item", ".png.mcmeta");
 	private static final FileToIdConverter JSON_MODEL_LISTER = new FileToIdConverter("models", ".json");
 	private static final FileToIdConverter JSON_ITEM_TAG_LISTER = FileToIdConverter.json("tags/item");
+	
+	@Override
+	public Map<ResourceLocation, String> getItemMcmeta() {
+		return ITEM_TEXTURE_MCMETA;
+	}
+	
+	@Override
+	public void addItemMcmeta(ResourceLocation id, String mcmetaJson) {
+		ITEM_TEXTURE_MCMETA.put(ITEM_PNG_MCMETA_LISTER.idToFile(id), mcmetaJson);
+	}
 	
 	@Override
 	public Map<ResourceLocation, String> getItemTags() {
@@ -166,7 +178,9 @@ public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResourc
 		if (packType == PackType.CLIENT_RESOURCES) {
 			if (ITEM_TEXTURES.containsKey(id)) {
 				return Conversions.convert(ITEM_TEXTURES.get(id));
-			} else if (MODELS.containsKey(id)) {
+			} else if (ITEM_TEXTURE_MCMETA.containsKey(id)) {
+				return Conversions.convert(ITEM_TEXTURE_MCMETA.get(id));
+			} if (MODELS.containsKey(id)) {
 				return Conversions.convert(MODELS.get(id));
 			}
 		} else if (packType == PackType.SERVER_DATA) {
@@ -184,6 +198,9 @@ public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResourc
 			if (packType == PackType.CLIENT_RESOURCES) {
 				if (path.equals("textures/item")) {
 					for (var entry : ITEM_TEXTURES.entrySet()) {
+						resourceOutput.accept(entry.getKey(), Conversions.convert(entry.getValue()));
+					}
+					for (var entry : ITEM_TEXTURE_MCMETA.entrySet()) {
 						resourceOutput.accept(entry.getKey(), Conversions.convert(entry.getValue()));
 					}
 				} else if (path.equals("models")) {
