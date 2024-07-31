@@ -84,7 +84,29 @@ public final class DynamicDataGenerator implements Initializable {
 		}
 		
 		public static void generateModel(BarkType type) {
-			RuntimeResourcePack.getInstance().addModel(type.getResourceIdentifier("item"), generatedModel(type.getResourceIdentifier("item")));
+			String model;
+			if (type == BarkType.SPRUCE) {
+				model = String.format(
+						"""
+						{
+							"parent": "item/generated",
+							"textures": {
+								"layer0": "%1$s"
+							},
+							"overrides": [
+						 		{
+						 			"predicate": {
+						 				"custom_model_data": 1
+						 			},
+						 			"model": "minecraft:item/cooked_beef"
+						 		}
+						 	]
+						}
+						""", type.getResourceIdentifier("item"));
+			} else {
+				model = generatedModel(type.getResourceIdentifier("item"));
+			}
+			RuntimeResourcePack.getInstance().addModel(type.getResourceIdentifier("item"), model);
 		}
 		
 		private static String generatedModel(ResourceLocation id) {
