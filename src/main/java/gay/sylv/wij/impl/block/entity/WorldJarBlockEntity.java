@@ -18,15 +18,20 @@
 package gay.sylv.wij.impl.block.entity;
 
 import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import com.mojang.serialization.MapCodec;
 import gay.sylv.wij.impl.block.Blocks;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.block.model.BlockModel;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
+import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -51,6 +56,11 @@ public class WorldJarBlockEntity extends BlockEntity {
 		public void render(
 				WorldJarBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay
 		) {
+			VertexConsumer buffer = bufferSource.getBuffer(RenderType.solid());
+			poseStack.pushPose();
+			poseStack.scale(0.001f, 0.001f, 0.001f);
+			blockRenderDispatcher.renderBatched(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), BlockPos.ZERO, blockEntity.getLevel(), poseStack, buffer, false, RandomSource.create());
+			poseStack.popPose();
 		}
 	}
 	
