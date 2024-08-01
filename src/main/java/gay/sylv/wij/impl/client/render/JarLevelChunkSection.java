@@ -25,6 +25,7 @@ public class JarLevelChunkSection {
 	 * The bottom-south-west corner of the chunk. **Note**: This is automatically aligned to a 16x16x16 grid.
 	 */
 	private final BlockPos origin;
+	@SuppressWarnings({"FieldCanBeLocal", "unused"})
 	@Environment(EnvType.CLIENT)
 	private Cleaner.Cleanable cleanable;
 	@Environment(EnvType.CLIENT)
