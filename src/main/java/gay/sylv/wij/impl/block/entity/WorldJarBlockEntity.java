@@ -23,6 +23,8 @@ import com.mojang.serialization.MapCodec;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.client.render.JarChunk;
 import gay.sylv.wij.impl.client.render.JarLevelChunkSection;
+import gay.sylv.wij.impl.client.render.JarLevelLightEngine;
+import gay.sylv.wij.impl.client.render.JarRenderChunkRegion;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.fabricmc.api.EnvType;
@@ -45,11 +47,21 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LightChunk;
 import net.minecraft.world.level.chunk.LightChunkGetter;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.level.material.FluidState;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.ArrayList;
+import java.util.LinkedList;
+import java.util.List;
+
 public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter {
+	public static final List<WorldJarBlockEntity> INSTANCES = new ArrayList<>();
+	public static final Long2ObjectMap<List<WorldJarBlockEntity>> INSTANCE_MAP = new Long2ObjectOpenHashMap<>();
+	
 	private int scale = 64;
+	private BlockPos internalSpawnPos = new BlockPos(0, -64, 0);
+	
 	/**
 	 * {@link JarLevelChunkSection}s that are loaded in the {@link WorldJarBlockEntity}.
 	 */
@@ -60,6 +72,12 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	 */
 	private final Long2ObjectMap<JarChunk> chunks = new Long2ObjectOpenHashMap<>();
 	
+	@Environment(EnvType.CLIENT)
+	private JarLevelLightEngine lightEngine;
+	
+	@Environment(EnvType.CLIENT)
+	private JarRenderChunkRegion renderChunkRegion;
+	
 	/**
 	 * If the {@link BlockState}s in the jar have changed.
 	 * <p>
@@ -69,6 +87,10 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	public WorldJarBlockEntity(BlockPos pos, BlockState blockState) {
 		super(Blocks.WORLD_JAR.type(), pos, blockState);
+	}
+	
+	public float getVisualScale() {
+		return 1.0f / scale;
 	}
 	
 	public int getScale() {
@@ -101,6 +123,14 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	}
 	
 	/**
+	 * Gets a {@link FluidState} from the specified position.
+	 * @return a {@link FluidState} at the {@link BlockState} at the specified position.
+	 */
+	public FluidState getFluidState(BlockPos pos) {
+		return getBlockState(pos).getFluidState();
+	}
+	
+	/**
 	 * Initializes the chunks server-side.
 	 * @author sylv
 	 */
@@ -125,16 +155,77 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		}
 	}
 	
+	public LightChunk getChunk(int chunkX, int chunkZ) {
+		long chunkPos = ChunkPos.asLong(chunkX, chunkZ);
+		return chunks.get(chunkPos);
+	}
+	
+	/**
+	 * Puts the current instance in [INSTANCE_MAP] and [INSTANCES].
+	 * @author sylv
+	 */
+	private void mapInstance() {
+		if (INSTANCES.contains(this)) return;
+		
+		// map
+		var chunkPos = ChunkPos.asLong(getBlockPos());
+		var list = INSTANCE_MAP.get(chunkPos);
+		if (list != null) {
+			list.add(this);
+		} else {
+			list = new ArrayList<>();
+			list.add(this);
+			INSTANCE_MAP.put(chunkPos, list);
+		}
+		
+		// put
+		INSTANCES.add(this);
+	}
+	
+	/**
+	 * Removes the current instance from [INSTANCE_MAP] and [INSTANCES].
+	 * @author sylv
+	 */
+	private void unmapInstance() {
+		// map
+		var chunkPos = ChunkPos.asLong(getBlockPos());
+		var list = INSTANCE_MAP.get(chunkPos);
+		list.remove(this);
+		if (list.isEmpty()) {
+			INSTANCE_MAP.remove(chunkPos);
+		}
+		
+		// put
+		INSTANCES.remove(this);
+	}
+	
+	@Override
+	public void setRemoved() {
+		super.setRemoved();
+		assert level != null;
+		if (!level.isClientSide) {
+			unmapInstance();
+		}
+	}
+	
+	@Override
+	public void setLevel(Level level) {
+		super.setLevel(level);
+		if (!level.isClientSide) {
+			if (!INSTANCES.contains(this)) {
+				mapInstance();
+			}
+		} else {
+			lightEngine = new JarLevelLightEngine(this, true, true);
+			renderChunkRegion = new JarRenderChunkRegion(this, lightEngine);
+		}
+	}
+	
 	@SuppressWarnings("NullableProblems")
 	@Nullable
 	@Override
 	public Level getLevel() {
 		return super.getLevel();
-	}
-	
-	public LightChunk getChunk(int chunkX, int chunkZ) {
-		long chunkPos = ChunkPos.asLong(chunkX, chunkZ);
-		return chunks.get(chunkPos);
 	}
 	
 	/**
@@ -178,6 +269,13 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		return getChunk(chunkX, chunkZ);
 	}
 	
+	public BlockPos getInternalSpawnPos() {
+		return internalSpawnPos;
+	}
+	
+	public void setInternalSpawnPos(BlockPos pos) {
+		this.internalSpawnPos = pos;
+	}
 	
 	@Environment(EnvType.CLIENT)
 	public static class WorldJarRenderer implements BlockEntityRenderer<WorldJarBlockEntity> {

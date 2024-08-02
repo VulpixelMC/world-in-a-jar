@@ -21,8 +21,10 @@ import com.mojang.blaze3d.platform.NativeImage;
 import gay.sylv.wij.api.block.BarkType;
 import gay.sylv.wij.impl.block.BlockHolder;
 import gay.sylv.wij.impl.block.entity.type.BlockEntityHolder;
+import net.minecraft.core.BlockPos;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import org.jetbrains.annotations.NotNull;
@@ -64,5 +66,9 @@ public final class Conversions {
 	
 	public static BarkType convert(Field field) throws IllegalAccessException {
 		return (BarkType) field.get(null);
+	}
+	
+	public static ChunkPos convert(BlockPos pos) {
+		return new ChunkPos(pos.getX() & 15, pos.getZ() & 15);
 	}
 }

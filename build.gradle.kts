@@ -1,5 +1,6 @@
 @file:Suppress("UnstableApiUsage")
 
+import net.fabricmc.loom.task.GenerateSourcesTask
 import nl.javadude.gradle.plugins.license.License
 
 plugins {
@@ -116,6 +117,7 @@ tasks.withType<JavaCompile> {
 	options.encoding = "UTF-8"
 	// Minecraft 1.21 upwards uses Java 21.
 	options.release.set(21)
+	options.compilerArgs.add("--enable-preview")
 }
 
 loom {
@@ -128,7 +130,7 @@ fabricApi {
 
 java {
 	// Still required by IDEs such as Eclipse and Visual Studio Code
-	sourceCompatibility = JavaVersion.VERSION_21
+	sourceCompatibility = JavaVersion.VERSION_22
 	targetCompatibility = JavaVersion.VERSION_21
 	
 	// Loom will automatically attach sourcesJar to a RemapSourcesJar task and to the "build" task if it is present.

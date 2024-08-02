@@ -22,6 +22,10 @@ public class Pair<T, U> extends ImmutablePair<T, U> {
 		super(first, second);
 	}
 	
+	public static <T, U> Pair<T, U> of(T first, U second) {
+		return new Pair<>(first, second);
+	}
+	
 	public void setFirst(T first) {
 		this.first = first;
 	}
