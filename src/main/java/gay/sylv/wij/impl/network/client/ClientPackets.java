@@ -17,9 +17,18 @@
  */
 package gay.sylv.wij.impl.network.client;
 
+import gay.sylv.wij.impl.block.Blocks;
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
+import gay.sylv.wij.impl.network.JarChunkUpdatePayload;
 import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
+
+import java.io.IOException;
+import java.util.Optional;
 
 /**
  * Registers receivers and handles client-side server-to-client-related packets.
@@ -28,4 +37,21 @@ import net.fabricmc.api.Environment;
 @Environment(EnvType.CLIENT)
 public final class ClientPackets implements Initializable {
 	public static final ClientPackets INSTANCE = new ClientPackets();
+	
+	@Override
+	public void initialize() {
+		ClientPlayNetworking.registerGlobalReceiver(JarChunkUpdatePayload.TYPE, ((payload, context) -> {
+			// verify that the jar is in the current client level
+			try (var level = context.player().level()) {
+				ResourceKey<Level> dimension = level.dimension();
+				if (dimension != payload.jarLocation().dimension()) return;
+				Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(payload.jarLocation().blockPos(), Blocks.WORLD_JAR.type());
+				if (optionalJar.isEmpty()) return;
+				WorldJarBlockEntity jar = optionalJar.get();
+				jar.getChunkSections().get(payload.sectionPos().asLong()).setBlockStates(payload.blockStateContainer());
+			} catch (IOException e) {
+				throw new RuntimeException(e);
+			}
+		}));
+	}
 }

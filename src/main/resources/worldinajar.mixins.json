@@ -7,7 +7,8 @@
     "AnvilMenuMixin",
     "AxeItemMixin",
     "BlockBehaviourMixin",
-    "HarvestProviderMixin"
+    "HarvestProviderMixin",
+    "PlayerMixin"
   ],
   "client": [
     "client.BuiltInPackSourceMixin",

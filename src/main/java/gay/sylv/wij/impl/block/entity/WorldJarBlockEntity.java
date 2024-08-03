@@ -25,10 +25,16 @@ import gay.sylv.wij.impl.client.render.JarChunk;
 import gay.sylv.wij.impl.client.render.JarLevelChunkSection;
 import gay.sylv.wij.impl.client.render.JarLevelLightEngine;
 import gay.sylv.wij.impl.client.render.JarRenderChunkRegion;
+import gay.sylv.wij.impl.dimension.Dimensions;
+import gay.sylv.wij.impl.network.Networking;
+import gay.sylv.wij.impl.network.client.JarEnterPayload;
+import gay.sylv.wij.mixin.duck.PlayerWithReturnDim;
+import gay.sylv.wij.mixin.duck.PlayerWithReturnPos;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
+import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
@@ -36,8 +42,16 @@ import net.minecraft.client.renderer.block.BlockRenderDispatcher;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.HolderLookup;
 import net.minecraft.core.SectionPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.NbtOps;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -48,12 +62,15 @@ import net.minecraft.world.level.chunk.LightChunk;
 import net.minecraft.world.level.chunk.LightChunkGetter;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
-import java.util.LinkedList;
 import java.util.List;
+import java.util.Optional;
 
 public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter {
 	public static final List<WorldJarBlockEntity> INSTANCES = new ArrayList<>();
@@ -61,6 +78,9 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	private int scale = 64;
 	private BlockPos internalSpawnPos = new BlockPos(0, -64, 0);
+	
+	private static final int DEFAULT_SCALE = 64;
+	private static final BlockPos DEFAULT_SPAWN_POS = new BlockPos(0, -64, 0);
 	
 	/**
 	 * {@link JarLevelChunkSection}s that are loaded in the {@link WorldJarBlockEntity}.
@@ -77,6 +97,12 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	@Environment(EnvType.CLIENT)
 	private JarRenderChunkRegion renderChunkRegion;
+	
+	/**
+	 * The location of the target jar.
+	 */
+	@Nullable
+	private Networking.JarLocation targetJarLocation;
 	
 	/**
 	 * If the {@link BlockState}s in the jar have changed.
@@ -200,6 +226,25 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	}
 	
 	@Override
+	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.loadAdditional(tag, registries);
+		CompoundTag modTag = tag.getCompound("worldinajar");
+		scale = modTag.getInt("scale");
+		internalSpawnPos = BlockPos.CODEC.parse(NbtOps.INSTANCE, modTag.get("pos")).result().orElse(DEFAULT_SPAWN_POS);
+		targetJarLocation = Networking.JarLocation.CODEC.parse(NbtOps.INSTANCE, modTag.get("target_jar_location")).result().orElse(null);
+	}
+	
+	@Override
+	protected void saveAdditional(CompoundTag tag, HolderLookup.Provider registries) {
+		super.saveAdditional(tag, registries);
+		CompoundTag modTag = new CompoundTag();
+		if (scale != 0) modTag.putInt("scale", scale);
+		if (internalSpawnPos != DEFAULT_SPAWN_POS) BlockPos.CODEC.encodeStart(NbtOps.INSTANCE, internalSpawnPos).result().ifPresent(pos -> modTag.put("pos", pos));
+		if (targetJarLocation != null) Networking.JarLocation.CODEC.encodeStart(NbtOps.INSTANCE, targetJarLocation).result().ifPresent(target -> modTag.put("target_jar_location", target));
+		tag.put("worldinajar", modTag);
+	}
+	
+	@Override
 	public void setRemoved() {
 		super.setRemoved();
 		assert level != null;
@@ -211,6 +256,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	@Override
 	public void setLevel(Level level) {
 		super.setLevel(level);
+		if (level.dimension() == Dimensions.JAR) return;
 		if (!level.isClientSide) {
 			if (!INSTANCES.contains(this)) {
 				mapInstance();
@@ -318,6 +364,37 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		@Override
 		protected @NotNull RenderShape getRenderShape(BlockState state) {
 			return RenderShape.MODEL;
+		}
+		
+		@Override
+		protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
+			Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(pos, Blocks.WORLD_JAR.type());
+			if (optionalJar.isEmpty()) return InteractionResult.FAIL;
+			WorldJarBlockEntity jar = optionalJar.get();
+			
+			if (level.isClientSide()) {
+				if (jar.targetJarLocation == null) {
+					ClientPlayNetworking.send(new JarEnterPayload(new Networking.JarLocation(pos, level.dimension())));
+					return InteractionResult.PASS;
+				}
+				
+				return InteractionResult.SUCCESS;
+			}
+			if (jar.targetJarLocation == null) return InteractionResult.SUCCESS;
+			
+			MinecraftServer server = level.getServer();
+			assert server != null;
+			
+			Vec3 returnPos = ((PlayerWithReturnPos) player).worldinajar$getReturnPos(jar.targetJarLocation);
+			ResourceKey<Level> returnDim = ((PlayerWithReturnDim) player).worldinajar$getReturnDimension(jar.targetJarLocation);
+			if (returnDim == null || returnPos == null) {
+				return InteractionResult.FAIL;
+			}
+			
+			ServerLevel targetLevel = server.getLevel(jar.targetJarLocation.dimension());
+			DimensionTransition transition = new DimensionTransition(targetLevel, Vec3.atCenterOf(jar.getInternalSpawnPos()), Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.DO_NOTHING);
+			player.changeDimension(transition);
+			return InteractionResult.SUCCESS;
 		}
 	}
 }

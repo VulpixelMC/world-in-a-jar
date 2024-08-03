@@ -17,7 +17,19 @@
  */
 package gay.sylv.wij.impl.network;
 
+import gay.sylv.wij.impl.block.Blocks;
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
+import gay.sylv.wij.impl.network.client.JarEnterPayload;
 import gay.sylv.wij.impl.util.Initializable;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.portal.DimensionTransition;
+import net.minecraft.world.phys.Vec3;
+
+import java.util.Objects;
+import java.util.Optional;
 
 /**
  * Registers receivers and handles non-dedicated server-side Client-to-Server-related packets.
@@ -25,4 +37,22 @@ import gay.sylv.wij.impl.util.Initializable;
  */
 public final class ServerPackets implements Initializable {
 	public static final ServerPackets INSTANCE = new ServerPackets();
+	
+	@Override
+	public void initialize() {
+		ServerPlayNetworking.registerGlobalReceiver(JarEnterPayload.TYPE, (payload, context) -> {
+			try (MinecraftServer server = context.server()) {
+				ServerLevel level = server.getLevel(payload.jarLocation().dimension());
+				assert level != null;
+				Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(payload.jarLocation().blockPos(), Blocks.WORLD_JAR.type());
+				if (optionalJar.isEmpty()) return;
+				WorldJarBlockEntity jar = optionalJar.get();
+				
+				ServerPlayer player = context.player();
+				ServerLevel targetLevel = Objects.requireNonNull(server.getLevel(Objects.requireNonNull(jar.getLevel()).dimension()));
+				DimensionTransition transition = new DimensionTransition(targetLevel, Vec3.atCenterOf(jar.getInternalSpawnPos()), Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.DO_NOTHING);
+				player.changeDimension(transition);
+			}
+		});
+	}
 }
