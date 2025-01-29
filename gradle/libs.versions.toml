@@ -3,17 +3,17 @@
 # https://fabricmc.net/develop/ for fabric
 
 # Base
-minecraft = "1.21"
-parchment = "2024.07.07"
-fabric_loader = "0.16.0"
+minecraft = "1.21.1"
+parchment = "2024.11.17"
+fabric_loader = "0.16.10"
 
 # Libraries
-fabric_api = "0.100.7+1.21"
-fabric_permissions = "0.3.1"
+fabric_api = "0.115.0+1.21.1"
+fabric_permissions = "0.3.3"
 
 # Mod Integrations
-wthit = "fabric-12.2.2"
-modmenu = "11.0.1"
+wthit = "fabric-12.5.1"
+modmenu = "12.0.0"
 luckperms = "5.4"
 
 # Runtime Mods
@@ -22,7 +22,7 @@ resource_explorer = "RuU8ZS7y"
 [libraries]
 # Base
 minecraft = { module = "com.mojang:minecraft", version.ref = "minecraft" }
-parchment = { module = "org.parchmentmc.data:parchment-1.21", version.ref = "parchment" }
+parchment = { module = "org.parchmentmc.data:parchment-1.21.1", version.ref = "parchment" }
 fabric_loader = { module = "net.fabricmc:fabric-loader", version.ref = "fabric_loader" }
 
 # Libraries
@@ -42,4 +42,4 @@ resource_explorer = { module = "maven.modrinth:resource_explorer", version.ref =
 [bundles]
 
 [plugins]
-quilt_loom = { id = "org.quiltmc.loom", version = "1.+" }
+fabric_loom = { id = "fabric-loom", version = "1.+" }

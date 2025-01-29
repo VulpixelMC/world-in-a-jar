@@ -5,7 +5,7 @@ import nl.javadude.gradle.plugins.license.License
 
 plugins {
 	id("com.github.hierynomus.license").version("0.16.1")
-	alias(libs.plugins.quilt.loom)
+	alias(libs.plugins.fabric.loom)
 	`maven-publish`
 }
 

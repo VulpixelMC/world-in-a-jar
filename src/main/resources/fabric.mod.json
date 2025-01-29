@@ -31,14 +31,14 @@
 		"worldinajar.mixins.json"
 	],
 	"depends": {
-		"fabricloader": ">=0.16.0",
-		"minecraft": "1.21",
+		"fabricloader": ">=0.16.10",
+		"minecraft": "1.21.1",
 		"java": ">=21",
 		"fabric-api": "*"
 	},
 	"suggests": {
 		"luckperms": "*",
-		"wthit": "~fabric-12.2.2",
-		"modmenu": ">=11.0.1"
+		"wthit": "~fabric-12.5.1",
+		"modmenu": ">=12.0.0"
 	}
 }

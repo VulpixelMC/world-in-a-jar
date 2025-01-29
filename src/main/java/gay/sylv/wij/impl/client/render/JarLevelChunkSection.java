@@ -64,7 +64,7 @@ public class JarLevelChunkSection {
 					.collect(
 							Collectors.toMap(
 									key -> key,
-									_ -> new VertexBuffer(VertexBuffer.Usage.STATIC)
+									renderType -> new VertexBuffer(VertexBuffer.Usage.STATIC)
 							)
 					);
 			this.cleanable = CLEANER.register(this, new ClientClean(vertexBuffers));
