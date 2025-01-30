@@ -18,8 +18,8 @@
 package gay.sylv.wij.mixin;
 
 import gay.sylv.wij.impl.network.Networking;
-import gay.sylv.wij.mixin.duck.PlayerWithReturnDim;
-import gay.sylv.wij.mixin.duck.PlayerWithReturnPos;
+import gay.sylv.wij.impl.duck.PlayerWithReturnDim;
+import gay.sylv.wij.impl.duck.PlayerWithReturnPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;

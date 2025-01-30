@@ -15,16 +15,17 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.mixin.duck;
+package gay.sylv.wij.impl.duck;
 
 import gay.sylv.wij.impl.network.Networking;
-import net.minecraft.world.phys.Vec3;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Holds a return position. A mixin implements this interface on all {@link net.minecraft.world.entity.player.Player}s.
+ * Holds a return dimension ({@link net.minecraft.resources.ResourceKey}&lt;{@link net.minecraft.world.level.Level}&gt;). A mixin implements this class on every {@link net.minecraft.world.entity.player.Player}.
  */
-public interface PlayerWithReturnPos {
-	@Nullable Vec3 worldinajar$getReturnPos(Networking.JarLocation jarLocation);
-	void worldinajar$setReturnPos(Networking.JarLocation jarLocation, Vec3 returnPos);
+public interface PlayerWithReturnDim {
+	@Nullable ResourceKey<Level> worldinajar$getReturnDimension(Networking.JarLocation jarLocation);
+	void worldinajar$setReturnDimension(Networking.JarLocation jarLocation, ResourceKey<Level> dimension);
 }
