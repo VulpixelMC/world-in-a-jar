@@ -117,7 +117,6 @@ tasks.withType<JavaCompile> {
 	options.encoding = "UTF-8"
 	// Minecraft 1.21 upwards uses Java 21.
 	options.release.set(21)
-	options.compilerArgs.add("--enable-preview")
 }
 
 loom {
