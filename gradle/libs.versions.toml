@@ -13,7 +13,7 @@ fabric_permissions = "0.3.3"
 
 # Mod Integrations
 wthit = "fabric-12.5.1"
-modmenu = "12.0.0"
+modmenu = "11.0.3"
 luckperms = "5.4"
 
 # Runtime Mods
