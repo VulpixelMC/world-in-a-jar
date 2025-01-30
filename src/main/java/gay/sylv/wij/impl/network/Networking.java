@@ -101,50 +101,17 @@ public final class Networking implements Initializable {
 	
 	@Override
 	public void initialize() {
-		s2c(JarChunkUpdatePayload.class);
-		c2s(JarEnterPayload.class);
+		s2c(JarChunkUpdatePayload.TYPE, JarChunkUpdatePayload.CODEC);
+		c2s(JarEnterPayload.TYPE, JarEnterPayload.CODEC);
 		
 		ServerPackets.INSTANCE.initialize();
 	}
 	
-	@SuppressWarnings("unchecked")
-	private static <T extends CustomPacketPayload> Pair<CustomPacketPayload.Type<T>, StreamCodec<RegistryFriendlyByteBuf, T>> scanClass(Class<T> clazz) {
-		AtomicReference<CustomPacketPayload.Type<T>> type = new AtomicReference<>();
-		AtomicReference<StreamCodec<RegistryFriendlyByteBuf, T>> codec = new AtomicReference<>();
-		Arrays.stream(clazz.getDeclaredFields())
-				.filter(field -> SafeMap.isStaticAccessible(field, CustomPacketPayload.Type.class) || SafeMap.isStaticAccessible(field, StreamCodec.class))
-				.limit(2)
-				.forEach(field -> {
-					try {
-						Class<?> fieldType = field.getType();
-						boolean isType = fieldType.isAssignableFrom(CustomPacketPayload.Type.class)
-								&& Arrays.stream(fieldType.getTypeParameters())
-								.allMatch(parameter -> parameter.getGenericDeclaration().isAssignableFrom(clazz));
-						boolean isCodec = fieldType.isAssignableFrom(StreamCodec.class)
-								&& Arrays.stream(fieldType.getTypeParameters())
-								.allMatch(parameter -> {
-									Class<?> generic = parameter.getGenericDeclaration();
-									return generic.isAssignableFrom(clazz) || generic.isAssignableFrom(RegistryFriendlyByteBuf.class);
-								});
-						if (isType) {
-							type.set((CustomPacketPayload.Type<T>) field.get(null));
-						} else if (isCodec) {
-							codec.set((StreamCodec<RegistryFriendlyByteBuf, T>) field.get(null));
-						}
-					} catch (IllegalAccessException | IllegalArgumentException e) {
-						throw new RuntimeException(e);
-					}
-				});
-		return Pair.of(Objects.requireNonNull(type.get()), Objects.requireNonNull(codec.get()));
+	private static <T extends CustomPacketPayload> void s2c(CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> codec) {
+		PayloadTypeRegistry.playS2C().register(type, codec);
 	}
 	
-	private static <T extends CustomPacketPayload> void s2c(Class<T> clazz) {
-		var scanned = scanClass(clazz);
-		PayloadTypeRegistry.playS2C().register(scanned.first(), scanned.second());
-	}
-	
-	private static <T extends CustomPacketPayload> void c2s(Class<T> clazz) {
-		var scanned = scanClass(clazz);
-		PayloadTypeRegistry.playC2S().register(scanned.first(), scanned.second());
+	private static <T extends CustomPacketPayload> void c2s(CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> codec) {
+		PayloadTypeRegistry.playS2C().register(type, codec);
 	}
 }
