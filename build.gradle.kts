@@ -1,6 +1,5 @@
 @file:Suppress("UnstableApiUsage")
 
-import net.fabricmc.loom.task.GenerateSourcesTask
 import nl.javadude.gradle.plugins.license.License
 
 plugins {
@@ -92,13 +91,6 @@ dependencies {
 		exclude(group = "net.fabricmc")
 	}
 	modRuntimeOnly(libs.resource.explorer)
-}
-
-configurations {
-	runtimeClasspath {
-		// remove duplicate fabric-loader
-		exclude(group = "net.fabricmc", module = "fabric-loader")
-	}
 }
 
 tasks.processResources {
