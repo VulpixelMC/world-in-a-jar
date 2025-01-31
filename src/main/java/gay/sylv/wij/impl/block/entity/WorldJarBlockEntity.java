@@ -72,8 +72,8 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	public static final List<WorldJarBlockEntity> INSTANCES = new ArrayList<>();
 	public static final Long2ObjectMap<List<WorldJarBlockEntity>> INSTANCE_MAP = new Long2ObjectOpenHashMap<>();
 	
-	private int scale = 64;
-	private BlockPos internalSpawnPos = new BlockPos(0, -64, 0);
+	private int scale = DEFAULT_SCALE;
+	private BlockPos internalSpawnPos = DEFAULT_SPAWN_POS;
 	
 	private static final int DEFAULT_SCALE = 64;
 	private static final BlockPos DEFAULT_SPAWN_POS = new BlockPos(0, -64, 0);

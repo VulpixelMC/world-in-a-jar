@@ -42,16 +42,13 @@ public final class ClientPackets implements Initializable {
 	public void initialize() {
 		ClientPlayNetworking.registerGlobalReceiver(JarChunkUpdatePayload.TYPE, ((payload, context) -> {
 			// verify that the jar is in the current client level
-			try (var level = context.player().level()) {
-				ResourceKey<Level> dimension = level.dimension();
-				if (dimension != payload.jarLocation().dimension()) return;
-				Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(payload.jarLocation().blockPos(), Blocks.WORLD_JAR.type());
-				if (optionalJar.isEmpty()) return;
-				WorldJarBlockEntity jar = optionalJar.get();
-				jar.getChunkSections().get(payload.sectionPos().asLong()).setBlockStates(payload.blockStateContainer());
-			} catch (IOException e) {
-				throw new RuntimeException(e);
-			}
+			var level = context.player().level();
+			ResourceKey<Level> dimension = level.dimension();
+			if (dimension != payload.jarLocation().dimension()) return;
+			Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(payload.jarLocation().blockPos(), Blocks.WORLD_JAR.type());
+			if (optionalJar.isEmpty()) return;
+			WorldJarBlockEntity jar = optionalJar.get();
+			jar.getChunkSections().get(payload.sectionPos().asLong()).setBlockStates(payload.blockStateContainer());
 		}));
 	}
 }

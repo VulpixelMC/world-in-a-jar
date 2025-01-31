@@ -19,6 +19,7 @@ package gay.sylv.wij.impl.network;
 
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
+import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.network.client.JarEnterPayload;
 import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -41,18 +42,17 @@ public final class ServerPackets implements Initializable {
 	@Override
 	public void initialize() {
 		ServerPlayNetworking.registerGlobalReceiver(JarEnterPayload.TYPE, (payload, context) -> {
-			try (MinecraftServer server = context.server()) {
-				ServerLevel level = server.getLevel(payload.jarLocation().dimension());
-				assert level != null;
-				Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(payload.jarLocation().blockPos(), Blocks.WORLD_JAR.type());
-				if (optionalJar.isEmpty()) return;
-				WorldJarBlockEntity jar = optionalJar.get();
-				
-				ServerPlayer player = context.player();
-				ServerLevel targetLevel = Objects.requireNonNull(server.getLevel(Objects.requireNonNull(jar.getLevel()).dimension()));
-				DimensionTransition transition = new DimensionTransition(targetLevel, Vec3.atCenterOf(jar.getInternalSpawnPos()), Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.DO_NOTHING);
-				player.changeDimension(transition);
-			}
+			MinecraftServer server = context.server();
+			ServerLevel level = server.getLevel(payload.jarLocation().dimension());
+			assert level != null;
+			Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(payload.jarLocation().blockPos(), Blocks.WORLD_JAR.type());
+			if (optionalJar.isEmpty()) return;
+			WorldJarBlockEntity jar = optionalJar.get();
+			
+			ServerPlayer player = context.player();
+			ServerLevel targetLevel = Objects.requireNonNull(server.getLevel(Dimensions.JAR));
+			DimensionTransition transition = new DimensionTransition(targetLevel, Vec3.atCenterOf(jar.getInternalSpawnPos()), Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.DO_NOTHING);
+			player.changeDimension(transition);
 		});
 	}
 }
