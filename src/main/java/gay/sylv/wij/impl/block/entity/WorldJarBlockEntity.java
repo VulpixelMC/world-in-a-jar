@@ -152,6 +152,23 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		return getBlockState(pos).getFluidState();
 	}
 	
+	public void updateBlockStates(MinecraftServer server) {
+		initializeServerChunks();
+		Level level = server.getLevel(Dimensions.JAR);
+		int max = scale - 1;
+		for (int x = 0; x < max; x++) {
+			for (int y = 0; y < max; y++) {
+				for (int z = 0; z < max; z++) {
+					BlockPos pos = new BlockPos(x, y, z);
+					assert level != null;
+					BlockState state = level.getBlockState(pos.offset(internalSpawnPos));
+					if (state.isAir()) continue;
+					setBlockState(pos, state);
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Initializes the chunks server-side.
 	 * @author sylv

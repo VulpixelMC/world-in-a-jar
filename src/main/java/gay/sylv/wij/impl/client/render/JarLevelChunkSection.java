@@ -122,6 +122,10 @@ public class JarLevelChunkSection {
 		this.blockStates = blockStates;
 	}
 	
+	public PalettedContainer<BlockState> getBlockStates() {
+		return this.blockStates;
+	}
+	
 	/**
 	 * Prevents memory leaks by closing {@link VertexBuffer}s.
 	 *

@@ -20,6 +20,7 @@ package gay.sylv.wij.impl.network;
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
 import gay.sylv.wij.impl.network.client.JarEnterPayload;
+import gay.sylv.wij.impl.network.client.JarLoadedPayload;
 import gay.sylv.wij.impl.util.Initializable;
 import gay.sylv.wij.impl.util.Pair;
 import gay.sylv.wij.impl.util.SafeMap;
@@ -103,6 +104,7 @@ public final class Networking implements Initializable {
 	public void initialize() {
 		s2c(JarChunkUpdatePayload.TYPE, JarChunkUpdatePayload.CODEC);
 		c2s(JarEnterPayload.TYPE, JarEnterPayload.CODEC);
+		c2s(JarLoadedPayload.TYPE, JarLoadedPayload.CODEC);
 		
 		ServerPackets.INSTANCE.initialize();
 	}

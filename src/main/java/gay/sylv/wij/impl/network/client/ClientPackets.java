@@ -48,7 +48,7 @@ public final class ClientPackets implements Initializable {
 			Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(payload.jarLocation().blockPos(), Blocks.WORLD_JAR.type());
 			if (optionalJar.isEmpty()) return;
 			WorldJarBlockEntity jar = optionalJar.get();
-			jar.getChunkSections().get(payload.sectionPos().asLong()).setBlockStates(payload.blockStateContainer());
+			jar.onChunkUpdate(context.client(), payload.sectionPos(), payload.blockStateContainer());
 		}));
 	}
 }

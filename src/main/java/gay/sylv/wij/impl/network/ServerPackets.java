@@ -21,14 +21,18 @@ import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.network.client.JarEnterPayload;
+import gay.sylv.wij.impl.network.client.JarLoadedPayload;
 import gay.sylv.wij.impl.util.Initializable;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.core.SectionPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
 
+import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -53,6 +57,25 @@ public final class ServerPackets implements Initializable {
 			ServerLevel targetLevel = Objects.requireNonNull(server.getLevel(Dimensions.JAR));
 			DimensionTransition transition = new DimensionTransition(targetLevel, Vec3.atCenterOf(jar.getInternalSpawnPos()), Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.DO_NOTHING);
 			player.changeDimension(transition);
+		});
+		ServerPlayNetworking.registerGlobalReceiver(JarLoadedPayload.TYPE, (payload, context) -> {
+			Networking.JarLocation jarLocation = payload.jarLocation();
+			
+			context.server().execute(() -> {
+				try {
+					WorldJarBlockEntity jar = Objects.requireNonNull(context.server().getLevel(jarLocation.dimension()))
+							.getBlockEntity(jarLocation.blockPos(), Blocks.WORLD_JAR.type())
+							.orElseThrow();
+					jar.updateBlockStates(context.server());
+					
+					for (ServerPlayer player : PlayerLookup.tracking(jar)) {
+						jar.getChunkSections().forEach((pos, section) -> {
+							SectionPos sectionPos = SectionPos.of(pos);
+							ServerPlayNetworking.send(player, new JarChunkUpdatePayload(jarLocation, sectionPos, section.getBlockStates()));
+						});
+					}
+				} catch (NoSuchElementException | NullPointerException ignored) {} // user error
+			});
 		});
 	}
 }
