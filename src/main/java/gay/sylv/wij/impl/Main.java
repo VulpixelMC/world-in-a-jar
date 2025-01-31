@@ -21,14 +21,19 @@ import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.item.Items;
 import gay.sylv.wij.impl.network.Networking;
 import gay.sylv.wij.impl.util.Constants;
+import gay.sylv.wij.impl.worldgen.JarChunkGenerator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.core.Registry;
+import net.minecraft.core.registries.BuiltInRegistries;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.Optional;
+
+import static gay.sylv.wij.impl.util.Constants.modId;
 
 public final class Main implements ModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Constants.MOD_NAME);
@@ -44,6 +49,8 @@ public final class Main implements ModInitializer {
 		Items.INSTANCE.initialize();
 		
 		Networking.INSTANCE.initialize();
+		
+		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, modId("jar"), JarChunkGenerator.CODEC);
 		
 		LOGGER.info("Finished loading {}", Constants.MOD_NAME);
 	}
