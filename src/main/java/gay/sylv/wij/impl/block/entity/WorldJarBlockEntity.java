@@ -17,8 +17,8 @@
  */
 package gay.sylv.wij.impl.block.entity;
 
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexConsumer;
+import com.mojang.blaze3d.systems.RenderSystem;
+import com.mojang.blaze3d.vertex.*;
 import com.mojang.serialization.MapCodec;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.client.render.JarChunk;
@@ -36,9 +36,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.MultiBufferSource;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.block.BlockRenderDispatcher;
+import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
@@ -68,9 +66,7 @@ import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter {
 	public static final List<WorldJarBlockEntity> INSTANCES = new ArrayList<>();
@@ -325,21 +321,131 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	@Environment(EnvType.CLIENT)
 	public static class WorldJarRenderer implements BlockEntityRenderer<WorldJarBlockEntity> {
-		private final BlockRenderDispatcher blockRenderDispatcher;
+		private final BlockEntityRendererProvider.Context context;
+		// always reuse the same SectionBufferBuilderPack because it cannot be freed, so it's an instant memory leak.
+		private static final SectionBufferBuilderPack BYTE_BUFFER_BUILDERS = new SectionBufferBuilderPack();
+		private static final Map<RenderType, BufferBuilder> BUFFERS = new HashMap<>();
 		
 		public WorldJarRenderer(BlockEntityRendererProvider.Context context) {
-			blockRenderDispatcher = context.getBlockRenderDispatcher();
+			this.context = context;
 		}
 		
 		@Override
 		public void render(
-				WorldJarBlockEntity blockEntity, float partialTick, PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, int packedOverlay
+				WorldJarBlockEntity jar,
+				float partialTick,
+				PoseStack poseStack,
+				MultiBufferSource bufferSource,
+				int packedLight,
+				int packedOverlay
 		) {
-			VertexConsumer buffer = bufferSource.getBuffer(RenderType.solid());
 			poseStack.pushPose();
-			poseStack.scale(0.001f, 0.001f, 0.001f);
-			blockRenderDispatcher.renderBatched(net.minecraft.world.level.block.Blocks.STONE.defaultBlockState(), BlockPos.ZERO, blockEntity.getLevel(), poseStack, buffer, false, RandomSource.create());
+			// prevent z-fighting
+			poseStack.scale(
+					jar.getVisualScale() - 0.001f,
+					jar.getVisualScale() - 0.001f,
+					jar.getVisualScale() - 0.001f
+			);
+			poseStack.translate(
+					0.001f,
+					0.001f,
+					0.001f
+			);
+			
+			if (jar.statesChanged) {
+				jar.statesChanged = false;
+				buildJar(context, jar);
+			}
+			
+			renderJar(jar, poseStack);
 			poseStack.popPose();
+		}
+		
+		public static void renderJar(
+				WorldJarBlockEntity jar,
+				PoseStack poseStack
+		) {
+			for (RenderType renderType : RenderType.chunkBufferLayers()) {
+				renderType.setupRenderState();
+				ShaderInstance shader = RenderSystem.getShader();
+				
+				jar.getChunkSections().forEach((pos, section) -> {
+					if (section.isHasBuilt() && section.getRenderedTypes().contains(renderType)) {
+						VertexBuffer buffer = section.getVertexBuffers().get(renderType);
+						buffer.bind();
+						buffer.drawWithShader(poseStack.last().pose(), RenderSystem.getProjectionMatrix(), shader);
+						VertexBuffer.unbind();
+					}
+				});
+				
+				renderType.clearRenderState();
+			}
+		}
+		
+		public static void buildJar(
+				BlockEntityRendererProvider.Context context,
+				WorldJarBlockEntity jar
+		) {
+			Vec3 cameraPos = context.getBlockEntityRenderDispatcher().camera.getPosition();
+			RandomSource randomSource = Objects.requireNonNull(jar.getLevel()).getRandom();
+			// The sections' PoseStack
+			PoseStack poseStack = new PoseStack();
+			
+			jar.getChunkSections().forEach((pos, section) -> {
+				BlockPos origin = section.getOrigin();
+				BlockPos offset = new BlockPos(15, 15, 15).offset(origin);
+				
+				section.getRenderedTypes().clear();
+				
+				for (BlockPos blockPos : BlockPos.betweenClosed(origin, offset)) {
+					BlockState state = jar.getBlockState(blockPos);
+					FluidState fluidState = state.getFluidState();
+					
+					if (!fluidState.isEmpty()) {
+						RenderType renderType = ItemBlockRenderTypes.getRenderLayer(fluidState);
+						section.getRenderedTypes().add(renderType);
+						BufferBuilder bufferBuilder = getOrSetBufferBuilder(renderType);;
+						
+						context.getBlockRenderDispatcher().renderLiquid(blockPos, jar.renderChunkRegion, bufferBuilder, state, fluidState);
+					}
+					
+					if (state.getRenderShape() == RenderShape.MODEL) {
+						RenderType renderType = ItemBlockRenderTypes.getChunkRenderType(state);
+						section.getRenderedTypes().add(renderType);
+						BufferBuilder bufferBuilder = getOrSetBufferBuilder(renderType);
+						
+						poseStack.pushPose();
+						poseStack.translate(
+								blockPos.getX(),
+								blockPos.getY(),
+								blockPos.getZ()
+						);
+						context.getBlockRenderDispatcher().renderBatched(state, blockPos, jar.renderChunkRegion, poseStack, bufferBuilder, true, randomSource);
+						poseStack.popPose();
+					}
+				}
+				
+				// end building and upload vertex buffers
+				for (RenderType renderType : section.getRenderedTypes()) {
+					VertexBuffer buffer = section.getVertexBuffers().get(renderType);
+					BufferBuilder bufferBuilder = BUFFERS.get(renderType);
+					MeshData renderedBuffer = bufferBuilder.build();
+					buffer.bind();
+					buffer.upload(renderedBuffer);
+					VertexBuffer.unbind();
+				}
+			});
+		}
+		
+		private static BufferBuilder getOrSetBufferBuilder(RenderType renderType) {
+			if (!BUFFERS.containsKey(renderType)) {
+				ByteBufferBuilder byteBufferBuilder = BYTE_BUFFER_BUILDERS.buffer(renderType);
+				BufferBuilder bufferBuilder = new BufferBuilder(byteBufferBuilder, renderType.mode(), renderType.format());
+				BUFFERS.put(renderType, bufferBuilder);
+				return bufferBuilder;
+			} else {
+				return BUFFERS.get(renderType);
+			}
 		}
 	}
 	
