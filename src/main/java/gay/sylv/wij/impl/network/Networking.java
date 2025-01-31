@@ -112,6 +112,6 @@ public final class Networking implements Initializable {
 	}
 	
 	private static <T extends CustomPacketPayload> void c2s(CustomPacketPayload.Type<T> type, StreamCodec<RegistryFriendlyByteBuf, T> codec) {
-		PayloadTypeRegistry.playS2C().register(type, codec);
+		PayloadTypeRegistry.playC2S().register(type, codec);
 	}
 }
