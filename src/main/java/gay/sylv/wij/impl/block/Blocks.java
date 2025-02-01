@@ -17,7 +17,7 @@
  */
 package gay.sylv.wij.impl.block;
 
-import gay.sylv.wij.impl.Main;
+import gay.sylv.wij.impl.WorldInAJar;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.block.entity.type.BlockEntityHolder;
 import gay.sylv.wij.impl.block.item.CreativePlacedBlockItem;
@@ -107,7 +107,7 @@ public final class Blocks implements Initializable {
 				)
 		);
 		
-		if (Main.isClient()) {
+		if (WorldInAJar.isClient()) {
 			BlockRendering.INSTANCE.initialize();
 		}
 	}

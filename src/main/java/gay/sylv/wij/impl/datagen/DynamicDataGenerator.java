@@ -20,7 +20,7 @@ package gay.sylv.wij.impl.datagen;
 import com.mojang.blaze3d.platform.NativeImage;
 import gay.sylv.wij.api.block.BarkType;
 import gay.sylv.wij.api.datagen.RuntimeResourcePack;
-import gay.sylv.wij.impl.Main;
+import gay.sylv.wij.impl.WorldInAJar;
 import gay.sylv.wij.impl.item.BarkItem;
 import gay.sylv.wij.impl.item.Items;
 import gay.sylv.wij.impl.util.Constants;
@@ -57,7 +57,7 @@ public final class DynamicDataGenerator implements Initializable {
 	
 	@Override
 	public void initialize() {
-		if (Main.isClient()) {
+		if (WorldInAJar.isClient()) {
 			BarkType.registerAll(BarkType.class);
 		}
 	}

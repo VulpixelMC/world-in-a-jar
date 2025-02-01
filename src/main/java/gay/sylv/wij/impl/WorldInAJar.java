@@ -35,7 +35,7 @@ import java.util.Optional;
 
 import static gay.sylv.wij.impl.util.Constants.modId;
 
-public final class Main implements ModInitializer {
+public final class WorldInAJar implements ModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Constants.MOD_NAME);
 	private static EnvType environment;
 	
