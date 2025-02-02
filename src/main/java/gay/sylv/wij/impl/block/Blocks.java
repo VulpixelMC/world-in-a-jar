@@ -21,6 +21,7 @@ import gay.sylv.wij.impl.WorldInAJar;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.block.entity.type.BlockEntityHolder;
 import gay.sylv.wij.impl.block.item.CreativePlacedBlockItem;
+import gay.sylv.wij.impl.block.item.WorldJarBlockItem;
 import gay.sylv.wij.impl.util.Conversions;
 import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -67,7 +68,9 @@ public final class Blocks implements Initializable {
 								.isRedstoneConductor(net.minecraft.world.level.block.Blocks::never)
 								.isViewBlocking(net.minecraft.world.level.block.Blocks::never)
 				),
-				WorldJarBlockEntity::new
+				WorldJarBlockEntity::new,
+				WorldJarBlockItem::new,
+				new Item.Properties()
 		);
 		
 		SUSSYSTONE = register(
@@ -130,14 +133,14 @@ public final class Blocks implements Initializable {
 		return new BlockHolder<>(block, item);
 	}
 	
-	private static <I extends Item, BE extends BlockEntity> BlockEntityHolder<I, BE> registerBlockEntityItem(@NotNull String id, Block block, BlockEntityType.BlockEntitySupplier<BE> supplier, I item) {
-		BlockHolder<I> holder = register(id, block, item);
+	private static <I extends BlockItem, BE extends BlockEntity> BlockEntityHolder<I, BE> registerBlockEntityItem(@NotNull String id, Block block, BlockEntityType.BlockEntitySupplier<BE> supplier, BlockItemSupplier<I> item, Item.Properties itemProperties) {
+		BlockHolder<I> holder = register(id, block, item.create(block, itemProperties));
 		BlockEntityType<BE> type = Registry.register(BuiltInRegistries.BLOCK_ENTITY_TYPE, modId(id), BlockEntityType.Builder.of(supplier, block).build());
 		return Conversions.convert(holder, type);
 	}
 	
 	private static <BE extends BlockEntity> BlockEntityHolder<BlockItem, BE> registerBlockEntityItem(@NotNull String id, Block block, BlockEntityType.BlockEntitySupplier<BE> supplier) {
-		return registerBlockEntityItem(id, block, supplier, new BlockItem(block, new Item.Properties()));
+		return registerBlockEntityItem(id, block, supplier, BlockItem::new, new Item.Properties());
 	}
 	
 	public static final class BlockRendering implements Initializable {
@@ -159,5 +162,10 @@ public final class Blocks implements Initializable {
 		private static void addRenderType(Block block, RenderType renderType) {
 			BlockRenderLayerMap.INSTANCE.putBlock(block, renderType);
 		}
+	}
+	
+	@FunctionalInterface
+	public interface BlockItemSupplier<T extends BlockItem> {
+		T create(Block block, Item.Properties properties);
 	}
 }

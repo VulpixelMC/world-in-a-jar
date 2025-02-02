@@ -20,11 +20,13 @@ package gay.sylv.wij.impl.network;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.dimension.Dimensions;
+import gay.sylv.wij.impl.duck.PlayerWithReturn;
 import gay.sylv.wij.impl.network.client.JarEnterPayload;
 import gay.sylv.wij.impl.network.client.JarLoadedPayload;
 import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
@@ -54,6 +56,9 @@ public final class ServerPackets implements Initializable {
 			WorldJarBlockEntity jar = optionalJar.get();
 			
 			ServerPlayer player = context.player();
+			((PlayerWithReturn) player).worldinajar$setReturnLocation(
+					new Networking.JarLocation(BlockPos.containing(player.position()), player.level().dimension())
+			);
 			ServerLevel targetLevel = Objects.requireNonNull(server.getLevel(Dimensions.JAR));
 			DimensionTransition transition = new DimensionTransition(targetLevel, Vec3.atCenterOf(jar.getInternalSpawnPos()), Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.DO_NOTHING);
 			player.changeDimension(transition);

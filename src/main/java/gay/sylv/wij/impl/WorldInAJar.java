@@ -17,17 +17,22 @@
  */
 package gay.sylv.wij.impl;
 
+import gay.sylv.wij.impl.attachment.Attachments;
 import gay.sylv.wij.impl.block.Blocks;
+import gay.sylv.wij.impl.component.Components;
 import gay.sylv.wij.impl.item.Items;
 import gay.sylv.wij.impl.network.Networking;
 import gay.sylv.wij.impl.util.Constants;
+import gay.sylv.wij.impl.util.jar.JarPlacer;
 import gay.sylv.wij.impl.worldgen.JarChunkGenerator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.server.MinecraftServer;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -44,6 +49,10 @@ public final class WorldInAJar implements ModInitializer {
 		LOGGER.info("Initializing {}", Constants.MOD_NAME);
 		environment = FabricLoader.getInstance().getEnvironmentType();
 		
+		Components.INSTANCE.initialize();
+		
+		Attachments.INSTANCE.initialize();
+		
 		Blocks.INSTANCE.initialize();
 		
 		Items.INSTANCE.initialize();
@@ -51,6 +60,9 @@ public final class WorldInAJar implements ModInitializer {
 		Networking.INSTANCE.initialize();
 		
 		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, modId("jar"), JarChunkGenerator.CODEC);
+		
+		ServerLifecycleEvents.SERVER_STARTED.register(WorldInAJar::onServerStart);
+		ServerLifecycleEvents.SERVER_STOPPED.register(WorldInAJar::onServerStop);
 		
 		LOGGER.info("Finished loading {}", Constants.MOD_NAME);
 	}
@@ -69,5 +81,21 @@ public final class WorldInAJar implements ModInitializer {
 	
 	public static ModContainer getModContainer() {
 		return FabricLoader.getInstance().getModContainer(Constants.MOD_ID).orElseThrow();
+	}
+	
+	private static void onServerStart(MinecraftServer server) {
+		try {
+			JarPlacer.initialize(server);
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
+	}
+	
+	private static void onServerStop(MinecraftServer server) {
+		try {
+			JarPlacer.clear();
+		} catch (IllegalAccessException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

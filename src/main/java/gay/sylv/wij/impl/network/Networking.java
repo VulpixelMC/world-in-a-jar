@@ -22,12 +22,11 @@ import com.mojang.serialization.codecs.RecordCodecBuilder;
 import gay.sylv.wij.impl.network.client.JarEnterPayload;
 import gay.sylv.wij.impl.network.client.JarLoadedPayload;
 import gay.sylv.wij.impl.util.Initializable;
-import gay.sylv.wij.impl.util.Pair;
-import gay.sylv.wij.impl.util.SafeMap;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.core.registries.Registries;
+import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -36,10 +35,6 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import org.jetbrains.annotations.NotNull;
-
-import java.util.Arrays;
-import java.util.Objects;
-import java.util.concurrent.atomic.AtomicReference;
 
 import static gay.sylv.wij.impl.util.Instantiation.blockStatePalettedContainer;
 
@@ -81,15 +76,15 @@ public final class Networking implements Initializable {
 	}
 	
 	public record JarLocation(BlockPos blockPos, ResourceKey<Level> dimension) {
-		public static final StreamCodec<RegistryFriendlyByteBuf, JarLocation> STREAM_CODEC = new StreamCodec<>() {
+		public static final StreamCodec<FriendlyByteBuf, JarLocation> STREAM_CODEC = new StreamCodec<>() {
 			@Override
-			public void encode(RegistryFriendlyByteBuf buf, JarLocation jarLocation) {
+			public void encode(FriendlyByteBuf buf, JarLocation jarLocation) {
 				buf.writeBlockPos(jarLocation.blockPos);
 				buf.writeResourceKey(jarLocation.dimension);
 			}
 			
 			@Override
-			public @NotNull JarLocation decode(RegistryFriendlyByteBuf buf) {
+			public @NotNull JarLocation decode(FriendlyByteBuf buf) {
 				return new JarLocation(buf.readBlockPos(), buf.readResourceKey(Registries.DIMENSION));
 			}
 		};

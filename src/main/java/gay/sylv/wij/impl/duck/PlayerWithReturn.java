@@ -18,13 +18,16 @@
 package gay.sylv.wij.impl.duck;
 
 import gay.sylv.wij.impl.network.Networking;
+import net.minecraft.resources.ResourceKey;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.Nullable;
 
 /**
- * Holds a return position. A mixin implements this interface on all {@link net.minecraft.world.entity.player.Player}s.
+ * Holds a return position and dimension. A mixin implements this interface on all {@link net.minecraft.world.entity.player.Player}s.
  */
-public interface PlayerWithReturnPos {
-	@Nullable Vec3 worldinajar$getReturnPos(Networking.JarLocation jarLocation);
-	void worldinajar$setReturnPos(Networking.JarLocation jarLocation, Vec3 returnPos);
+public interface PlayerWithReturn {
+	@Nullable Vec3 worldinajar$getReturnPos();
+	@Nullable ResourceKey<Level> worldinajar$getReturnDimension();
+	void worldinajar$setReturnLocation(Networking.JarLocation returnLocation);
 }

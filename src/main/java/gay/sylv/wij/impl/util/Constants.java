@@ -24,6 +24,10 @@ public final class Constants {
 	public static final String MOD_ID = "worldinajar";
 	public static final String MOD_NAME = "World In a Jar";
 	/**
+	 * Used for compatibility reasons (e.g. NBT). Do not change this until prior compatibility is established.
+	 */
+	public static final String COMPAT_MOD_ID = "worldinajar";
+	/**
 	 * destroy speed for unbreakable blocks
 	 */
 	public static final float UNBREAKABLE_DESTROY_SPEED = 75.0F;
