@@ -40,15 +40,7 @@ public final class Assertions {
 			return;
 		}
 		
-		StackWalker walker = StackWalker.getInstance(StackWalker.Option.RETAIN_CLASS_REFERENCE);
-		Class<?> caller = walker.walk(
-				frame -> frame
-						.sequential()
-						.map(StackWalker.StackFrame::getDeclaringClass)
-						.limit(3)
-						.toList()
-						.getLast()
-		);
+		Class<?> caller = Util.getCaller(2);
 		boolean allowed = Arrays.asList(allowedCallers).contains(caller);
 		
 		if (!allowed) {
