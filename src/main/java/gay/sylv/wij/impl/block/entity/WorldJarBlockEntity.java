@@ -105,9 +105,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	private final Long2ObjectMap<JarChunk> chunks = new Long2ObjectOpenHashMap<>();
 	
 	@Environment(EnvType.CLIENT)
-	private JarLevelLightEngine lightEngine;
-	
-	@Environment(EnvType.CLIENT)
 	private JarRenderChunkRegion renderChunkRegion;
 	
 	/**
@@ -133,11 +130,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	 */
 	private boolean loadedNotPlaced = false;
 	
-	/**
-	 * True if the client has received the jar's contents.
-	 */
-	private boolean clientJarChunksUpdated = false;
-	
 	public WorldJarBlockEntity(BlockPos pos, BlockState blockState) {
 		super(Blocks.WORLD_JAR.type(), pos, blockState);
 		INSTANCES.addAuto(this);
@@ -149,10 +141,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	public int getScale() {
 		return scale;
-	}
-	
-	public void setScale(int scale) {
-		this.scale = scale;
 	}
 	
 	/**
@@ -305,7 +293,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		super.setLevel(level);
 		if (level.dimension() == Dimensions.JAR) return;
 		if (level.isClientSide) {
-			lightEngine = new JarLevelLightEngine(this, true, true);
+			JarLevelLightEngine lightEngine = new JarLevelLightEngine(this, true, true);
 			renderChunkRegion = new JarRenderChunkRegion(this, lightEngine);
 			ClientPlayNetworking.send(new JarLoadedPayload(getJarLocation()));
 		} else {
@@ -373,10 +361,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	public BlockPos getInternalSpawnPos() {
 		return internalSpawnPos;
-	}
-	
-	public void setInternalSpawnPos(BlockPos pos) {
-		this.internalSpawnPos = pos;
 	}
 	
 	public BlockPos getInternalPos() {
@@ -463,7 +447,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 				BlockEntityRendererProvider.Context context,
 				WorldJarBlockEntity jar
 		) {
-			Vec3 cameraPos = context.getBlockEntityRenderDispatcher().camera.getPosition();
 			RandomSource randomSource = Objects.requireNonNull(jar.getLevel()).getRandom();
 			// The sections' PoseStack
 			PoseStack poseStack = new PoseStack();
