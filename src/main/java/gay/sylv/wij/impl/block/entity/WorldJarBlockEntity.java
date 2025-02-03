@@ -170,7 +170,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	public void updateBlockStates(MinecraftServer server) {
 		initializeServerChunks();
 		Level level = server.getLevel(Dimensions.JAR);
-		int max = scale - 1;
+		int max = scale;
 		for (int x = 0; x < max; x++) {
 			for (int y = 0; y < max; y++) {
 				for (int z = 0; z < max; z++) {
