@@ -459,7 +459,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 			super(properties);
 			PlayerBlockBreakEvents.BEFORE.register((Level level, Player player, BlockPos pos, BlockState state, @Nullable BlockEntity blockEntity) -> {
 				// Prevent breaking/destruction in jar dimension
-				return !level.dimension().equals(Dimensions.JAR);
+				return !(level.dimension().equals(Dimensions.JAR) && state.is(Blocks.WORLD_JAR.block()));
 			});
 		}
 		
