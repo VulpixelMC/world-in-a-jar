@@ -22,6 +22,7 @@ import com.mojang.blaze3d.vertex.*;
 import com.mojang.serialization.MapCodec;
 import gay.sylv.wij.api.block.WorldJar;
 import gay.sylv.wij.impl.block.Blocks;
+import gay.sylv.wij.impl.block.item.CreativePlacedBlockItem;
 import gay.sylv.wij.impl.client.render.JarChunk;
 import gay.sylv.wij.impl.client.render.JarLevelChunkSection;
 import gay.sylv.wij.impl.client.render.JarLevelLightEngine;
@@ -459,6 +460,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 				
 				for (BlockPos blockPos : BlockPos.betweenClosed(origin, offset)) {
 					BlockState state = jar.getBlockState(blockPos);
+					if (state.getBlock().asItem() instanceof CreativePlacedBlockItem) return; // Don't render jar container blocks.
 					FluidState fluidState = state.getFluidState();
 					
 					if (!fluidState.isEmpty()) {
