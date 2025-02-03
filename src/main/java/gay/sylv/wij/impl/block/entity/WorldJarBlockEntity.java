@@ -383,7 +383,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	@Override
 	public boolean hasBlockPos(BlockPos pos) {
-		return pos.closerToCenterThan(internalSpawnPos.getCenter(), scale);
+		return pos.closerToCenterThan(getInternalPos().getCenter().add(scale / 2.0d, scale / 2.0d, scale / 2.0d), scale);
 	}
 	
 	@Environment(EnvType.CLIENT)
