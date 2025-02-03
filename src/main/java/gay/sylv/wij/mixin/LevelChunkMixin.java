@@ -42,7 +42,7 @@ public abstract class LevelChunkMixin extends ChunkAccess {
 	
 	@Inject(
 			method = "setBlockState",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/core/BlockPos;getX()I")
+			at = @At("RETURN")
 	)
 	private void updateWorldJar(BlockPos pos, BlockState state, boolean isMoving, CallbackInfoReturnable<BlockState> cir) {
 		if (!this.level.isClientSide() && this.level.dimension().equals(Dimensions.JAR)) {
