@@ -196,7 +196,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 					BlockPos pos = new BlockPos(x, y, z);
 					assert level != null;
 					BlockState state = level.getBlockState(pos.offset(internalSpawnPos));
-					if (state.isAir()) continue;
 					setBlockState(pos, state);
 				}
 			}
@@ -213,7 +212,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 					BlockPos pos = new BlockPos(x, y, z);
 					assert level != null;
 					BlockState state = level.getBlockState(pos.offset(internalSpawnPos));
-					if (state.isAir()) continue;
 					setBlockState(pos, state);
 				}
 			}
