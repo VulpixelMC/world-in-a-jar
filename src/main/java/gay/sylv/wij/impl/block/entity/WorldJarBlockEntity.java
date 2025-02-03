@@ -162,6 +162,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	public void setBlockState(BlockPos pos, BlockState state) {
 		var sectionPos = SectionPos.of(pos);
 		var section = chunkSections.get(sectionPos.asLong());
+		if (section == null) return;
 		section.setBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15, state);
 	}
 	
@@ -256,6 +257,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	public void sendJarChunk(ServerPlayer player, SectionPos sectionPos) {
 		Networking.JarLocation jarLocation = getJarLocation();
 		JarLevelChunkSection section = getChunkSections().get(sectionPos.asLong());
+		if (section == null) return;
 		PalettedContainer<BlockState> blockStates = section.getBlockStates();
 		JarChunkUpdatePayload payload = new JarChunkUpdatePayload(jarLocation, sectionPos, blockStates);
 		player.server.execute(() -> ServerPlayNetworking.send(player, payload));
