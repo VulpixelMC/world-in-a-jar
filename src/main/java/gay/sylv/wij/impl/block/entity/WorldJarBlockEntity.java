@@ -331,6 +331,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 				int packedLight,
 				int packedOverlay
 		) {
+			if (jar.level != null && jar.level.dimension().equals(Dimensions.JAR)) return;
 			poseStack.pushPose();
 			// prevent z-fighting
 			poseStack.scale(
