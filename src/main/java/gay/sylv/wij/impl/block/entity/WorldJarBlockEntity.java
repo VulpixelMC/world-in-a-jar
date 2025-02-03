@@ -27,6 +27,8 @@ import gay.sylv.wij.impl.client.render.JarLevelLightEngine;
 import gay.sylv.wij.impl.client.render.JarRenderChunkRegion;
 import gay.sylv.wij.impl.component.Components;
 import gay.sylv.wij.impl.dimension.Dimensions;
+import gay.sylv.wij.impl.network.JarChunkUpdatePayload;
+import gay.sylv.wij.impl.network.JarLoadedAckPayload;
 import gay.sylv.wij.impl.network.Networking;
 import gay.sylv.wij.impl.network.client.JarEnterPayload;
 import gay.sylv.wij.impl.duck.PlayerWithReturn;
@@ -39,6 +41,8 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
+import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.*;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
@@ -51,6 +55,7 @@ import net.minecraft.nbt.NbtOps;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -118,6 +123,16 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	 * This is used in rendering to determine whether we need to rebuild the VBOs.
 	 */
 	private boolean statesChanged = false;
+	
+	/**
+	 * True if loaded rather than placed.
+	 */
+	private boolean loadedNotPlaced = false;
+	
+	/**
+	 * True if the client has received the jar's contents.
+	 */
+	private boolean clientJarChunksUpdated = false;
 	
 	public WorldJarBlockEntity(BlockPos pos, BlockState blockState) {
 		super(Blocks.WORLD_JAR.type(), pos, blockState);
@@ -209,6 +224,25 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		}
 	}
 	
+	public void sendJarChunks(ServerPlayer player) {
+		Networking.JarLocation jarLocation = getJarLocation();
+		getChunkSections().forEach((pos, section) -> {
+			SectionPos sectionPos = SectionPos.of(pos);
+			ServerPlayNetworking.send(player, new JarChunkUpdatePayload(jarLocation, sectionPos, section.getBlockStates()));
+		});
+	}
+	
+	public void sendJarChunk(ServerPlayer player, SectionPos sectionPos) {
+		Networking.JarLocation jarLocation = getJarLocation();
+		JarLevelChunkSection section = getChunkSections().get(sectionPos.asLong());
+		ServerPlayNetworking.send(player, new JarChunkUpdatePayload(jarLocation, sectionPos, section.getBlockStates()));
+	}
+	
+	private Networking.JarLocation getJarLocation() {
+		assert this.level != null;
+		return new Networking.JarLocation(this.getBlockPos(), this.level.dimension());
+	}
+	
 	public LightChunk getChunk(int chunkX, int chunkZ) {
 		long chunkPos = ChunkPos.asLong(chunkX, chunkZ);
 		return chunks.get(chunkPos);
@@ -217,6 +251,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	@Override
 	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
 		super.loadAdditional(tag, registries);
+		loadedNotPlaced = true;
 		CompoundTag modTag = tag.getCompound(Constants.COMPAT_MOD_ID);
 		scale = modTag.getInt("scale");
 		jarEntry = new JarEntry(modTag.getInt("id"));
@@ -247,7 +282,14 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		if (level.isClientSide) {
 			lightEngine = new JarLevelLightEngine(this, true, true);
 			renderChunkRegion = new JarRenderChunkRegion(this, lightEngine);
-			ClientPlayNetworking.send(new JarLoadedPayload(new Networking.JarLocation(this.getBlockPos(), level.dimension())));
+			ClientPlayNetworking.send(new JarLoadedPayload(getJarLocation()));
+		} else {
+			// Send to tracking players when server loads placed jar.
+			if (!loadedNotPlaced) {
+				for (ServerPlayer player : PlayerLookup.tracking(this)) {
+					ServerPlayNetworking.send(player, new JarLoadedAckPayload(getJarLocation()));
+				}
+			}
 		}
 	}
 	
@@ -473,6 +515,11 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		@Override
 		public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
 			return new WorldJarBlockEntity(pos, state);
+		}
+		
+		@Override
+		protected void onPlace(BlockState state, Level level, BlockPos pos, BlockState oldState, boolean movedByPiston) {
+			super.onPlace(state, level, pos, oldState, movedByPiston);
 		}
 		
 		@Override

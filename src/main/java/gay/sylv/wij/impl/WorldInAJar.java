@@ -83,6 +83,10 @@ public final class WorldInAJar implements ModInitializer {
 		return FabricLoader.getInstance().getModContainer(Constants.MOD_ID).orElseThrow();
 	}
 	
+	public static Logger getLogger(Class<?> clazz) {
+		return LoggerFactory.getLogger(Constants.MOD_NAME + "/" + clazz.getName());
+	}
+	
 	private static void onServerStart(MinecraftServer server) {
 		try {
 			JarPlacer.initialize(server);

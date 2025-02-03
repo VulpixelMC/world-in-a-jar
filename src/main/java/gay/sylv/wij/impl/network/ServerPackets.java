@@ -17,6 +17,7 @@
  */
 package gay.sylv.wij.impl.network;
 
+import gay.sylv.wij.impl.WorldInAJar;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.dimension.Dimensions;
@@ -27,14 +28,13 @@ import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.SectionPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
+import org.slf4j.Logger;
 
-import java.util.Arrays;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -75,12 +75,11 @@ public final class ServerPackets implements Initializable {
 					jar.updateBlockStates(context.server());
 					
 					for (ServerPlayer player : PlayerLookup.tracking(jar)) {
-						jar.getChunkSections().forEach((pos, section) -> {
-							SectionPos sectionPos = SectionPos.of(pos);
-							ServerPlayNetworking.send(player, new JarChunkUpdatePayload(jarLocation, sectionPos, section.getBlockStates()));
-						});
+						jar.sendJarChunks(player);
 					}
-				} catch (NoSuchElementException | NullPointerException ignored) {} // user error
+				} catch (NullPointerException e) {
+					throw new RuntimeException(e);
+				} catch (NoSuchElementException ignored) {}
 			});
 		});
 	}

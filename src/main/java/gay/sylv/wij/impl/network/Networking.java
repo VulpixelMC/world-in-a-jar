@@ -98,6 +98,7 @@ public final class Networking implements Initializable {
 	@Override
 	public void initialize() {
 		s2c(JarChunkUpdatePayload.TYPE, JarChunkUpdatePayload.CODEC);
+		s2c(JarLoadedAckPayload.TYPE, JarLoadedAckPayload.CODEC);
 		c2s(JarEnterPayload.TYPE, JarEnterPayload.CODEC);
 		c2s(JarLoadedPayload.TYPE, JarLoadedPayload.CODEC);
 		
