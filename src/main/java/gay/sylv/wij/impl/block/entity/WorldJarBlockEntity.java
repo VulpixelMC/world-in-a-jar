@@ -250,7 +250,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 			SectionPos sectionPos = SectionPos.of(pos);
 			PalettedContainer<BlockState> blockStates = section.getBlockStates();
 			JarChunkUpdatePayload payload = new JarChunkUpdatePayload(jarLocation, sectionPos, blockStates);
-			player.server.execute(() -> ServerPlayNetworking.send(player, payload));
+			player.server.executeBlocking(() -> ServerPlayNetworking.send(player, payload));
 		});
 	}
 	
@@ -260,7 +260,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		if (section == null) return;
 		PalettedContainer<BlockState> blockStates = section.getBlockStates();
 		JarChunkUpdatePayload payload = new JarChunkUpdatePayload(jarLocation, sectionPos, blockStates);
-		player.server.execute(() -> ServerPlayNetworking.send(player, payload));
+		player.server.executeBlocking(() -> ServerPlayNetworking.send(player, payload));
 	}
 	
 	private Networking.JarLocation getJarLocation() {
@@ -481,7 +481,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 					if (!fluidState.isEmpty()) {
 						RenderType renderType = ItemBlockRenderTypes.getRenderLayer(fluidState);
 						section.getRenderedTypes().add(renderType);
-						BufferBuilder bufferBuilder = getOrSetBufferBuilder(renderType);;
+						BufferBuilder bufferBuilder = getOrSetBufferBuilder(renderType);
 						
 						context.getBlockRenderDispatcher().renderLiquid(blockPos, jar.renderChunkRegion, bufferBuilder, state, fluidState);
 					}
