@@ -17,5 +17,11 @@
  */
 package gay.sylv.wij.api.block;
 
+import net.minecraft.core.BlockPos;
+
 public interface WorldJar {
+	/**
+	 * Checks if this object contains the specified {@link BlockPos}.
+	 */
+	boolean hasBlockPos(BlockPos pos);
 }

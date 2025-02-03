@@ -20,6 +20,7 @@ package gay.sylv.wij.impl.block.entity;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
 import com.mojang.serialization.MapCodec;
+import gay.sylv.wij.api.block.WorldJar;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.client.render.JarChunk;
 import gay.sylv.wij.impl.client.render.JarLevelChunkSection;
@@ -34,6 +35,7 @@ import gay.sylv.wij.impl.network.client.JarEnterPayload;
 import gay.sylv.wij.impl.duck.PlayerWithReturn;
 import gay.sylv.wij.impl.network.client.JarLoadedPayload;
 import gay.sylv.wij.impl.util.Constants;
+import gay.sylv.wij.impl.util.WeakReferenceList;
 import gay.sylv.wij.impl.util.jar.JarEntry;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
@@ -83,12 +85,14 @@ import org.joml.Matrix4fStack;
 
 import java.util.*;
 
-public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter {
+public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter, WorldJar {
 	private int scale = DEFAULT_SCALE;
 	private BlockPos internalSpawnPos = DEFAULT_SPAWN_POS;
 	
 	private static final int DEFAULT_SCALE = 64;
 	private static final BlockPos DEFAULT_SPAWN_POS = new BlockPos(0, -64, 0);
+	
+	public static final WeakReferenceList<WorldJarBlockEntity> INSTANCES = new WeakReferenceList<>();
 	
 	/**
 	 * {@link JarLevelChunkSection}s that are loaded in the {@link WorldJarBlockEntity}.
@@ -136,6 +140,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	public WorldJarBlockEntity(BlockPos pos, BlockState blockState) {
 		super(Blocks.WORLD_JAR.type(), pos, blockState);
+		INSTANCES.addAuto(this);
 	}
 	
 	public float getVisualScale() {
@@ -198,6 +203,23 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		}
 	}
 	
+	public void updateSectionStates(MinecraftServer server, SectionPos sectionPos) {
+		Level level = server.getLevel(Dimensions.JAR);
+		int min = sectionPos.minBlockX();
+		int max = sectionPos.maxBlockX();
+		for (int x = min; x < max; x++) {
+			for (int y = min; y < max; y++) {
+				for (int z = min; z < max; z++) {
+					BlockPos pos = new BlockPos(x, y, z);
+					assert level != null;
+					BlockState state = level.getBlockState(pos.offset(internalSpawnPos));
+					if (state.isAir()) continue;
+					setBlockState(pos, state);
+				}
+			}
+		}
+	}
+	
 	/**
 	 * Initializes the chunks server-side.
 	 * @author sylv
@@ -227,14 +249,18 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		Networking.JarLocation jarLocation = getJarLocation();
 		getChunkSections().forEach((pos, section) -> {
 			SectionPos sectionPos = SectionPos.of(pos);
-			ServerPlayNetworking.send(player, new JarChunkUpdatePayload(jarLocation, sectionPos, section.getBlockStates()));
+			PalettedContainer<BlockState> blockStates = section.getBlockStates();
+			JarChunkUpdatePayload payload = new JarChunkUpdatePayload(jarLocation, sectionPos, blockStates);
+			player.server.execute(() -> ServerPlayNetworking.send(player, payload));
 		});
 	}
 	
 	public void sendJarChunk(ServerPlayer player, SectionPos sectionPos) {
 		Networking.JarLocation jarLocation = getJarLocation();
 		JarLevelChunkSection section = getChunkSections().get(sectionPos.asLong());
-		ServerPlayNetworking.send(player, new JarChunkUpdatePayload(jarLocation, sectionPos, section.getBlockStates()));
+		PalettedContainer<BlockState> blockStates = section.getBlockStates();
+		JarChunkUpdatePayload payload = new JarChunkUpdatePayload(jarLocation, sectionPos, blockStates);
+		player.server.execute(() -> ServerPlayNetworking.send(player, payload));
 	}
 	
 	private Networking.JarLocation getJarLocation() {
@@ -351,6 +377,15 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	public void setInternalSpawnPos(BlockPos pos) {
 		this.internalSpawnPos = pos;
+	}
+	
+	public BlockPos getInternalPos() {
+		return internalSpawnPos.below();
+	}
+	
+	@Override
+	public boolean hasBlockPos(BlockPos pos) {
+		return pos.closerToCenterThan(internalSpawnPos.getCenter(), scale);
 	}
 	
 	@Environment(EnvType.CLIENT)
