@@ -22,7 +22,7 @@ import it.unimi.dsi.fastutil.objects.ReferenceArraySet;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.RenderType;
+import net.minecraft.client.renderer.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
 import net.minecraft.world.level.block.Block;
@@ -49,7 +49,7 @@ public class JarLevelChunkSection {
 	@Environment(EnvType.CLIENT)
 	private Map<RenderType, VertexBuffer> vertexBuffers;
 	@Environment(EnvType.CLIENT)
-	private ReferenceArraySet<RenderType> renderedTypes = new ReferenceArraySet<>(RenderType.chunkBufferLayers().size());
+	private ReferenceArraySet<RenderType> renderedTypes;
 	private boolean hasBuilt = false;
 	private PalettedContainer<BlockState> blockStates;
 	
@@ -71,8 +71,6 @@ public class JarLevelChunkSection {
 		);
 	}
 	
-	
-	
 	/**
 	 * @param offset The position of the chunk in 3-dimensions.
 	 */
@@ -88,6 +86,7 @@ public class JarLevelChunkSection {
 							)
 					);
 			this.cleanable = CLEANER.register(this, new ClientClean(vertexBuffers));
+			this.renderedTypes = new ReferenceArraySet<>(RenderType.chunkBufferLayers().size());
 		}
 	}
 	
