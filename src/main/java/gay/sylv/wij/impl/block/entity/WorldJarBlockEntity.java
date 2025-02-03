@@ -183,7 +183,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	}
 	
 	public void updateBlockStates(MinecraftServer server) {
-		initializeServerChunks();
 		Level level = server.getLevel(Dimensions.JAR);
 		int max = scale;
 		for (int x = 0; x < max; x++) {
@@ -284,6 +283,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 			renderChunkRegion = new JarRenderChunkRegion(this, lightEngine);
 			ClientPlayNetworking.send(new JarLoadedPayload(getJarLocation()));
 		} else {
+			initializeServerChunks();
 			// Send to tracking players when server loads placed jar.
 			if (!loadedNotPlaced) {
 				for (ServerPlayer player : PlayerLookup.tracking(this)) {
