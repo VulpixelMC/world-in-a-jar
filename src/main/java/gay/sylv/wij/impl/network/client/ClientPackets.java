@@ -40,7 +40,7 @@ public final class ClientPackets implements Initializable {
 	
 	@Override
 	public void initialize() {
-		ClientPlayNetworking.registerGlobalReceiver(JarChunkUpdatePayload.TYPE, ((payload, context) -> {
+		ClientPlayNetworking.registerGlobalReceiver(JarChunkUpdatePayload.TYPE, (payload, context) -> {
 			// verify that the jar is in the current client level
 			var level = context.player().level();
 			ResourceKey<Level> dimension = level.dimension();
@@ -49,6 +49,6 @@ public final class ClientPackets implements Initializable {
 			if (optionalJar.isEmpty()) return;
 			WorldJarBlockEntity jar = optionalJar.get();
 			jar.onChunkUpdate(context.client(), payload.sectionPos(), payload.blockStateContainer());
-		}));
+		});
 	}
 }

@@ -25,6 +25,7 @@ import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.SectionPos;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.PalettedContainer;
 
@@ -58,7 +59,26 @@ public class JarLevelChunkSection {
 	 * @param offset The position of the chunk in 3-dimensions.
 	 */
 	public JarLevelChunkSection(SectionPos offset, boolean isClient) {
+		this(
+				offset,
+				isClient,
+				// set empty BlockState container
+				new PalettedContainer<>(
+						Block.BLOCK_STATE_REGISTRY,
+						net.minecraft.world.level.block.Blocks.AIR.defaultBlockState(),
+						PalettedContainer.Strategy.SECTION_STATES
+				)
+		);
+	}
+	
+	
+	
+	/**
+	 * @param offset The position of the chunk in 3-dimensions.
+	 */
+	public JarLevelChunkSection(SectionPos offset, boolean isClient, PalettedContainer<BlockState> blockStates) {
 		origin = new BlockPos(offset.multiply(16));
+		this.blockStates = blockStates;
 		if (isClient) {
 			vertexBuffers = RenderType.chunkBufferLayers().stream()
 					.collect(

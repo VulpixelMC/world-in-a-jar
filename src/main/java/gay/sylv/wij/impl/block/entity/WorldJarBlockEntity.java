@@ -30,6 +30,7 @@ import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.network.Networking;
 import gay.sylv.wij.impl.network.client.JarEnterPayload;
 import gay.sylv.wij.impl.duck.PlayerWithReturn;
+import gay.sylv.wij.impl.network.client.JarLoadedPayload;
 import gay.sylv.wij.impl.util.Constants;
 import gay.sylv.wij.impl.util.jar.JarEntry;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
@@ -72,6 +73,8 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.joml.Matrix4f;
+import org.joml.Matrix4fStack;
 
 import java.util.*;
 
@@ -150,6 +153,9 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	public BlockState getBlockState(BlockPos pos) {
 		var sectionPos = SectionPos.of(pos);
 		var section = chunkSections.get(sectionPos.asLong());
+		if (section == null) {
+			return net.minecraft.world.level.block.Blocks.AIR.defaultBlockState();
+		}
 		return section.getBlockState(pos.getX() & 15, pos.getY() & 15, pos.getZ() & 15);
 	}
 	
@@ -241,6 +247,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		if (level.isClientSide) {
 			lightEngine = new JarLevelLightEngine(this, true, true);
 			renderChunkRegion = new JarRenderChunkRegion(this, lightEngine);
+			ClientPlayNetworking.send(new JarLoadedPayload(new Networking.JarLocation(this.getBlockPos(), level.dimension())));
 		}
 	}
 	
@@ -264,7 +271,11 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 			JarChunk chunk = chunks.get(chunkPos.toLong());
 			
 			// remap block states
-			chunkSection.setBlockStates(blockStateContainer);
+			if (chunkSection == null) {
+				chunkSection = new JarLevelChunkSection(sectionPos, true, blockStateContainer);
+			} else {
+				chunkSection.setBlockStates(blockStateContainer);
+			}
 			
 			chunkSections.put(sectionPos.asLong(), chunkSection);
 			chunks.put(chunkPos.toLong(), chunk);
@@ -349,15 +360,22 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 			for (RenderType renderType : RenderType.chunkBufferLayers()) {
 				renderType.setupRenderState();
 				ShaderInstance shader = RenderSystem.getShader();
+				Matrix4f frustumMatrix = poseStack.last().pose();
+				Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
+				matrix4fStack.pushMatrix();
+				matrix4fStack.mul(frustumMatrix);
+				RenderSystem.applyModelViewMatrix();
 				
 				jar.getChunkSections().forEach((pos, section) -> {
 					if (section.isHasBuilt() && section.getRenderedTypes().contains(renderType)) {
 						VertexBuffer buffer = section.getVertexBuffers().get(renderType);
 						buffer.bind();
-						buffer.drawWithShader(poseStack.last().pose(), RenderSystem.getProjectionMatrix(), shader);
+						buffer.drawWithShader(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix(), shader);
 						VertexBuffer.unbind();
 					}
 				});
+				
+				matrix4fStack.popMatrix();
 				
 				renderType.clearRenderState();
 			}
@@ -415,6 +433,10 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 					buffer.upload(renderedBuffer);
 					VertexBuffer.unbind();
 				}
+				
+				// flush buffers
+				BUFFERS.clear();
+				section.setHasBuilt(true);
 			});
 		}
 		
