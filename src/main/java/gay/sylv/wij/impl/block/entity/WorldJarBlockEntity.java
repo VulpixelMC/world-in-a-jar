@@ -461,7 +461,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 				
 				for (BlockPos blockPos : BlockPos.betweenClosed(origin, offset)) {
 					BlockState state = jar.getBlockState(blockPos);
-					if (state.getBlock() instanceof JarContainmentBlock containmentBlock && !containmentBlock.renderInJar()) return; // Don't render jar container blocks.
+					if (state.getBlock() instanceof JarContainmentBlock containmentBlock && !containmentBlock.renderInJar()) continue; // Don't render jar container blocks.
 					FluidState fluidState = state.getFluidState();
 					
 					if (!fluidState.isEmpty()) {
