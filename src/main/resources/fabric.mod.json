@@ -24,7 +24,7 @@
           "gay.sylv.wij.impl.WorldInAJar"
 		],
 		"client": [
-			"gay.sylv.wij.impl.client.MainClient"
+			"gay.sylv.wij.impl.client.WorldInAJarClient"
 		]
 	},
 	"mixins": [

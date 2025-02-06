@@ -59,7 +59,7 @@ public class JarRenderChunkRegion implements BlockAndTintGetter {
 		this.lightEngine = lightEngine;
 	}
 	
-	private Map<ColorResolver, BlockTintCache> createTintCache(ColorResolver... resolver) {
+	public static Map<ColorResolver, BlockTintCache> createTintCache(ColorResolver... resolver) {
 		var map = new HashMap<ColorResolver, BlockTintCache>();
 		Arrays.stream(resolver)
 				.map(x -> Pair.of(x, new BlockTintCache(pos -> calculateColor(pos, x))))
@@ -113,7 +113,7 @@ public class JarRenderChunkRegion implements BlockAndTintGetter {
 	 * This calls {@link ClientLevel#calculateBlockTint}.
 	 * @author sylv
 	 */
-	private int calculateColor(BlockPos pos, ColorResolver colorProvider) {
+	public static int calculateColor(BlockPos pos, ColorResolver colorProvider) {
 		var client = Minecraft.getInstance();
 		assert client.level != null;
 		return client.level.calculateBlockTint(pos, colorProvider);

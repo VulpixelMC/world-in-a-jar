@@ -34,6 +34,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import static gay.sylv.wij.impl.util.Instantiation.blockStatePalettedContainer;
@@ -71,6 +72,14 @@ public final class Networking implements Initializable {
 				return blockStateContainer;
 			}
 		};
+		public static final StreamCodec<RegistryFriendlyByteBuf, Vec3> VEC3 = StreamCodec.of(
+				(buf, pos) -> {
+					buf.writeDouble(pos.x());
+					buf.writeDouble(pos.y());
+					buf.writeDouble(pos.z());
+				},
+				buf -> new Vec3(buf.readDouble(), buf.readDouble(), buf.readDouble())
+		);
 		
 		private Codecs() {}
 	}
@@ -99,6 +108,7 @@ public final class Networking implements Initializable {
 	public void initialize() {
 		s2c(JarChunkUpdatePayload.TYPE, JarChunkUpdatePayload.CODEC);
 		s2c(JarLoadedAckPayload.TYPE, JarLoadedAckPayload.CODEC);
+		s2c(ExternalChunkUpdatePayload.TYPE, ExternalChunkUpdatePayload.CODEC);
 		c2s(JarEnterPayload.TYPE, JarEnterPayload.CODEC);
 		c2s(JarLoadedPayload.TYPE, JarLoadedPayload.CODEC);
 		

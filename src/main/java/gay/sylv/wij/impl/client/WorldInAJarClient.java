@@ -17,14 +17,19 @@
  */
 package gay.sylv.wij.impl.client;
 
+import gay.sylv.wij.impl.client.render.JarInternalsRenderer;
 import gay.sylv.wij.impl.datagen.DynamicDataGenerator;
+import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.network.client.ClientPackets;
 import gay.sylv.wij.impl.util.Constants;
 import net.fabricmc.api.ClientModInitializer;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
+import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
+import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public final class MainClient implements ClientModInitializer {
+public final class WorldInAJarClient implements ClientModInitializer {
 	private static final Logger LOGGER = LoggerFactory.getLogger(Constants.MOD_NAME + "/Client");
 	
 	@Override
@@ -34,6 +39,10 @@ public final class MainClient implements ClientModInitializer {
 		DynamicDataGenerator.INSTANCE.initialize();
 		
 		ClientPackets.INSTANCE.initialize();
+		
+		CoreShaderRegistrationCallback.EVENT.register(context -> {
+			JarInternalsRenderer.INSTANCE.initialize();
+		});
 		
 		LOGGER.info("{}/Client loaded", Constants.MOD_NAME);
 	}

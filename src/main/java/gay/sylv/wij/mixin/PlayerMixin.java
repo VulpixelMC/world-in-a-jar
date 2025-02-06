@@ -18,6 +18,7 @@
 package gay.sylv.wij.mixin;
 
 import gay.sylv.wij.impl.attachment.Attachments;
+import gay.sylv.wij.impl.duck.PlayerWithEnteredJar;
 import gay.sylv.wij.impl.network.Networking;
 import gay.sylv.wij.impl.duck.PlayerWithReturn;
 import net.minecraft.resources.ResourceKey;
@@ -26,18 +27,20 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.spongepowered.asm.mixin.Mixin;
 
 import java.util.Objects;
+import java.util.Optional;
 
 @Mixin(Player.class)
-public abstract class PlayerMixin extends LivingEntity implements PlayerWithReturn {
+public abstract class PlayerMixin extends LivingEntity implements PlayerWithReturn, PlayerWithEnteredJar {
 	protected PlayerMixin(EntityType<? extends LivingEntity> entityType, Level level) {
 		super(entityType, level);
 	}
 	
 	@Override
-	public ResourceKey<Level> worldinajar$getReturnDimension() {
+	public @NotNull ResourceKey<Level> worldinajar$getReturnDimension() {
 		if (hasAttached(Attachments.RETURN_JAR_LOCATION)) {
 			return getAttachedOrThrow(Attachments.RETURN_JAR_LOCATION).dimension();
 		} else {
@@ -46,7 +49,7 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerWithRetu
 	}
 	
 	@Override
-	public Vec3 worldinajar$getReturnPos() {
+	public @NotNull Vec3 worldinajar$getReturnPos() {
 		if (hasAttached(Attachments.RETURN_JAR_LOCATION)) {
 			return getAttachedOrThrow(Attachments.RETURN_JAR_LOCATION).blockPos().getCenter();
 		} else if (!level().isClientSide()) {
@@ -59,5 +62,20 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerWithRetu
 	@Override
 	public void worldinajar$setReturnLocation(Networking.JarLocation returnLocation) {
 		setAttached(Attachments.RETURN_JAR_LOCATION, returnLocation);
+	}
+	
+	@Override
+	public void worldinajar$RemoveReturnLocation() {
+		removeAttached(Attachments.RETURN_JAR_LOCATION);
+	}
+	
+	@Override
+	public Optional<Networking.JarLocation> worldinajar$getJarLocation() {
+		return Optional.ofNullable(getAttached(Attachments.RETURN_JAR_LOCATION));
+	}
+	
+	@Override
+	public void worldinajar$setJarLocation(Networking.JarLocation location) {
+		setAttached(Attachments.RETURN_JAR_LOCATION, location);
 	}
 }

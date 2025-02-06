@@ -14,6 +14,7 @@ public final class Attachments implements Initializable {
 	public static final Attachments INSTANCE = new Attachments();
 	
 	public static AttachmentType<Networking.JarLocation> RETURN_JAR_LOCATION;
+	public static AttachmentType<Networking.JarLocation> ENTERED_JAR_LOCATION;
 	
 	private Attachments() {}
 	
@@ -21,6 +22,13 @@ public final class Attachments implements Initializable {
 	public void initialize() {
 		RETURN_JAR_LOCATION = register(
 				"return_jar_location",
+				builder -> builder
+						.copyOnDeath()
+						.persistent(Networking.JarLocation.CODEC)
+						.syncWith(Networking.JarLocation.STREAM_CODEC, AttachmentSyncPredicate.targetOnly())
+		);
+		ENTERED_JAR_LOCATION = register(
+				"entered_jar_location",
 				builder -> builder
 						.copyOnDeath()
 						.persistent(Networking.JarLocation.CODEC)

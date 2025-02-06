@@ -23,11 +23,7 @@ import com.mojang.serialization.MapCodec;
 import gay.sylv.wij.api.block.JarContainmentBlock;
 import gay.sylv.wij.api.block.WorldJar;
 import gay.sylv.wij.impl.block.Blocks;
-import gay.sylv.wij.impl.block.item.CreativePlacedBlockItem;
-import gay.sylv.wij.impl.client.render.JarChunk;
-import gay.sylv.wij.impl.client.render.JarLevelChunkSection;
-import gay.sylv.wij.impl.client.render.JarLevelLightEngine;
-import gay.sylv.wij.impl.client.render.JarRenderChunkRegion;
+import gay.sylv.wij.impl.client.render.*;
 import gay.sylv.wij.impl.component.Components;
 import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.network.JarChunkUpdatePayload;
@@ -371,7 +367,11 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	@Override
 	public boolean hasBlockPos(BlockPos pos) {
-		return pos.closerToCenterThan(getInternalPos().getCenter().add(scale / 2.0d, scale / 2.0d, scale / 2.0d), scale);
+		return pos.closerToCenterThan(getCenterPos(), scale);
+	}
+	
+	public @NotNull Vec3 getCenterPos() {
+		return getInternalPos().getCenter().add(scale / 2.0d, scale / 2.0d, scale / 2.0d);
 	}
 	
 	@Environment(EnvType.CLIENT)
@@ -505,14 +505,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		}
 		
 		private static BufferBuilder getOrSetBufferBuilder(RenderType renderType) {
-			if (!BUFFERS.containsKey(renderType)) {
-				ByteBufferBuilder byteBufferBuilder = BYTE_BUFFER_BUILDERS.buffer(renderType);
-				BufferBuilder bufferBuilder = new BufferBuilder(byteBufferBuilder, renderType.mode(), renderType.format());
-				BUFFERS.put(renderType, bufferBuilder);
-				return bufferBuilder;
-			} else {
-				return BUFFERS.get(renderType);
-			}
+			return JarInternalsRenderer.getOrSetBufferBuilder(renderType, BUFFERS, BYTE_BUFFER_BUILDERS);
 		}
 	}
 	
@@ -589,13 +582,11 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 			
 			Vec3 returnPos = ((PlayerWithReturn) player).worldinajar$getReturnPos();
 			ResourceKey<Level> returnDim = ((PlayerWithReturn) player).worldinajar$getReturnDimension();
-			if (returnDim == null || returnPos == null) {
-				return InteractionResult.FAIL;
-			}
 			
 			ServerLevel returnLevel = server.getLevel(returnDim);
 			DimensionTransition transition = new DimensionTransition(returnLevel, returnPos, Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.DO_NOTHING);
 			player.changeDimension(transition);
+			((PlayerWithReturn) player).worldinajar$RemoveReturnLocation();
 			return InteractionResult.SUCCESS;
 		}
 	}

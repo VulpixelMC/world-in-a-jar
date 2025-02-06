@@ -19,12 +19,17 @@ package gay.sylv.wij.impl.network.client;
 
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
+import gay.sylv.wij.impl.client.render.JarInternalsRenderer;
+import gay.sylv.wij.impl.duck.PlayerWithEnteredJar;
+import gay.sylv.wij.impl.network.ExternalChunkUpdatePayload;
 import gay.sylv.wij.impl.network.JarChunkUpdatePayload;
 import gay.sylv.wij.impl.network.JarLoadedAckPayload;
 import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
@@ -57,6 +62,14 @@ public final class ClientPackets implements Initializable {
 			Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(payload.jarLocation().blockPos(), Blocks.WORLD_JAR.type());
 			if (optionalJar.isEmpty()) return;
 			context.responseSender().sendPacket(new JarLoadedPayload(payload.jarLocation()));
+		});
+		ClientPlayNetworking.registerGlobalReceiver(ExternalChunkUpdatePayload.TYPE, (payload, context) -> {
+			Minecraft client = Minecraft.getInstance();
+			LocalPlayer localPlayer = client.player;
+			if (localPlayer == null) return;
+			JarInternalsRenderer.INSTANCE.worldinajar$setExternalBlockStateContainer(payload.blockStateContainer());
+			JarInternalsRenderer.INSTANCE.worldinajar$setCenterOfJar(payload.centerOfJar());
+			JarInternalsRenderer.setRebuild(true);
 		});
 	}
 }

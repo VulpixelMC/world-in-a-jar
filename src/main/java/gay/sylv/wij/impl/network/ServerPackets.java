@@ -17,24 +17,30 @@
  */
 package gay.sylv.wij.impl.network;
 
-import gay.sylv.wij.impl.WorldInAJar;
+import gay.sylv.wij.api.entity.event.ServerPlayerEventsExtra;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
+import gay.sylv.wij.impl.client.render.JarInternalsRenderer;
 import gay.sylv.wij.impl.dimension.Dimensions;
+import gay.sylv.wij.impl.duck.PlayerWithEnteredJar;
 import gay.sylv.wij.impl.duck.PlayerWithReturn;
 import gay.sylv.wij.impl.network.client.JarEnterPayload;
 import gay.sylv.wij.impl.network.client.JarLoadedPayload;
 import gay.sylv.wij.impl.util.Initializable;
+import gay.sylv.wij.impl.util.Instantiation;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.portal.DimensionTransition;
 import net.minecraft.world.phys.Vec3;
-import org.slf4j.Logger;
 
+import java.util.Iterator;
 import java.util.NoSuchElementException;
 import java.util.Objects;
 import java.util.Optional;
@@ -48,6 +54,19 @@ public final class ServerPackets implements Initializable {
 	
 	@Override
 	public void initialize() {
+		ServerPlayerEventsExtra.AFTER_SPAWN.register((connection, player, cookie) -> {
+			if (player.level().dimension().equals(Dimensions.JAR)) {
+				((PlayerWithEnteredJar) player).worldinajar$getJarLocation().ifPresent(jarLocation -> {
+					ServerLevel level = player.server.getLevel(jarLocation.dimension());
+					assert level != null;
+					Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(jarLocation.blockPos(), Blocks.WORLD_JAR.type());
+					if (optionalJar.isEmpty()) return;
+					WorldJarBlockEntity jar = optionalJar.get();
+					
+					ServerPlayNetworking.send(player, createExternalChunkUpdate(level, jar));
+				});
+			}
+		});
 		ServerPlayNetworking.registerGlobalReceiver(JarEnterPayload.TYPE, (payload, context) -> {
 			MinecraftServer server = context.server();
 			ServerLevel level = server.getLevel(payload.jarLocation().dimension());
@@ -60,6 +79,9 @@ public final class ServerPackets implements Initializable {
 			((PlayerWithReturn) player).worldinajar$setReturnLocation(
 					new Networking.JarLocation(BlockPos.containing(player.position()), player.level().dimension())
 			);
+			((PlayerWithEnteredJar) player).worldinajar$setJarLocation(payload.jarLocation());
+			context.responseSender().sendPacket(createExternalChunkUpdate(level, jar));
+			
 			ServerLevel targetLevel = Objects.requireNonNull(server.getLevel(Dimensions.JAR));
 			DimensionTransition transition = new DimensionTransition(targetLevel, Vec3.atCenterOf(jar.getInternalSpawnPos()), Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.DO_NOTHING);
 			player.changeDimension(transition);
@@ -82,5 +104,16 @@ public final class ServerPackets implements Initializable {
 				} catch (NoSuchElementException ignored) {}
 			});
 		});
+	}
+	
+	private ExternalChunkUpdatePayload createExternalChunkUpdate(ServerLevel level, WorldJarBlockEntity jar) {
+		PalettedContainer<BlockState> externalBlockStateContainer = Instantiation.blockStatePalettedContainer();
+		Iterator<BlockPos> blockPosIterator = BlockPos.betweenClosed(new BlockPos(0, 0, 0), new BlockPos(15, 15, 15)).iterator();
+		for (BlockPos blockPos : BlockPos.betweenClosed(jar.getBlockPos().offset(-8, -8, -8), jar.getBlockPos().offset(7, 7, 7))) {
+			BlockPos pos = blockPosIterator.next();
+			BlockState blockState = level.getBlockState(blockPos);
+			externalBlockStateContainer.set(pos.getX(), pos.getY(), pos.getZ(), blockState);
+		}
+		return new ExternalChunkUpdatePayload(externalBlockStateContainer, jar.getCenterPos());
 	}
 }

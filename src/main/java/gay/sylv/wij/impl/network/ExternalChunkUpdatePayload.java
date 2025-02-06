@@ -1,0 +1,46 @@
+/**
+ * World In a Jar
+ * Copyright (C) 2024  VulpixelMC
+ * <p>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU Lesser General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ * <p>
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU Lesser General Public License for more details.
+ * <p>
+ * You should have received a copy of the GNU Lesser General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ */
+package gay.sylv.wij.impl.network;
+
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
+import net.minecraft.network.RegistryFriendlyByteBuf;
+import net.minecraft.network.codec.StreamCodec;
+import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.PalettedContainer;
+import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
+
+import static gay.sylv.wij.impl.util.Instantiation.packetType;
+
+/**
+ * Signals that a chunk outside the {@link WorldJarBlockEntity} has updated. This sends the {@link PalettedContainer}&lt;{@link BlockState}&gt; of the external chunk.
+ */
+public record ExternalChunkUpdatePayload(PalettedContainer<BlockState> blockStateContainer, Vec3 centerOfJar) implements CustomPacketPayload {
+	public static final Type<ExternalChunkUpdatePayload> TYPE = packetType("jar_external_chunk_update");
+	public static final StreamCodec<RegistryFriendlyByteBuf, ExternalChunkUpdatePayload> CODEC = StreamCodec.composite(
+			Networking.Codecs.BLOCK_STATE_PALETTED_CONTAINER, ExternalChunkUpdatePayload::blockStateContainer,
+			Networking.Codecs.VEC3, ExternalChunkUpdatePayload::centerOfJar,
+			ExternalChunkUpdatePayload::new
+	);
+	
+	@Override
+	public @NotNull Type<? extends CustomPacketPayload> type() {
+		return TYPE;
+	}
+}

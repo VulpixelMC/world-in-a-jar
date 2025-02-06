@@ -21,13 +21,15 @@ import gay.sylv.wij.impl.network.Networking;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 /**
  * Holds a return position and dimension. A mixin implements this interface on all {@link net.minecraft.world.entity.player.Player}s.
  */
 public interface PlayerWithReturn {
-	@Nullable Vec3 worldinajar$getReturnPos();
-	@Nullable ResourceKey<Level> worldinajar$getReturnDimension();
+	@NotNull Vec3 worldinajar$getReturnPos();
+	@NotNull ResourceKey<Level> worldinajar$getReturnDimension();
 	void worldinajar$setReturnLocation(Networking.JarLocation returnLocation);
+	void worldinajar$RemoveReturnLocation();
 }
