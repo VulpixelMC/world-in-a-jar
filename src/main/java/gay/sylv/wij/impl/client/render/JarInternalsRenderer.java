@@ -95,8 +95,8 @@ public final class JarInternalsRenderer implements Initializable, BlockAndTintGe
 		Vec3 distCenterToCamera = jarCenter.subtract(camera.getPosition());
 		poseStack.translate(distCenterToCamera.x, distCenterToCamera.y, distCenterToCamera.z);
 		poseStack.scale(64.0f, 64.0f, 64.0f);
+		poseStack.scale(1.0f + 0.05f, 1.0f + 0.05f, 1.0f + 0.05f); // prevent terrain from clipping inside the jar
 		poseStack.translate(-8.5f, -8.5f, -8.5f); // translate to the jar's location
-		poseStack.translate(0.0f, -0.025f, 0.0f); // prevent terrain from clipping inside the jar
 		
 		for (RenderType renderType : INSTANCE.renderedTypes) {
 			renderType.setupRenderState();
