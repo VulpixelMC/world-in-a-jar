@@ -20,7 +20,6 @@ package gay.sylv.wij.impl.network.client;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.client.render.JarInternalsRenderer;
-import gay.sylv.wij.impl.duck.PlayerWithEnteredJar;
 import gay.sylv.wij.impl.network.ExternalChunkUpdatePayload;
 import gay.sylv.wij.impl.network.JarChunkUpdatePayload;
 import gay.sylv.wij.impl.network.JarLoadedAckPayload;

@@ -19,8 +19,8 @@ package gay.sylv.wij.mixin;
 
 import gay.sylv.wij.impl.attachment.Attachments;
 import gay.sylv.wij.impl.duck.PlayerWithEnteredJar;
-import gay.sylv.wij.impl.network.Networking;
 import gay.sylv.wij.impl.duck.PlayerWithReturn;
+import gay.sylv.wij.impl.network.Networking;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;

@@ -18,7 +18,10 @@
 package gay.sylv.wij.impl.block.entity;
 
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.*;
+import com.mojang.blaze3d.vertex.BufferBuilder;
+import com.mojang.blaze3d.vertex.MeshData;
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.serialization.MapCodec;
 import gay.sylv.wij.api.block.JarContainmentBlock;
 import gay.sylv.wij.api.block.WorldJar;
@@ -26,11 +29,11 @@ import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.client.render.*;
 import gay.sylv.wij.impl.component.Components;
 import gay.sylv.wij.impl.dimension.Dimensions;
+import gay.sylv.wij.impl.duck.PlayerWithReturn;
 import gay.sylv.wij.impl.network.JarChunkUpdatePayload;
 import gay.sylv.wij.impl.network.JarLoadedAckPayload;
 import gay.sylv.wij.impl.network.Networking;
 import gay.sylv.wij.impl.network.client.JarEnterPayload;
-import gay.sylv.wij.impl.duck.PlayerWithReturn;
 import gay.sylv.wij.impl.network.client.JarLoadedPayload;
 import gay.sylv.wij.impl.util.Constants;
 import gay.sylv.wij.impl.util.WeakReferenceList;

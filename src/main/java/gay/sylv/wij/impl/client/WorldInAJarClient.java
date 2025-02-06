@@ -19,12 +19,9 @@ package gay.sylv.wij.impl.client;
 
 import gay.sylv.wij.impl.client.render.JarInternalsRenderer;
 import gay.sylv.wij.impl.datagen.DynamicDataGenerator;
-import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.network.client.ClientPackets;
 import gay.sylv.wij.impl.util.Constants;
 import net.fabricmc.api.ClientModInitializer;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientChunkEvents;
-import net.fabricmc.fabric.api.client.event.lifecycle.v1.ClientWorldEvents;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
