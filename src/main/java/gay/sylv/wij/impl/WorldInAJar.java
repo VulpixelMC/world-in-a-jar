@@ -17,9 +17,13 @@
  */
 package gay.sylv.wij.impl;
 
+import gay.sylv.wij.api.entity.event.ServerPlayerEventsExtra;
 import gay.sylv.wij.impl.attachment.Attachments;
 import gay.sylv.wij.impl.block.Blocks;
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.component.Components;
+import gay.sylv.wij.impl.dimension.Dimensions;
+import gay.sylv.wij.impl.duck.PlayerWithEnteredJar;
 import gay.sylv.wij.impl.item.Items;
 import gay.sylv.wij.impl.network.Networking;
 import gay.sylv.wij.impl.util.Constants;
@@ -27,16 +31,27 @@ import gay.sylv.wij.impl.util.jar.JarPlacer;
 import gay.sylv.wij.impl.worldgen.JarChunkGenerator;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.MinecraftServer;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.nio.charset.StandardCharsets;
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
+import java.util.UUID;
 
 import static gay.sylv.wij.impl.util.Constants.modId;
 
@@ -64,7 +79,62 @@ public final class WorldInAJar implements ModInitializer {
 		ServerLifecycleEvents.SERVER_STARTED.register(WorldInAJar::onServerStart);
 		ServerLifecycleEvents.SERVER_STOPPED.register(WorldInAJar::onServerStop);
 		
+		ServerPlayerEventsExtra.AFTER_SPAWN.register((connection, player, cookie) -> {
+			if (!(player instanceof FakePlayer) && player.level().dimension().equals(Dimensions.JAR)) {
+				createFakePlayer((ServerLevel) player.level(), player);
+			}
+		});
+		
+		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
+			if (!(handler.getPlayer() instanceof FakePlayer) && handler.getPlayer().level().dimension().equals(Dimensions.JAR)) {
+				removeFakePlayer(handler.getPlayer().serverLevel(), handler.getPlayer());
+			}
+		});
+		
 		LOGGER.info("Finished loading {}", Constants.MOD_NAME);
+	}
+	
+	public static void createFakePlayer(ServerLevel jarLevel, ServerPlayer player) {
+		((PlayerWithEnteredJar) player).worldinajar$getJarLocation().ifPresent(jarLocation -> {
+			ServerLevel outsideJarLevel = Objects.requireNonNull(Objects.requireNonNull(jarLevel.getServer()).getLevel(jarLocation.dimension()));
+			Optional<WorldJarBlockEntity> optionalJar = outsideJarLevel.getBlockEntity(jarLocation.blockPos(), Blocks.WORLD_JAR.type());
+			if (optionalJar.isEmpty()) return;
+			WorldJarBlockEntity jar = optionalJar.get();
+			FakePlayer fakePlayer = jar.getOrCreateFakePlayer(outsideJarLevel, player);
+			Objects.requireNonNull(fakePlayer.getAttribute(Attributes.SCALE)).setBaseValue(jar.getVisualScale());
+			fakePlayer.setServerLevel(outsideJarLevel);
+			PlayerList playerList = jarLevel
+					.getServer()
+					.getPlayerList();
+			playerList.broadcastAll(ClientboundPlayerInfoUpdatePacket.createPlayerInitializing(List.of(fakePlayer)));
+			outsideJarLevel.addNewPlayer(fakePlayer);
+		});
+	}
+	
+	public static void removeFakePlayerWithJar(WorldJarBlockEntity jar, ServerLevel outsideJarLevel, ServerPlayer player) {
+		Optional<FakePlayer> optionalFakePlayer = getFakePlayer(jar, player);
+		if (optionalFakePlayer.isEmpty()) return;
+		FakePlayer fakePlayer = optionalFakePlayer.get();
+		PlayerList playerList = outsideJarLevel
+				.getServer()
+				.getPlayerList();
+		jar.getFakePlayers().remove(fakePlayer.getUUID());
+		playerList.remove(fakePlayer);
+	}
+	
+	public static void removeFakePlayer(ServerLevel jarLevel, ServerPlayer player) {
+		jarLevel.getServer().execute(() -> ((PlayerWithEnteredJar) player).worldinajar$getJarLocation().ifPresent(jarLocation -> {
+			ServerLevel outsideJarLevel = Objects.requireNonNull(Objects.requireNonNull(jarLevel.getServer()).getLevel(jarLocation.dimension()));
+			Optional<WorldJarBlockEntity> optionalJar = outsideJarLevel.getBlockEntity(jarLocation.blockPos(), Blocks.WORLD_JAR.type());
+			if (optionalJar.isEmpty()) return;
+			WorldJarBlockEntity jar = optionalJar.get();
+			removeFakePlayerWithJar(jar, outsideJarLevel, player);
+		}));
+	}
+	
+	public static Optional<FakePlayer> getFakePlayer(WorldJarBlockEntity jar, ServerPlayer player) {
+		UUID uuid = UUID.nameUUIDFromBytes(player.getName().getString().getBytes(StandardCharsets.UTF_8));
+		return Optional.ofNullable(jar.getFakePlayers().get(uuid));
 	}
 	
 	public static Optional<EnvType> getEnvironment() {

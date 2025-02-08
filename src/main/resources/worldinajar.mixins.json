@@ -7,8 +7,10 @@
 		"AnvilMenuMixin",
 		"AxeItemMixin",
 		"BlockBehaviourMixin",
+		"EntityMixin",
 		"HarvestProviderMixin",
 		"LevelChunkMixin",
+		"NearestAttackableTargetGoalMixin",
 		"PlayerListMixin",
 		"PlayerMixin"
 	],

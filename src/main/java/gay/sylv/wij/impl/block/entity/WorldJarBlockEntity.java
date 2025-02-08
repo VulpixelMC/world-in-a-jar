@@ -17,6 +17,7 @@
  */
 package gay.sylv.wij.impl.block.entity;
 
+import com.mojang.authlib.GameProfile;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.BufferBuilder;
 import com.mojang.blaze3d.vertex.MeshData;
@@ -25,6 +26,7 @@ import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.serialization.MapCodec;
 import gay.sylv.wij.api.block.JarContainmentBlock;
 import gay.sylv.wij.api.block.WorldJar;
+import gay.sylv.wij.impl.WorldInAJar;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.client.render.*;
 import gay.sylv.wij.impl.component.Components;
@@ -40,9 +42,12 @@ import gay.sylv.wij.impl.util.WeakReferenceList;
 import gay.sylv.wij.impl.util.jar.JarEntry;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
+import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
+import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
@@ -84,6 +89,7 @@ import org.jetbrains.annotations.Nullable;
 import org.joml.Matrix4f;
 import org.joml.Matrix4fStack;
 
+import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter, WorldJar {
@@ -125,6 +131,8 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	 * This is used in rendering to determine whether we need to rebuild the VBOs.
 	 */
 	private boolean statesChanged = false;
+	
+	private final Object2ObjectMap<UUID, FakePlayer> fakePlayers = new Object2ObjectOpenHashMap<>();
 	
 	/**
 	 * True if loaded rather than placed.
@@ -512,6 +520,15 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		}
 	}
 	
+	public Object2ObjectMap<UUID, FakePlayer> getFakePlayers() {
+		return fakePlayers;
+	}
+	
+	public FakePlayer getOrCreateFakePlayer(ServerLevel outsideJarLevel, ServerPlayer player) {
+		UUID uuid = UUID.nameUUIDFromBytes(player.getName().getString().getBytes(StandardCharsets.UTF_8));
+		return fakePlayers.computeIfAbsent(uuid, ignored -> FakePlayer.get(outsideJarLevel, new GameProfile(uuid, player.getName().getString())));
+	}
+	
 	public static class WorldJarBlock extends BaseEntityBlock {
 		private static final MapCodec<WorldJarBlock> CODEC = simpleCodec(WorldJarBlock::new);
 		
@@ -566,8 +583,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		
 		@Override
 		protected @NotNull InteractionResult useWithoutItem(BlockState state, Level level, BlockPos pos, Player player, BlockHitResult hitResult) {
-			Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(pos, Blocks.WORLD_JAR.type());
-			if (optionalJar.isEmpty()) return InteractionResult.FAIL;
 			boolean isReturnJar = level.dimension().equals(Dimensions.JAR);
 			
 			if (level.isClientSide()) {
@@ -586,10 +601,11 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 			Vec3 returnPos = ((PlayerWithReturn) player).worldinajar$getReturnPos();
 			ResourceKey<Level> returnDim = ((PlayerWithReturn) player).worldinajar$getReturnDimension();
 			
+			WorldInAJar.removeFakePlayer((ServerLevel) level, (ServerPlayer) player);
+			
 			ServerLevel returnLevel = server.getLevel(returnDim);
 			DimensionTransition transition = new DimensionTransition(returnLevel, returnPos, Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.DO_NOTHING);
 			player.changeDimension(transition);
-			((PlayerWithReturn) player).worldinajar$RemoveReturnLocation();
 			return InteractionResult.SUCCESS;
 		}
 	}
