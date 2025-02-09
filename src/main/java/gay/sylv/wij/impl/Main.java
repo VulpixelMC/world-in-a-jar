@@ -100,7 +100,7 @@ public final class Main implements ModInitializer {
 				BedrockPickaxeItem.dropBedrockShard(player.getMainHandItem(), level, state, pos, player);
 			}
 			
-			return !state.is(BlockTags.UNBREAKABLE);
+			return !state.is(BlockTags.UNBREAKABLE) || player.getAbilities().instabuild;
 		});
 		
 		LOGGER.info("Finished loading {}", Constants.MOD_NAME);
