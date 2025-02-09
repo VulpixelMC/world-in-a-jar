@@ -33,7 +33,7 @@ abstract class EntityMixin {
 	)
 	private void afterSetLevel(Level level, CallbackInfo ci) {
 		//noinspection ConstantValue
-		if (!level.isClientSide() && level.dimension().equals(Dimensions.JAR) && (Entity) (Object) this instanceof ServerPlayer player) {
+		if (!level.isClientSide() && level.dimension().equals(Dimensions.JAR) && (Entity) (Object) this instanceof ServerPlayer player && !(player instanceof FakePlayer)) {
 			Main.createFakePlayer((ServerLevel) level, player);
 		}
 	}
