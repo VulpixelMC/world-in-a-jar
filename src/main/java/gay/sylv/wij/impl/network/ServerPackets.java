@@ -78,6 +78,7 @@ public final class ServerPackets implements Initializable {
 					new Networking.JarLocation(BlockPos.containing(player.position()), player.level().dimension())
 			);
 			((PlayerWithEnteredJar) player).worldinajar$setJarLocation(payload.jarLocation());
+			((PlayerWithReturn) player).worldinajar$setReturnPos(player.position());
 			context.responseSender().sendPacket(createExternalChunkUpdate(level, jar));
 			
 			ServerLevel targetLevel = Objects.requireNonNull(server.getLevel(Dimensions.JAR));

@@ -28,7 +28,8 @@ import org.jetbrains.annotations.NotNull;
  */
 public interface PlayerWithReturn {
 	@NotNull Vec3 worldinajar$getReturnPos();
+	void worldinajar$setReturnPos(@NotNull Vec3 pos);
 	@NotNull ResourceKey<Level> worldinajar$getReturnDimension();
-	void worldinajar$setReturnLocation(Networking.JarLocation returnLocation);
+	void worldinajar$setReturnLocation(@NotNull Networking.JarLocation returnLocation);
 	void worldinajar$RemoveReturnLocation();
 }

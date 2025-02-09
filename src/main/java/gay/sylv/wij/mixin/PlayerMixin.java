@@ -50,8 +50,8 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerWithRetu
 	
 	@Override
 	public @NotNull Vec3 worldinajar$getReturnPos() {
-		if (hasAttached(Attachments.RETURN_JAR_LOCATION)) {
-			return getAttachedOrThrow(Attachments.RETURN_JAR_LOCATION).blockPos().getCenter();
+		if (hasAttached(Attachments.PLAYER_RETURN_POS)) {
+			return getAttachedOrThrow(Attachments.PLAYER_RETURN_POS);
 		} else if (!level().isClientSide()) {
 			return Objects.requireNonNull(level().getServer()).overworld().getSharedSpawnPos().getCenter();
 		} else {
@@ -60,7 +60,12 @@ public abstract class PlayerMixin extends LivingEntity implements PlayerWithRetu
 	}
 	
 	@Override
-	public void worldinajar$setReturnLocation(Networking.JarLocation returnLocation) {
+	public void worldinajar$setReturnPos(@NotNull Vec3 pos) {
+		setAttached(Attachments.PLAYER_RETURN_POS, pos);
+	}
+	
+	@Override
+	public void worldinajar$setReturnLocation(Networking.@NotNull JarLocation returnLocation) {
 		setAttached(Attachments.RETURN_JAR_LOCATION, returnLocation);
 	}
 	
