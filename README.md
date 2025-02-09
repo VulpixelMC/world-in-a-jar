@@ -8,7 +8,7 @@ This mod squeezes entire worlds into jars for your enjoyment. Play god or go hom
 You can put blocks in a jar block with a lot of room! All of your storage issues are solved!<br>
 Make little snow globes, make a cool redstone contraption; The possibilities are endless.
 <br><br>
-[![Created for ModFest: Singularity](https://raw.githubusercontent.com/VulpixelMC/world-in-a-jar/refs/heads/1.21.x/images/made at singularity.svg)](https://modfest.net/singularity)
+[![Created for ModFest: Singularity](https://raw.githubusercontent.com/VulpixelMC/world-in-a-jar/refs/heads/1.21.x/images/made%20at%20singularity.svg)](https://modfest.net/singularity)
 
 ## How To Use
 ### Mine Bedrock
