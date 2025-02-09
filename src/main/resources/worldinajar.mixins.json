@@ -15,6 +15,7 @@
 		"PlayerMixin"
 	],
 	"client": [
+		"client.SkinManagerMixin",
 		"client.BuiltInPackSourceMixin",
 		"client.MinecraftMixin"
 	],
