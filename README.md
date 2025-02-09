@@ -3,17 +3,37 @@
 ![Modrinth Game Versions](https://img.shields.io/modrinth/game-versions/worldinajar)
 ![Modrinth Version](https://img.shields.io/modrinth/v/worldinajar)
 
-ever wanted to stuff an entire world in a jar? no? too bad! this mod squeezes entire worlds into jars for your enjoyment. play god or go home.
+This mod squeezes entire worlds into jars for your enjoyment. Play god or go home.
 <br><br>
-You can put blocks in a jar block** with up to infinite* room! All of your storage issues are solved!<br>
+You can put blocks in a jar block with a lot of room! All of your storage issues are solved!<br>
 Make little snow globes, make a cool redstone contraption; The possibilities are endless.
 <br><br>
 [![Created for ModFest: Singularity](https://blob.jortage.com/blobs/5/d4d/5d4d14d96db2e2024d87cf5606cb7ce6421633a002e328947f85d210ba250ecb9f86de8df210dd031be2d4eafb0980494e7a1e8e99590a550abaa42d82768b9f)](https://modfest.net/singularity)
 
+## How To Use
+### Mine Bedrock
+Start by mining bedrock using a Netherite Pickaxe. This may take a few tries before a shard drops.
+![A Netherite Pickaxe mining a Bedrock block.](https://raw.githubusercontent.com/VulpixelMC/world-in-a-jar/refs/heads/1.21.x/images/step_1-1.png)
+![A player holding Bedrock Shards.](https://raw.githubusercontent.com/VulpixelMC/world-in-a-jar/refs/heads/1.21.x/images/step_1-2.png)
+### Upgrade To a Bedrock Pickaxe
+Upgrade your Netherite Pickaxe to a Bedrock Pickaxe using a Smithing Table.
+![A Smithing Table screen with input (left to right) Netherite Upgrade Smithing Template, Netherite Pickaxe, and Bedrock Shard.](https://raw.githubusercontent.com/VulpixelMC/world-in-a-jar/refs/heads/1.21.x/images/step_2-1.png)
+### Mine More Bedrock
+Mine more Bedrock with your Bedrock Pickaxe. You will need 28 Bedrock Shards.
+![A Bedrock Pickaxe mining a Bedrock block.](https://raw.githubusercontent.com/VulpixelMC/world-in-a-jar/refs/heads/1.21.x/images/step_3-1.png)
+### Obtain Ingredients And Craft Reinforced Echnoplast
+Obtain 7 Glass and 28 Amethyst Shards to craft 7 Reinforced Echnoplast.
+![A player crafting 7 Reinforced Echnoplast.](https://raw.githubusercontent.com/VulpixelMC/world-in-a-jar/refs/heads/1.21.x/images/step_4-1.png)
+### Strip Logs To Obtain Bark
+Strip logs to obtain their bark. You will need 9 bark of any type.
+### Craft a World Jar
+Craft a World Jar using a Cork Block, Eye of Ender, and 7 Reinforced Echnoplast.
+### Enter the World Jar
+Place the World Jar and interact with (right-click) the jar to enter it. You can interact with the jar again to exit.
 
-## Disclaimers
-*The world ends at the world border; it is not truly infinite.<br>
-**As of releasing the ModFest version, the jar item is currently uncraftable.<br>
+## Video Demonstration
+[![World In a Jar - 1.0 Demonstration](https://img.youtube.com/vi/WVQViU2IfJs/0.jpg)](https://youtu.be/WVQViU2IfJs)
+
 
 ## Permissions
 The number stated after the permission ID is the minimum OP level that users will need to have the permission. This mod can also use permissions with mods compatible with Fabric Permissions API (such as LuckPerms). The permission ID and OP level are written respectively (in that order).
