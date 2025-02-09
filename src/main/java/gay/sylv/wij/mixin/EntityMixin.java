@@ -1,6 +1,6 @@
 package gay.sylv.wij.mixin;
 
-import gay.sylv.wij.impl.WorldInAJar;
+import gay.sylv.wij.impl.Main;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.dimension.Dimensions;
@@ -34,7 +34,7 @@ abstract class EntityMixin {
 	private void afterSetLevel(Level level, CallbackInfo ci) {
 		//noinspection ConstantValue
 		if (!level.isClientSide() && level.dimension().equals(Dimensions.JAR) && (Entity) (Object) this instanceof ServerPlayer player) {
-			WorldInAJar.createFakePlayer((ServerLevel) level, player);
+			Main.createFakePlayer((ServerLevel) level, player);
 		}
 	}
 	
@@ -59,7 +59,7 @@ abstract class EntityMixin {
 				x += jar.getBlockPos().getX();
 				y += jar.getBlockPos().getY();
 				z += jar.getBlockPos().getZ();
-				Optional<FakePlayer> optionalFakePlayer = WorldInAJar.getFakePlayer(jar, player);
+				Optional<FakePlayer> optionalFakePlayer = Main.getFakePlayer(jar, player);
 				if (optionalFakePlayer.isEmpty()) return;
 				FakePlayer fakePlayer = optionalFakePlayer.get();
 				fakePlayer.setPos(x, y, z);
@@ -102,7 +102,7 @@ abstract class EntityMixin {
 				Optional<WorldJarBlockEntity> optionalJar = jarLevel.getBlockEntity(jarLocation.blockPos(), Blocks.WORLD_JAR.type());
 				if (optionalJar.isEmpty()) return;
 				WorldJarBlockEntity jar = optionalJar.get();
-				Optional<FakePlayer> optionalFakePlayer = WorldInAJar.getFakePlayer(jar, player);
+				Optional<FakePlayer> optionalFakePlayer = Main.getFakePlayer(jar, player);
 				if (optionalFakePlayer.isEmpty()) return;
 				FakePlayer fakePlayer = optionalFakePlayer.get();
 				setRot.accept(fakePlayer);

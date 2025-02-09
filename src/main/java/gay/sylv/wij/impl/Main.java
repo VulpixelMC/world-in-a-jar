@@ -21,10 +21,13 @@ import gay.sylv.wij.api.entity.event.ServerPlayerEventsExtra;
 import gay.sylv.wij.impl.attachment.Attachments;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
+import gay.sylv.wij.impl.block.tag.BlockTags;
 import gay.sylv.wij.impl.component.Components;
 import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.duck.PlayerWithEnteredJar;
+import gay.sylv.wij.impl.item.BedrockPickaxeItem;
 import gay.sylv.wij.impl.item.Items;
+import gay.sylv.wij.impl.item.tag.ItemTags;
 import gay.sylv.wij.impl.network.Networking;
 import gay.sylv.wij.impl.util.Constants;
 import gay.sylv.wij.impl.util.jar.JarPlacer;
@@ -33,6 +36,7 @@ import net.fabricmc.api.EnvType;
 import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
+import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
@@ -55,8 +59,8 @@ import java.util.UUID;
 
 import static gay.sylv.wij.impl.util.Constants.modId;
 
-public final class WorldInAJar implements ModInitializer {
-	private static final Logger LOGGER = LoggerFactory.getLogger(Constants.MOD_NAME);
+public final class Main implements ModInitializer {
+	private static final Logger LOGGER = getLogger(Main.class);
 	private static EnvType environment;
 	
 	@Override
@@ -76,8 +80,8 @@ public final class WorldInAJar implements ModInitializer {
 		
 		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, modId("jar"), JarChunkGenerator.CODEC);
 		
-		ServerLifecycleEvents.SERVER_STARTED.register(WorldInAJar::onServerStart);
-		ServerLifecycleEvents.SERVER_STOPPED.register(WorldInAJar::onServerStop);
+		ServerLifecycleEvents.SERVER_STARTED.register(Main::onServerStart);
+		ServerLifecycleEvents.SERVER_STOPPED.register(Main::onServerStop);
 		
 		ServerPlayerEventsExtra.AFTER_SPAWN.register((connection, player, cookie) -> {
 			if (!(player instanceof FakePlayer) && player.level().dimension().equals(Dimensions.JAR)) {
@@ -89,6 +93,14 @@ public final class WorldInAJar implements ModInitializer {
 			if (!(handler.getPlayer() instanceof FakePlayer) && handler.getPlayer().level().dimension().equals(Dimensions.JAR)) {
 				removeFakePlayer(handler.getPlayer().serverLevel(), handler.getPlayer());
 			}
+		});
+		
+		PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
+			if (player.getMainHandItem().is(ItemTags.CHIPS_OR_DESTROYS_UNBREAKABLE) && BedrockPickaxeItem.isBedrockMineable(level, state, player)) {
+				BedrockPickaxeItem.dropBedrockShard(player.getMainHandItem(), level, state, pos, player);
+			}
+			
+			return !state.is(BlockTags.UNBREAKABLE);
 		});
 		
 		LOGGER.info("Finished loading {}", Constants.MOD_NAME);

@@ -31,7 +31,7 @@ public interface GroupedIdentifier {
 	 * @return the mod ID of the {@link GroupedIdentifier}. For example, {@code worldinajar} in {@code worldinajar:bark/minecraft/oak}.
 	 */
 	default String getModId() {
-		return Constants.MOD_ID;
+		return Constants.COMPAT_MOD_ID;
 	}
 	
 	/**

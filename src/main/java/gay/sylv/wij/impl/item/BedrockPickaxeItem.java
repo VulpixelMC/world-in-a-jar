@@ -17,6 +17,7 @@
  */
 package gay.sylv.wij.impl.item;
 
+import gay.sylv.wij.impl.item.tag.ItemTags;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -34,6 +35,7 @@ import net.minecraft.world.level.storage.loot.LootContext;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.level.storage.loot.providers.number.BinomialDistributionGenerator;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraft.world.phys.Vec3;
 
@@ -44,9 +46,10 @@ public class BedrockPickaxeItem extends PickaxeItem {
 		super(tier, properties);
 	}
 	
-	@Override
-	public boolean mineBlock(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miningEntity) {
-		if (level instanceof ServerLevel serverLevel && state.is(Blocks.BEDROCK) && miningEntity instanceof Player player) {
+	public static void dropBedrockShard(ItemStack stack, Level level, BlockState state, BlockPos pos, LivingEntity miningEntity) {
+		if (isBedrockMineable(level, state, miningEntity)) {
+			ServerLevel serverLevel = (ServerLevel) level;
+			Player player = (Player) miningEntity;
 			level.setBlockAndUpdate(pos, gay.sylv.wij.impl.block.Blocks.CRACKED_BEDROCK.block().defaultBlockState());
 			LootParams lootParams = new LootParams.Builder(serverLevel)
 					.withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
@@ -56,9 +59,20 @@ public class BedrockPickaxeItem extends PickaxeItem {
 					.withLuck(player.getLuck())
 					.create(LootContextParamSets.BLOCK);
 			LootContext lootContext = new LootContext.Builder(lootParams).create(Optional.empty());
-			Block.popResource(level, pos, new ItemStack(Items.BEDROCK_SHARD, UniformGenerator.between(0.0F, 2.0F).getInt(lootContext)));
+			int chance;
+			if (stack.is(ItemTags.DESTROYS_UNBREAKABLE)) {
+				chance = UniformGenerator.between(0.0F, 2.0F).getInt(lootContext);
+			} else if (stack.is(ItemTags.CHIPS_UNBREAKABLE) ){
+				chance = BinomialDistributionGenerator.binomial(1, 1.0F / 4.0F).getInt(lootContext);
+			} else {
+				return;
+			}
+			Block.popResource(level, pos, new ItemStack(Items.BEDROCK_SHARD, chance));
 			level.playSound(null, pos, SoundEvents.WITHER_BREAK_BLOCK, SoundSource.BLOCKS, 1.5F, 1.0F);
 		}
-		return super.mineBlock(stack, level, state, pos, miningEntity);
+	}
+	
+	public static boolean isBedrockMineable(Level level, BlockState state, LivingEntity miningEntity) {
+		return level instanceof ServerLevel && state.is(Blocks.BEDROCK) && miningEntity instanceof Player;
 	}
 }

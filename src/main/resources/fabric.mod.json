@@ -21,10 +21,10 @@
 			"gay.sylv.wij.impl.datagen.DataGenerator"
 		],
 		"main": [
-          "gay.sylv.wij.impl.WorldInAJar"
+          "gay.sylv.wij.impl.Main"
 		],
 		"client": [
-			"gay.sylv.wij.impl.client.WorldInAJarClient"
+			"gay.sylv.wij.impl.client.MainClient"
 		]
 	},
 	"mixins": [

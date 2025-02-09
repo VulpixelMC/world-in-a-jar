@@ -26,7 +26,7 @@ import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.serialization.MapCodec;
 import gay.sylv.wij.api.block.JarContainmentBlock;
 import gay.sylv.wij.api.block.WorldJar;
-import gay.sylv.wij.impl.WorldInAJar;
+import gay.sylv.wij.impl.Main;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.client.render.*;
 import gay.sylv.wij.impl.component.Components;
@@ -601,7 +601,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 			Vec3 returnPos = ((PlayerWithReturn) player).worldinajar$getReturnPos();
 			ResourceKey<Level> returnDim = ((PlayerWithReturn) player).worldinajar$getReturnDimension();
 			
-			WorldInAJar.removeFakePlayer((ServerLevel) level, (ServerPlayer) player);
+			Main.removeFakePlayer((ServerLevel) level, (ServerPlayer) player);
 			
 			ServerLevel returnLevel = server.getLevel(returnDim);
 			DimensionTransition transition = new DimensionTransition(returnLevel, returnPos, Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.DO_NOTHING);

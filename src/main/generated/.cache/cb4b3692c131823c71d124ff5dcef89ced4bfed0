@@ -1,7 +1,9 @@
-// 1.21	2024-07-30T18:17:48.645102	World In a Jar/Recipes
-fe82e15c0e4317b4d29e998addb37b8e376ad46c data/worldinajar/advancement/recipes/misc/world_jar.json
-ec9bdbf14f73c5d90c7941c551c27d6d7122b326 data/worldinajar/advancement/recipes/misc/reinforced_echnoplast.json
-6e2cb6d73c6853cd9664d8387f7110ab7a1915e9 data/worldinajar/recipe/cork_block.json
-853614779c54a39db84ab7ef60d82799ad60566c data/worldinajar/recipe/reinforced_echnoplast.json
-33c27c049baa48303fad6487dedf3cad89102b36 data/worldinajar/advancement/recipes/misc/cork_block.json
-4d0aa5cc374ba2ec4d4b3e266142e580be43302c data/worldinajar/recipe/world_jar.json
+// 1.21.1	2025-02-08T18:57:40.6489484	World In a Jar/Recipes
+853614779c54a39db84ab7ef60d82799ad60566c data\worldinajar\recipe\reinforced_echnoplast.json
+f0325b1103a559a02d044c162f95ee6a3be39ba6 data\worldinajar\recipe\bedrock_pickaxe.json
+6e2cb6d73c6853cd9664d8387f7110ab7a1915e9 data\worldinajar\recipe\cork_block.json
+fe82e15c0e4317b4d29e998addb37b8e376ad46c data\worldinajar\advancement\recipes\misc\world_jar.json
+f6c0a96153553b3de7d2cac52ce45373c3f027bb data\worldinajar\advancement\recipes\tools\bedrock_pickaxe.json
+33c27c049baa48303fad6487dedf3cad89102b36 data\worldinajar\advancement\recipes\misc\cork_block.json
+ec9bdbf14f73c5d90c7941c551c27d6d7122b326 data\worldinajar\advancement\recipes\misc\reinforced_echnoplast.json
+4d0aa5cc374ba2ec4d4b3e266142e580be43302c data\worldinajar\recipe\world_jar.json

@@ -39,7 +39,7 @@ public final class Constants {
 	private Constants() {}
 	
 	public static ResourceLocation modId(String path) {
-		return ResourceLocation.fromNamespaceAndPath(MOD_ID, path);
+		return ResourceLocation.fromNamespaceAndPath(COMPAT_MOD_ID, path);
 	}
 	
 	public static ResourceLocation vanilla(String path) {

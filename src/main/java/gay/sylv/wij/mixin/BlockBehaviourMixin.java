@@ -43,7 +43,7 @@ public abstract class BlockBehaviourMixin {
 			)
 	)
 	private float bypassUnbreakability(BlockState state, BlockGetter level, BlockPos pos, Operation<Float> original, @Local(argsOnly = true) Player player) {
-		if (state.is(BlockTags.UNBREAKABLE) && player.getMainHandItem().is(ItemTags.DESTROYS_UNBREAKABLE) && pos.getY() > level.getMinBuildHeight()) {
+		if (state.is(BlockTags.UNBREAKABLE) && player.getMainHandItem().is(ItemTags.CHIPS_OR_DESTROYS_UNBREAKABLE) && pos.getY() > level.getMinBuildHeight()) {
 			return Constants.UNBREAKABLE_DESTROY_SPEED;
 		} else {
 			return original.call(state, level, pos);

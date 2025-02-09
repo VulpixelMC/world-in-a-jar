@@ -28,9 +28,12 @@ import net.fabricmc.fabric.api.datagen.v1.provider.FabricBlockLootTableProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricRecipeProvider;
 import net.fabricmc.fabric.api.datagen.v1.provider.FabricTagProvider;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
+import net.minecraft.data.recipes.SmithingTransformRecipeBuilder;
+import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.concurrent.CompletableFuture;
 
@@ -91,6 +94,13 @@ public final class DataGenerator implements DataGeneratorEntrypoint {
 			getOrCreateTagBuilder(ItemTags.DESTROYS_UNBREAKABLE)
 					.add(Items.BEDROCK_PICKAXE);
 			
+			getOrCreateTagBuilder(ItemTags.CHIPS_UNBREAKABLE)
+					.add(net.minecraft.world.item.Items.NETHERITE_PICKAXE);
+			
+			getOrCreateTagBuilder(ItemTags.CHIPS_OR_DESTROYS_UNBREAKABLE)
+					.addTag(ItemTags.DESTROYS_UNBREAKABLE)
+					.addTag(ItemTags.CHIPS_UNBREAKABLE);
+			
 			getOrCreateTagBuilder(net.minecraft.tags.ItemTags.PICKAXES)
 					.add(Items.BEDROCK_PICKAXE);
 		}
@@ -145,6 +155,16 @@ public final class DataGenerator implements DataGeneratorEntrypoint {
 					.pattern("/O/")
 					.pattern("%/%")
 					.save(exporter);
+			SmithingTransformRecipeBuilder.smithing(
+					Ingredient.of(net.minecraft.world.item.Items.NETHERITE_UPGRADE_SMITHING_TEMPLATE),
+					Ingredient.of(net.minecraft.world.item.Items.NETHERITE_PICKAXE),
+					Ingredient.of(Items.BEDROCK_SHARD),
+					RecipeCategory.TOOLS,
+					Items.BEDROCK_PICKAXE
+			)
+					.unlocks("has_bedrock_shard", has(Items.BEDROCK_SHARD))
+					.unlocks("has_netherite_pickaxe", has(net.minecraft.world.item.Items.NETHERITE_PICKAXE))
+					.save(exporter, BuiltInRegistries.ITEM.getKey(Items.BEDROCK_PICKAXE));
 		}
 	}
 }
