@@ -9,7 +9,9 @@ You can put blocks in a jar block with a lot of room! All of your storage issues
 Make little snow globes, make a cool redstone contraption; The possibilities are endless.
 <br><br>
 [![Showcased at BlanketCon '25](https://raw.githubusercontent.com/worldwidepixel/badges/refs/heads/main/bc25/featured_in/cozy.svg)](https://modfest.net/bc25)
+
 [![Showcased at BlanketCon '23](https://badger-api-staging.worldwidepixel.ca/cozy?gradientStart=361222&gradientEnd=34002D&lineOne=Featured%20in&lineTwo=BlanketCon%20%2723&colourOne=FFFFFF&colourTwo=E365C1&iconUrl=https://raw.githubusercontent.com/ModFest/art/refs/heads/v2/icon/1024w/bc23/transparent.png&format=svg)](https://modfest.net/bc23)
+
 [![Created for ModFest: Singularity](https://raw.githubusercontent.com/VulpixelMC/world-in-a-jar/refs/heads/1.21.x/images/made%20at%20singularity.svg)](https://modfest.net/singularity)
 
 ## How To Use
