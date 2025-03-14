@@ -83,7 +83,7 @@ public final class JarInternalsRenderer implements Initializable, BlockAndTintGe
 	
 	@Override
 	public void initialize() {
-		WorldRenderEvents.AFTER_ENTITIES.register(JarInternalsRenderer::buildAndRenderExternal);
+		WorldRenderEvents.BEFORE_ENTITIES.register(JarInternalsRenderer::buildAndRenderExternal);
 	}
 	
 	private static void buildAndRenderExternal(WorldRenderContext context) {
@@ -97,13 +97,14 @@ public final class JarInternalsRenderer implements Initializable, BlockAndTintGe
 				buildExternal(client, blockRenderer, INSTANCE.externalBlockStateContainer);
 			}
 			
-			Camera camera = client.gameRenderer.getMainCamera();
+			Camera camera = context.camera();
 			// Render external chunk
-			renderExternal(camera, INSTANCE.worldinajar$getCenterOfJar(), new PoseStack());
+			renderExternal(context, camera, INSTANCE.worldinajar$getCenterOfJar(), new PoseStack());
 		}
 	}
 	
 	private static void renderExternal(
+			WorldRenderContext context,
 			Camera camera,
 			Vec3 jarCenter,
 			PoseStack poseStack
@@ -121,6 +122,7 @@ public final class JarInternalsRenderer implements Initializable, BlockAndTintGe
 			Matrix4f frustumMatrix = poseStack.last().pose();
 			Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
 			matrix4fStack.pushMatrix();
+			matrix4fStack.mul(context.positionMatrix());
 			matrix4fStack.mul(frustumMatrix);
 			RenderSystem.applyModelViewMatrix();
 			
