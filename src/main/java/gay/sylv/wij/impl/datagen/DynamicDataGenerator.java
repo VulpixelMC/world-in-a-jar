@@ -33,8 +33,9 @@ import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.server.packs.PackResources;
+import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
-import net.minecraft.server.packs.resources.ResourceManager;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.component.ItemLore;
@@ -43,8 +44,7 @@ import org.jetbrains.annotations.NotNull;
 import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
-import java.util.Objects;
+import java.util.*;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import static gay.sylv.wij.impl.datagen.RuntimeResourcePackImpl.generatedTag;
@@ -125,21 +125,39 @@ public final class DynamicDataGenerator implements Initializable {
 	public static final class TextureGenerator {
 		private TextureGenerator() {}
 		
-		public static void generate(RuntimeResourcePack rrp, ResourceManager manager) {
+		public static void generate(RuntimeResourcePack rrp, List<PackResources> resources) {
 			NativeImage barkMask = getTexture(rrp, "bark.png");
+			
+			Map<ResourceLocation, IoSupplier<InputStream>> data = new HashMap<>();
 			
 			BarkType.getTypes().stream()
 					.map(type -> {
+						resources
+								.forEach(packResources -> {
+									packResources.listResources(
+											PackType.CLIENT_RESOURCES,
+											type.toFilePath().getNamespace(),
+											type.toFilePath().getPath(),
+											data::put
+									);
+									packResources.listResources(
+											PackType.CLIENT_RESOURCES,
+											type.toFilePath().getNamespace(),
+											type.toFilePath().withSuffix(".mcmeta").getPath(),
+											data::put
+									);
+								});
+						
 						NativeImage log;
 						try {
-							log = NativeImage.read(manager.getResourceOrThrow(type.toFilePath()).open());
+							log = NativeImage.read(data.get(type.toFilePath()).get());
 						} catch (IOException e) {
 							throw new RuntimeException(e);
 						}
 						NativeImage darkenedLog = multiplyBrightness(log, 0.85f);
 						
 						if (type.isAnimated()) {
-							try (var inputStream = manager.getResourceOrThrow(type.toFilePath().withSuffix(".mcmeta")).open()) {
+							try (var inputStream = data.get(type.toFilePath().withSuffix(".mcmeta")).get()) {
 								rrp.addItemMcmeta(type.getIdentifier(), new String(inputStream.readAllBytes(), StandardCharsets.UTF_8));
 							} catch (IOException e) {
 								throw new RuntimeException(e);
@@ -198,16 +216,6 @@ public final class DynamicDataGenerator implements Initializable {
 			});
 			
 			return newMask;
-		}
-		
-		public static void replaceColor(NativeImage texture, int maskColor, int color) {
-			texture.applyToAllPixels(pixel -> {
-				if (pixel == maskColor) {
-					return color;
-				} else {
-					return pixel;
-				}
-			});
 		}
 		
 		public static NativeImage multiplyBrightness(NativeImage texture, float multiply) {

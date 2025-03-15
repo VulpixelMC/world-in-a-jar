@@ -16,8 +16,8 @@
 	],
 	"client": [
 		"client.BuiltInPackSourceMixin",
-		"client.MinecraftMixin",
-		"client.SkinManagerMixin"
+		"client.SkinManagerMixin",
+		"client.PackRepositoryMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
