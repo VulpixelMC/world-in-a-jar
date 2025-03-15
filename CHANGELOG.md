@@ -1,3 +1,4 @@
-# Permissions (0.3.0+1.20.1)
-* Added support for Fabric Permissions API (and thereby LuckPerms).
-* Removed Pineapple.
+# World In a Jar 1.0.0-beta.1+1.21.1
+
+## Fixed
+- Block entities inside of world jars render when inside a world jar.
