@@ -23,8 +23,10 @@ import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.block.tag.BlockTags;
 import gay.sylv.wij.impl.component.Components;
+import gay.sylv.wij.impl.datagen.DynamicDataGenerator;
 import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.duck.PlayerWithEnteredJar;
+import gay.sylv.wij.impl.gui.creative_tab.CreativeModeTabs;
 import gay.sylv.wij.impl.item.BedrockPickaxeItem;
 import gay.sylv.wij.impl.item.Items;
 import gay.sylv.wij.impl.item.tag.ItemTags;
@@ -73,8 +75,9 @@ public final class Main implements ModInitializer {
 		Attachments.INSTANCE.initialize();
 		
 		Blocks.INSTANCE.initialize();
-		
 		Items.INSTANCE.initialize();
+		DynamicDataGenerator.INSTANCE.initialize();
+		CreativeModeTabs.INSTANCE.initialize();
 		
 		Networking.INSTANCE.initialize();
 		

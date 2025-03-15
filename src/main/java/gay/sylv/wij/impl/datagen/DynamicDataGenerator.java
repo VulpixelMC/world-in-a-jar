@@ -53,9 +53,7 @@ public final class DynamicDataGenerator implements Initializable {
 	
 	@Override
 	public void initialize() {
-		if (Main.isClient()) {
-			BarkType.registerAll(BarkType.class);
-		}
+		BarkType.registerAll(BarkType.class);
 	}
 	
 	public static final class ItemGenerator {

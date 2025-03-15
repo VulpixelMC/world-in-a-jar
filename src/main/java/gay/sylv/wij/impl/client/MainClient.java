@@ -33,8 +33,6 @@ public final class MainClient implements ClientModInitializer {
 	public void onInitializeClient() {
 		LOGGER.info("Initializing {}/Client", Constants.MOD_NAME);
 		
-		DynamicDataGenerator.INSTANCE.initialize();
-		
 		ClientPackets.INSTANCE.initialize();
 		
 		CoreShaderRegistrationCallback.EVENT.register(context -> {
