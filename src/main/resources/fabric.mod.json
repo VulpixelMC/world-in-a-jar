@@ -3,7 +3,7 @@
 	"id": "${id}",
 	"version": "${version}",
 	"name": "World In a Jar",
-	"description": "the best of the cursed: a world in a jar.",
+	"description": "A snowglobe-inspired block made for builders and survival players alike.",
 	"authors": [
 		"Vulpixel",
 		"Sylv",
