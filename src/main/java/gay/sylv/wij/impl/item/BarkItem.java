@@ -18,7 +18,12 @@
 package gay.sylv.wij.impl.item;
 
 import gay.sylv.wij.api.block.BarkType;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.Item;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
+
+import java.util.List;
 
 public class BarkItem extends Item {
 	private final BarkType type;
@@ -26,6 +31,11 @@ public class BarkItem extends Item {
 	public BarkItem(Properties properties, BarkType type) {
 		super(properties);
 		this.type = type;
+	}
+	
+	@Override
+	public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+		tooltipComponents.add(Component.translatable("worldinajar.lore.bark"));
 	}
 	
 	public BarkType getType() {

@@ -20,7 +20,6 @@ package gay.sylv.wij.impl.datagen;
 import com.mojang.blaze3d.platform.NativeImage;
 import gay.sylv.wij.api.block.BarkType;
 import gay.sylv.wij.api.datagen.RuntimeResourcePack;
-import gay.sylv.wij.impl.Main;
 import gay.sylv.wij.impl.item.BarkItem;
 import gay.sylv.wij.impl.item.Items;
 import gay.sylv.wij.impl.util.Constants;
@@ -29,16 +28,13 @@ import gay.sylv.wij.impl.util.Pair;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
 import net.minecraft.core.Registry;
-import net.minecraft.core.component.DataComponents;
 import net.minecraft.core.registries.BuiltInRegistries;
-import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.packs.PackResources;
 import net.minecraft.server.packs.PackType;
 import net.minecraft.server.packs.resources.IoSupplier;
 import net.minecraft.util.FastColor;
 import net.minecraft.world.item.Item;
-import net.minecraft.world.item.component.ItemLore;
 import org.jetbrains.annotations.NotNull;
 
 import java.io.IOException;
@@ -70,8 +66,7 @@ public final class DynamicDataGenerator implements Initializable {
 					BuiltInRegistries.ITEM,
 					type.getIdentifier(),
 					new BarkItem(
-							new Item.Properties()
-									.component(DataComponents.LORE, new ItemLore(List.of(Component.translatable("worldinajar.lore.bark")))),
+							new Item.Properties(),
 							type
 					)
 			);
