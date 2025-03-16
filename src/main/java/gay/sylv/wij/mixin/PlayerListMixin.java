@@ -17,6 +17,9 @@
  */
 package gay.sylv.wij.mixin;
 
+import com.llamalad7.mixinextras.injector.wrapoperation.Operation;
+import com.llamalad7.mixinextras.injector.wrapoperation.WrapOperation;
+import com.mojang.authlib.GameProfile;
 import gay.sylv.wij.api.entity.event.ServerPlayerEventsExtra;
 import net.minecraft.network.Connection;
 import net.minecraft.server.level.ServerPlayer;
@@ -35,5 +38,17 @@ abstract class PlayerListMixin {
 	)
 	private void afterSpawn(Connection connection, ServerPlayer player, CommonListenerCookie cookie, CallbackInfo ci) {
 		ServerPlayerEventsExtra.AFTER_SPAWN.invoker().afterSpawn(connection, player, cookie);
+	}
+	
+	@WrapOperation(
+			method = "getPlayerByName",
+			at = @At(value = "INVOKE", target = "Lcom/mojang/authlib/GameProfile;getName()Ljava/lang/String;")
+	)
+	private String ignoreFakePlayer(GameProfile instance, Operation<String> original) {
+		if (instance.getId().version() != 3) {
+			return original.call(instance);
+		} else {
+			return ""; // an impossible name, so it's never equal
+		}
 	}
 }

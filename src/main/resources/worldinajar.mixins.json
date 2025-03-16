@@ -17,6 +17,7 @@
 	],
 	"client": [
 		"client.BuiltInPackSourceMixin",
+		"client.ClientPacketListenerMixin",
 		"client.PackRepositoryMixin",
 		"client.SkinManagerMixin"
 	],

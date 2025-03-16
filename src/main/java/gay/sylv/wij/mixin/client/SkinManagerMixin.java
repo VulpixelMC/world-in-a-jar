@@ -41,8 +41,9 @@ abstract class SkinManagerMixin {
 		if (value.getId().version() == 3) {
 			Minecraft client = Minecraft.getInstance();
 			if (client.getCurrentServer() == null && !client.isLocalServer()) return value;
+			String playerName = value.getName();
 			if (client.isLocalServer()) {
-				Player player = Objects.requireNonNull(client.getSingleplayerServer()).getPlayerList().getPlayerByName(value.getName());
+				Player player = Objects.requireNonNull(client.getSingleplayerServer()).getPlayerList().getPlayerByName(playerName);
 				if (player == null) return value;
 				
 				return player.getGameProfile();
@@ -51,7 +52,7 @@ abstract class SkinManagerMixin {
 			ClientPacketListener connection = client.getConnection();
 			if (connection == null) return value;
 			
-			PlayerInfo playerInfo = connection.getPlayerInfo(value.getName());
+			PlayerInfo playerInfo = connection.getPlayerInfo(playerName);
 			if (playerInfo == null) return value;
 			return playerInfo.getProfile();
 		}
