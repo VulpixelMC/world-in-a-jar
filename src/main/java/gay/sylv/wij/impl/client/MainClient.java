@@ -19,7 +19,6 @@ package gay.sylv.wij.impl.client;
 
 import gay.sylv.wij.impl.Main;
 import gay.sylv.wij.impl.client.render.JarInternalsRenderer;
-import gay.sylv.wij.impl.datagen.DynamicDataGenerator;
 import gay.sylv.wij.impl.network.client.ClientPackets;
 import gay.sylv.wij.impl.util.Constants;
 import net.fabricmc.api.ClientModInitializer;
@@ -35,9 +34,7 @@ public final class MainClient implements ClientModInitializer {
 		
 		ClientPackets.INSTANCE.initialize();
 		
-		CoreShaderRegistrationCallback.EVENT.register(context -> {
-			JarInternalsRenderer.INSTANCE.initialize();
-		});
+		CoreShaderRegistrationCallback.EVENT.register(context -> JarInternalsRenderer.INSTANCE.initialize());
 		
 		LOGGER.info("{}/Client loaded", Constants.MOD_NAME);
 	}

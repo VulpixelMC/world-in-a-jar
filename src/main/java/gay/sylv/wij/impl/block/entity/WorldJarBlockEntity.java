@@ -439,13 +439,13 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 				Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
 				matrix4fStack.pushMatrix();
 				matrix4fStack.mul(frustumMatrix);
-				RenderSystem.applyModelViewMatrix();
+				Matrix4f modelView = new Matrix4f(matrix4fStack);
 				
 				jar.getChunkSections().forEach((pos, section) -> {
 					if (section.isHasBuilt() && section.getRenderedTypes().contains(renderType)) {
 						VertexBuffer buffer = section.getVertexBuffers().get(renderType);
 						buffer.bind();
-						buffer.drawWithShader(RenderSystem.getModelViewMatrix(), RenderSystem.getProjectionMatrix(), shader);
+						buffer.drawWithShader(modelView, RenderSystem.getProjectionMatrix(), shader);
 						VertexBuffer.unbind();
 					}
 				});

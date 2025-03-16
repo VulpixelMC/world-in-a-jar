@@ -1,9 +1,3 @@
-# World In a Jar 1.0.0-beta.1+1.21.1
-
-## Added
-- Creative mode tab.
-
+# World In a Jar 1.0.0-beta.2+1.21.1
 ## Fixed
-- Don't reload twice.
-- Use the mod icon as the runtime resource pack icon.
-- Use tooltips rather than lore in bark items.
+- Unrelated block entities and entities occasionally render inside the world jar.
