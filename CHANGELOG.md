@@ -2,3 +2,4 @@
 ## Fixed
 - World borders less than ~65538 in size cause World Jars to spawn incorrectly.
 - Skins don't load on fake players inside world jars.
+- When loading the world, players sometimes become tiny.

@@ -49,6 +49,8 @@ import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.server.players.PlayerList;
+import net.minecraft.world.entity.ai.attributes.AttributeInstance;
+import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -90,6 +92,10 @@ public final class Main implements ModInitializer {
 			if (!(player instanceof FakePlayer) && player.level().dimension().equals(Dimensions.JAR)) {
 				createFakePlayer((ServerLevel) player.level(), player);
 			}
+			
+			if (!(player instanceof FakePlayer)) {
+				Objects.requireNonNull(player.getAttribute(Attributes.SCALE)).removeModifier(modId("tiny"));
+			}
 		});
 		
 		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
@@ -116,7 +122,12 @@ public final class Main implements ModInitializer {
 			if (optionalJar.isEmpty()) return;
 			WorldJarBlockEntity jar = optionalJar.get();
 			FakePlayer fakePlayer = jar.getOrCreateFakePlayer(outsideJarLevel, player);
-			Objects.requireNonNull(fakePlayer.getAttribute(Attributes.SCALE)).setBaseValue(jar.getVisualScale());
+			
+			AttributeInstance attribute = Objects.requireNonNull(fakePlayer.getAttribute(Attributes.SCALE));
+			attribute.removeModifier(modId("tiny"));
+			AttributeModifier modifier = new AttributeModifier(modId("tiny"), jar.getVisualScale(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
+			attribute.getModifiers().add(modifier);
+			
 			fakePlayer.setServerLevel(outsideJarLevel);
 			PlayerList playerList = jarLevel
 					.getServer()
