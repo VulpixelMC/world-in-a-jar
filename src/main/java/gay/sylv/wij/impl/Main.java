@@ -104,6 +104,14 @@ public final class Main implements ModInitializer {
 			}
 		});
 		
+		ServerLifecycleEvents.SERVER_STOPPING.register((server) -> {
+			server.getPlayerList().getPlayers().forEach(player -> {
+				if (!(player instanceof FakePlayer) && player.level().dimension().equals(Dimensions.JAR)) {
+					removeFakePlayer(player.serverLevel(), player);
+				}
+			});
+		});
+		
 		PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
 			if (player.getMainHandItem().is(ItemTags.CHIPS_OR_DESTROYS_UNBREAKABLE) && BedrockPickaxeItem.isBedrockMineable(level, state, player)) {
 				BedrockPickaxeItem.dropBedrockShard(player.getMainHandItem(), level, state, pos, player);
@@ -141,6 +149,10 @@ public final class Main implements ModInitializer {
 		Optional<FakePlayer> optionalFakePlayer = getFakePlayer(jar, player);
 		if (optionalFakePlayer.isEmpty()) return;
 		FakePlayer fakePlayer = optionalFakePlayer.get();
+		removeKnownFakePlayerWithJar(jar, outsideJarLevel, fakePlayer);
+	}
+	
+	public static void removeKnownFakePlayerWithJar(WorldJarBlockEntity jar, ServerLevel outsideJarLevel, FakePlayer fakePlayer) {
 		PlayerList playerList = outsideJarLevel
 				.getServer()
 				.getPlayerList();

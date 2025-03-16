@@ -295,6 +295,11 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	public void setRemoved() {
 		super.setRemoved();
 		assert level != null;
+		if (!this.level.isClientSide()) {
+			this.fakePlayers.forEach((uuid, fakePlayer) -> {
+				Main.removeKnownFakePlayerWithJar(this, (ServerLevel) this.level, fakePlayer);
+			});
+		}
 	}
 	
 	@Override
