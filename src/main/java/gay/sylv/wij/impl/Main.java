@@ -93,7 +93,7 @@ public final class Main implements ModInitializer {
 				createFakePlayer((ServerLevel) player.level(), player);
 			}
 			
-			if (!(player instanceof FakePlayer)) {
+			if (!(player instanceof FakePlayer) && !player.level().dimension().equals(Dimensions.JAR)) {
 				Objects.requireNonNull(player.getAttribute(Attributes.SCALE)).removeModifier(modId("tiny"));
 			}
 		});
@@ -125,8 +125,8 @@ public final class Main implements ModInitializer {
 			
 			AttributeInstance attribute = Objects.requireNonNull(fakePlayer.getAttribute(Attributes.SCALE));
 			attribute.removeModifier(modId("tiny"));
-			AttributeModifier modifier = new AttributeModifier(modId("tiny"), jar.getVisualScale(), AttributeModifier.Operation.ADD_MULTIPLIED_TOTAL);
-			attribute.getModifiers().add(modifier);
+			AttributeModifier modifier = new AttributeModifier(modId("tiny"), jar.getVisualScale() - 1.0d, AttributeModifier.Operation.ADD_VALUE);
+			attribute.addTransientModifier(modifier);
 			
 			fakePlayer.setServerLevel(outsideJarLevel);
 			PlayerList playerList = jarLevel
