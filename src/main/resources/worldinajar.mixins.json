@@ -10,14 +10,15 @@
 		"EntityMixin",
 		"HarvestProviderMixin",
 		"LevelChunkMixin",
+		"LevelMixin",
 		"NearestAttackableTargetGoalMixin",
 		"PlayerListMixin",
 		"PlayerMixin"
 	],
 	"client": [
 		"client.BuiltInPackSourceMixin",
-		"client.SkinManagerMixin",
-		"client.PackRepositoryMixin"
+		"client.PackRepositoryMixin",
+		"client.SkinManagerMixin"
 	],
 	"injectors": {
 		"defaultRequire": 1
