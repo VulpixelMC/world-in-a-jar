@@ -15,6 +15,7 @@ fabric_permissions = "0.3.3"
 wthit = "fabric-12.5.1"
 modmenu = "11.0.3"
 luckperms = "5.4"
+sodium = "mc1.21.1-0.6.9-fabric"
 
 # Runtime Mods
 resource_explorer = "RuU8ZS7y"
@@ -34,6 +35,7 @@ wthit = { module = "mcp.mobius.waila:wthit", version.ref = "wthit" }
 wthit_api = { module = "mcp.mobius.waila:wthit-api", version.ref = "wthit" }
 modmenu = { module = "com.terraformersmc:modmenu", version.ref = "modmenu" }
 luckperms = { module = "net.luckperms:api", version.ref = "luckperms" }
+sodium = { module = "maven.modrinth:sodium", version.ref = "sodium" }
 
 # Runtime Mods
 resource_explorer = { module = "maven.modrinth:resource_explorer", version.ref = "resource_explorer" }
