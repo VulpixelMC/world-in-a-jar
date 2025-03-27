@@ -18,6 +18,7 @@
 package gay.sylv.wij.impl.block.item;
 
 import gay.sylv.wij.impl.block.Blocks;
+import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.component.Components;
 import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.util.Constants;
@@ -68,6 +69,9 @@ public class WorldJarBlockItem extends BlockItem {
 		CompoundTag tag = new CompoundTag();
 		CompoundTag modTag = new CompoundTag();
 		modTag.putInt("id", jarEntry.id());
+		if (context.getPlayer() != null && context.getPlayer().isCreative()) {
+			WorldJarBlockEntity.CONTAINER_LOCK.addToTag(tag);
+		}
 		tag.put(Constants.COMPAT_MOD_ID, modTag);
 		
 		BlockItem.setBlockEntityData(itemInHand, Blocks.WORLD_JAR.type(), tag);

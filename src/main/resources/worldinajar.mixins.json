@@ -4,6 +4,7 @@
 	"package": "gay.sylv.wij.mixin",
 	"compatibilityLevel": "JAVA_21",
 	"mixins": [
+		"Accessor_BaseContainerBlockEntity",
 		"AnvilMenuMixin",
 		"AxeItemMixin",
 		"BlockBehaviourMixin",

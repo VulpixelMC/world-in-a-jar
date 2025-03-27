@@ -30,9 +30,12 @@ import gay.sylv.wij.impl.util.Instantiation;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
 import net.minecraft.core.BlockPos;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.level.portal.DimensionTransition;
@@ -72,6 +75,21 @@ public final class ServerPackets implements Initializable {
 			Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(payload.jarLocation().blockPos(), Blocks.WORLD_JAR.type());
 			if (optionalJar.isEmpty()) return;
 			WorldJarBlockEntity jar = optionalJar.get();
+			
+			if (jar.isLocked() && !context.player().isCreative()) {
+				if (jar.getLevel() == null) return;
+				
+				jar.getLevel().playSound(
+						null,
+						jar.getBlockPos(),
+						SoundEvents.CHEST_LOCKED,
+						SoundSource.PLAYERS,
+						1.0f,
+						1.0f
+				);
+				context.player().displayClientMessage(Component.translatable("container.isLocked", "World Jar"), true);
+				return;
+			}
 			
 			ServerPlayer player = context.player();
 			((PlayerWithReturn) player).worldinajar$setReturnLocation(

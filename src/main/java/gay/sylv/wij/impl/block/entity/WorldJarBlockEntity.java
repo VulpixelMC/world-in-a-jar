@@ -40,6 +40,7 @@ import gay.sylv.wij.impl.network.client.JarLoadedPayload;
 import gay.sylv.wij.impl.util.Constants;
 import gay.sylv.wij.impl.util.WeakReferenceList;
 import gay.sylv.wij.impl.util.jar.JarEntry;
+import gay.sylv.wij.mixin.Accessor_BaseContainerBlockEntity;
 import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
@@ -57,22 +58,32 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.SectionPos;
+import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.NbtOps;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceKey;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.ItemInteractionResult;
+import net.minecraft.world.LockCode;
+import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.inventory.AbstractContainerMenu;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BaseContainerBlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.LightChunk;
@@ -92,7 +103,7 @@ import org.joml.Matrix4fStack;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
-public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter, WorldJar {
+public class WorldJarBlockEntity extends BaseContainerBlockEntity implements LightChunkGetter, WorldJar {
 	private int scale = DEFAULT_SCALE;
 	private BlockPos internalSpawnPos = DEFAULT_SPAWN_POS;
 	
@@ -100,6 +111,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	private static final BlockPos DEFAULT_SPAWN_POS = new BlockPos(0, -64, 0);
 	
 	public static final WeakReferenceList<WorldJarBlockEntity> INSTANCES = new WeakReferenceList<>();
+	public static final LockCode CONTAINER_LOCK = new LockCode("glowcase");
 	
 	/**
 	 * {@link JarLevelChunkSection}s that are loaded in the {@link WorldJarBlockEntity}.
@@ -150,6 +162,14 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	public int getScale() {
 		return scale;
+	}
+	
+	public boolean isLocked() {
+		return ((Accessor_BaseContainerBlockEntity) this).getLockKey() != LockCode.NO_LOCK;
+	}
+	
+	public void setLocked(boolean locked) {
+		((Accessor_BaseContainerBlockEntity) this).setLockKey(locked ? CONTAINER_LOCK : LockCode.NO_LOCK);
 	}
 	
 	/**
@@ -273,6 +293,9 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	@Override
 	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
 		super.loadAdditional(tag, registries);
+		if (this.isLocked()) {
+			Main.LOGGER.info("WorldJarBlockEntity is locked");
+		}
 		loadedNotPlaced = true;
 		CompoundTag modTag = tag.getCompound(Constants.COMPAT_MOD_ID);
 		scale = modTag.getInt("scale");
@@ -289,6 +312,33 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		modTag.putInt("id", jarEntry.id());
 		if (targetJarLocation != null) Networking.JarLocation.CODEC.encodeStart(NbtOps.INSTANCE, targetJarLocation).result().ifPresent(target -> modTag.put("target_jar_location", target));
 		tag.put(Constants.COMPAT_MOD_ID, modTag);
+	}
+	
+	@Override
+	protected void applyImplicitComponents(DataComponentInput componentInput) {
+		LockCode lockKey = ((Accessor_BaseContainerBlockEntity) this).getLockKey();
+		super.applyImplicitComponents(componentInput);
+		((Accessor_BaseContainerBlockEntity) this).setLockKey(lockKey);
+	}
+	
+	@Override
+	protected @NotNull Component getDefaultName() {
+		return Component.translatable("block.worldinajar.world_jar");
+	}
+	
+	@Override
+	protected @NotNull NonNullList<ItemStack> getItems() {
+		return NonNullList.create();
+	}
+	
+	@Override
+	protected void setItems(NonNullList<ItemStack> items) {
+	}
+	
+	@SuppressWarnings("DataFlowIssue") // this is actually nullable lol
+	@Override
+	protected @NotNull AbstractContainerMenu createMenu(int containerId, Inventory inventory) {
+		return null;
 	}
 	
 	@Override
@@ -404,6 +454,11 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		return getInternalPos().getCenter().add(scale / 2.0d, scale / 2.0d, scale / 2.0d);
 	}
 	
+	@Override
+	public int getContainerSize() {
+		return 0;
+	}
+	
 	@Environment(EnvType.CLIENT)
 	public static class WorldJarRenderer implements BlockEntityRenderer<WorldJarBlockEntity> {
 		private final BlockEntityRendererProvider.Context context;
@@ -439,7 +494,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 			);
 			
 			if (jar.statesChanged) {
-				Main.LOGGER.info("Building world jar");
 				jar.statesChanged = false;
 				buildJar(context, jar);
 			}
@@ -598,6 +652,19 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 				return super.getDestroyProgress(state, player, level, pos);
 			} else {
 				return 0.0F;
+			}
+		}
+		
+		@Override
+		protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
+			if (BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(ResourceLocation.fromNamespaceAndPath("glowcase", "lock")) && player.isCreative()) {
+				Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(pos, Blocks.WORLD_JAR.type());
+				if (optionalJar.isEmpty()) return ItemInteractionResult.FAIL;
+				WorldJarBlockEntity jar = optionalJar.get();
+				jar.setLocked(!jar.isLocked());
+				return ItemInteractionResult.CONSUME;
+			} else {
+				return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
 			}
 		}
 		
