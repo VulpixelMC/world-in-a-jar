@@ -4,3 +4,4 @@
 
 ## Fixed
 - Only send a single block update to clients surrounding a jar when a BlockState is set.
+- Bedrock Breaking mod compatibility.

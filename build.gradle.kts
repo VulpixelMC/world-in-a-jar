@@ -80,6 +80,7 @@ dependencies {
 		exclude(group = "net.fabricmc")
 	}
 	modImplementation(libs.sodium)
+	modImplementation(libs.bedrockbreaking)
 	
 	modRuntimeOnly(libs.wthit)
 	modRuntimeOnly(libs.modmenu) {

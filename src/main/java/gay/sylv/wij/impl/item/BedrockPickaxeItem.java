@@ -18,6 +18,7 @@
 package gay.sylv.wij.impl.item;
 
 import gay.sylv.wij.impl.item.tag.ItemTags;
+import net.fabricmc.loader.api.FabricLoader;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -50,7 +51,11 @@ public class BedrockPickaxeItem extends PickaxeItem {
 		if (isBedrockMineable(level, state, miningEntity)) {
 			ServerLevel serverLevel = (ServerLevel) level;
 			Player player = (Player) miningEntity;
-			level.setBlockAndUpdate(pos, gay.sylv.wij.impl.block.Blocks.CRACKED_BEDROCK.block().defaultBlockState());
+			if (!FabricLoader.getInstance().isModLoaded("breakingbedrock")) {
+				level.setBlockAndUpdate(pos, gay.sylv.wij.impl.block.Blocks.CRACKED_BEDROCK.block().defaultBlockState());
+			} else {
+				level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+			}
 			LootParams lootParams = new LootParams.Builder(serverLevel)
 					.withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
 					.withParameter(LootContextParams.TOOL, stack)
@@ -73,6 +78,6 @@ public class BedrockPickaxeItem extends PickaxeItem {
 	}
 	
 	public static boolean isBedrockMineable(Level level, BlockState state, LivingEntity miningEntity) {
-		return level instanceof ServerLevel && state.is(Blocks.BEDROCK) && miningEntity instanceof Player;
+		return level instanceof ServerLevel && state.is(Blocks.BEDROCK) && miningEntity instanceof Player player && !player.isCreative();
 	}
 }

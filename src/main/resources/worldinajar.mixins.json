@@ -14,7 +14,8 @@
 		"LevelMixin",
 		"NearestAttackableTargetGoalMixin",
 		"PlayerListMixin",
-		"PlayerMixin"
+		"PlayerMixin",
+		"breakingbedrock.Mixin_BedrockBlock"
 	],
 	"client": [
 		"client.BuiltInPackSourceMixin",
