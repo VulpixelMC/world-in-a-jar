@@ -17,7 +17,7 @@
  */
 package gay.sylv.wij.impl.util.jar;
 
-import gay.sylv.wij.impl.Main;
+import gay.sylv.wij.impl.WIJMain;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.util.CallerSensitive;
@@ -67,13 +67,13 @@ public final class JarPlacer {
 	
 	@CallerSensitive
 	public static void initialize(MinecraftServer server) throws IllegalAccessException {
-		checkCaller(Main.class);
+		checkCaller(WIJMain.class);
 		instance = new JarPlacer(server);
 	}
 	
 	@CallerSensitive
 	public static void clear() throws IllegalAccessException {
-		checkCaller(Main.class);
+		checkCaller(WIJMain.class);
 		instance = null;
 	}
 	

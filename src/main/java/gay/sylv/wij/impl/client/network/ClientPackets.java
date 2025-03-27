@@ -15,14 +15,16 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.impl.network.client;
+package gay.sylv.wij.impl.client.network;
 
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
+import gay.sylv.wij.impl.client.block.entity.ClientWorldJarBlockEntity;
 import gay.sylv.wij.impl.client.render.JarInternalsRenderer;
-import gay.sylv.wij.impl.network.ExternalChunkUpdatePayload;
-import gay.sylv.wij.impl.network.JarChunkUpdatePayload;
-import gay.sylv.wij.impl.network.JarLoadedAckPayload;
+import gay.sylv.wij.impl.network.s2c.ExternalChunkUpdatePayload;
+import gay.sylv.wij.impl.network.s2c.JarChunkUpdatePayload;
+import gay.sylv.wij.impl.network.s2c.JarLoadedAckPayload;
+import gay.sylv.wij.impl.network.c2s.JarLoadedPayload;
 import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.api.EnvType;
 import net.fabricmc.api.Environment;
@@ -51,7 +53,7 @@ public final class ClientPackets implements Initializable {
 			if (dimension != payload.jarLocation().dimension()) return;
 			Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(payload.jarLocation().blockPos(), Blocks.WORLD_JAR.type());
 			if (optionalJar.isEmpty()) return;
-			WorldJarBlockEntity jar = optionalJar.get();
+			ClientWorldJarBlockEntity jar = (ClientWorldJarBlockEntity) optionalJar.get();
 			jar.onChunkUpdate(context.client(), payload.sectionPos(), payload.blockStateContainer());
 		});
 		ClientPlayNetworking.registerGlobalReceiver(JarLoadedAckPayload.TYPE, (payload, context) -> {

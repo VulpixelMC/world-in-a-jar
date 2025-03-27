@@ -17,8 +17,18 @@
  */
 package gay.sylv.wij.impl.util;
 
+import java.lang.reflect.InvocationTargetException;
+
 public interface Initializable {
 	default void initialize() {
 		/* no-op */
+	}
+	
+	static <T extends Initializable> void initialize(Class<T> clazz) {
+		try {
+			clazz.getConstructor().newInstance().initialize();
+		} catch (InstantiationException | IllegalAccessException | InvocationTargetException | NoSuchMethodException e) {
+			throw new RuntimeException(e);
+		}
 	}
 }

@@ -15,28 +15,26 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.impl.network;
+package gay.sylv.wij.impl.network.c2s;
 
-import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
+import gay.sylv.wij.impl.network.Networking;
+import gay.sylv.wij.impl.network.s2c.JarChunkUpdatePayload;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.chunk.PalettedContainer;
-import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 
 import static gay.sylv.wij.impl.util.Instantiation.packetType;
 
 /**
- * Signals that a chunk outside the {@link WorldJarBlockEntity} has updated. This sends the {@link PalettedContainer}&lt;{@link BlockState}&gt; of the external chunk.
+ * A request from the client to send a {@link JarChunkUpdatePayload}.
+ * @param jarLocation the location of the jar.
  */
-public record ExternalChunkUpdatePayload(PalettedContainer<BlockState> blockStateContainer, Vec3 centerOfJar) implements CustomPacketPayload {
-	public static final Type<ExternalChunkUpdatePayload> TYPE = packetType("jar_external_chunk_update");
-	public static final StreamCodec<RegistryFriendlyByteBuf, ExternalChunkUpdatePayload> CODEC = StreamCodec.composite(
-			Networking.Codecs.BLOCK_STATE_PALETTED_CONTAINER, ExternalChunkUpdatePayload::blockStateContainer,
-			Networking.Codecs.VEC3, ExternalChunkUpdatePayload::centerOfJar,
-			ExternalChunkUpdatePayload::new
+public record JarLoadedPayload(Networking.JarLocation jarLocation) implements CustomPacketPayload {
+	public static final Type<JarLoadedPayload> TYPE = packetType("jar_loaded");
+	public static final StreamCodec<RegistryFriendlyByteBuf, JarLoadedPayload> CODEC = StreamCodec.composite(
+			Networking.JarLocation.STREAM_CODEC, JarLoadedPayload::jarLocation,
+			JarLoadedPayload::new
 	);
 	
 	@Override

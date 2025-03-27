@@ -20,11 +20,11 @@
 		"fabric-datagen": [
 			"gay.sylv.wij.impl.datagen.DataGenerator"
 		],
-		"main": [
-			"gay.sylv.wij.impl.Main"
-		],
 		"client": [
-			"gay.sylv.wij.impl.client.MainClient"
+			"gay.sylv.wij.impl.client.FabricWIJClient"
+		],
+		"server": [
+			"gay.sylv.wij.impl.server.dedicated.FabricWIJDedicated"
 		]
 	},
 	"mixins": [

@@ -17,7 +17,6 @@
  */
 package gay.sylv.wij.impl;
 
-import gay.sylv.wij.api.entity.event.ServerPlayerEventsExtra;
 import gay.sylv.wij.impl.attachment.Attachments;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
@@ -31,27 +30,30 @@ import gay.sylv.wij.impl.item.BedrockPickaxeItem;
 import gay.sylv.wij.impl.item.Items;
 import gay.sylv.wij.impl.item.tag.ItemTags;
 import gay.sylv.wij.impl.network.Networking;
+import gay.sylv.wij.impl.platform.PlatformProvider;
+import gay.sylv.wij.impl.platform.side.DistSide;
 import gay.sylv.wij.impl.util.Constants;
+import gay.sylv.wij.impl.util.Initializable;
 import gay.sylv.wij.impl.util.jar.JarPlacer;
 import gay.sylv.wij.impl.worldgen.JarChunkGenerator;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.ModInitializer;
 import net.fabricmc.fabric.api.entity.FakePlayer;
-import net.fabricmc.fabric.api.event.lifecycle.v1.ServerLifecycleEvents;
-import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
-import net.fabricmc.fabric.api.networking.v1.ServerPlayConnectionEvents;
 import net.fabricmc.loader.api.FabricLoader;
 import net.fabricmc.loader.api.ModContainer;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Registry;
 import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.network.protocol.game.ClientboundPlayerInfoUpdatePacket;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.server.network.ServerGamePacketListenerImpl;
 import net.minecraft.server.players.PlayerList;
 import net.minecraft.world.entity.ai.attributes.AttributeInstance;
 import net.minecraft.world.entity.ai.attributes.AttributeModifier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -63,14 +65,14 @@ import java.util.UUID;
 
 import static gay.sylv.wij.impl.util.Constants.modId;
 
-public final class Main implements ModInitializer {
-	private static final Logger LOGGER = getLogger(Main.class);
-	private static EnvType environment;
+public final class WIJMain implements Initializable {
+	public static PlatformProvider platformProvider;
+	
+	private static final Logger LOGGER = getLogger(WIJMain.class);
 	
 	@Override
-	public void onInitialize() {
+	public void initialize() {
 		LOGGER.info("Initializing {}", Constants.MOD_NAME);
-		environment = FabricLoader.getInstance().getEnvironmentType();
 		
 		Components.INSTANCE.initialize();
 		
@@ -84,41 +86,6 @@ public final class Main implements ModInitializer {
 		Networking.INSTANCE.initialize();
 		
 		Registry.register(BuiltInRegistries.CHUNK_GENERATOR, modId("jar"), JarChunkGenerator.CODEC);
-		
-		ServerLifecycleEvents.SERVER_STARTED.register(Main::onServerStart);
-		ServerLifecycleEvents.SERVER_STOPPED.register(Main::onServerStop);
-		
-		ServerPlayerEventsExtra.AFTER_SPAWN.register((connection, player, cookie) -> {
-			if (!(player instanceof FakePlayer) && player.level().dimension().equals(Dimensions.JAR)) {
-				createFakePlayer((ServerLevel) player.level(), player);
-			}
-			
-			if (!(player instanceof FakePlayer) && !player.level().dimension().equals(Dimensions.JAR)) {
-				Objects.requireNonNull(player.getAttribute(Attributes.SCALE)).removeModifier(modId("tiny"));
-			}
-		});
-		
-		ServerPlayConnectionEvents.DISCONNECT.register((handler, server) -> {
-			if (!(handler.getPlayer() instanceof FakePlayer) && handler.getPlayer().level().dimension().equals(Dimensions.JAR)) {
-				removeFakePlayer(handler.getPlayer().serverLevel(), handler.getPlayer());
-			}
-		});
-		
-		ServerLifecycleEvents.SERVER_STOPPING.register((server) -> {
-			server.getPlayerList().getPlayers().forEach(player -> {
-				if (!(player instanceof FakePlayer) && player.level().dimension().equals(Dimensions.JAR)) {
-					removeFakePlayer(player.serverLevel(), player);
-				}
-			});
-		});
-		
-		PlayerBlockBreakEvents.BEFORE.register((level, player, pos, state, blockEntity) -> {
-			if (player.getMainHandItem().is(ItemTags.CHIPS_OR_DESTROYS_UNBREAKABLE) && BedrockPickaxeItem.isBedrockMineable(level, state, player)) {
-				BedrockPickaxeItem.dropBedrockShard(player.getMainHandItem(), level, state, pos, player);
-			}
-			
-			return !state.is(BlockTags.UNBREAKABLE) || player.getAbilities().instabuild;
-		});
 		
 		LOGGER.info("Finished loading {}", Constants.MOD_NAME);
 	}
@@ -175,16 +142,12 @@ public final class Main implements ModInitializer {
 		return Optional.ofNullable(jar.getFakePlayers().get(uuid));
 	}
 	
-	public static Optional<EnvType> getEnvironment() {
-		return Optional.ofNullable(environment);
-	}
-	
-	public static boolean isEnvType(EnvType type) {
-		return getEnvironment().orElseThrow() == type;
+	public static boolean isDistSide(DistSide side) {
+		return platformProvider.getDistSide() == side;
 	}
 	
 	public static boolean isClient() {
-		return isEnvType(EnvType.CLIENT);
+		return isDistSide(DistSide.CLIENT);
 	}
 	
 	public static ModContainer getModContainer() {
@@ -195,7 +158,7 @@ public final class Main implements ModInitializer {
 		return LoggerFactory.getLogger(Constants.MOD_NAME + "/" + clazz.getName());
 	}
 	
-	private static void onServerStart(MinecraftServer server) {
+	public static void onServerStart(MinecraftServer server) {
 		try {
 			JarPlacer.initialize(server);
 		} catch (IllegalAccessException e) {
@@ -203,11 +166,43 @@ public final class Main implements ModInitializer {
 		}
 	}
 	
-	private static void onServerStop(MinecraftServer server) {
+	public static void onServerStop(MinecraftServer server) {
 		try {
 			JarPlacer.clear();
 		} catch (IllegalAccessException e) {
 			throw new RuntimeException(e);
+		}
+	}
+	
+	public static boolean beforePlayerBlockBreak(Level level, Player player, BlockPos pos, BlockState state) {
+		if (player.getMainHandItem().is(ItemTags.CHIPS_OR_DESTROYS_UNBREAKABLE) && BedrockPickaxeItem.isBedrockMineable(level, state, player)) {
+			BedrockPickaxeItem.dropBedrockShard(player.getMainHandItem(), level, state, pos, player);
+		}
+		
+		return !state.is(BlockTags.UNBREAKABLE) || player.getAbilities().instabuild;
+	}
+	
+	public static void onServerStopping(MinecraftServer server) {
+		server.getPlayerList().getPlayers().forEach(player -> {
+			if (!(player instanceof FakePlayer) && player.level().dimension().equals(Dimensions.JAR)) {
+				removeFakePlayer(player.serverLevel(), player);
+			}
+		});
+	}
+	
+	public static void onPlayerDisconnect(ServerGamePacketListenerImpl handler, MinecraftServer server) {
+		if (!(handler.getPlayer() instanceof FakePlayer) && handler.getPlayer().level().dimension().equals(Dimensions.JAR)) {
+			removeFakePlayer(handler.getPlayer().serverLevel(), handler.getPlayer());
+		}
+	}
+	
+	public static void afterPlayerSpawn(ServerPlayer player) {
+		if (!(player instanceof FakePlayer) && player.level().dimension().equals(Dimensions.JAR)) {
+			createFakePlayer((ServerLevel) player.level(), player);
+		}
+		
+		if (!(player instanceof FakePlayer) && !player.level().dimension().equals(Dimensions.JAR)) {
+			Objects.requireNonNull(player.getAttribute(Attributes.SCALE)).removeModifier(modId("tiny"));
 		}
 	}
 }

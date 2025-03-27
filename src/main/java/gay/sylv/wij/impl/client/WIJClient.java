@@ -17,19 +17,20 @@
  */
 package gay.sylv.wij.impl.client;
 
-import gay.sylv.wij.impl.Main;
+import gay.sylv.wij.impl.WIJMain;
 import gay.sylv.wij.impl.client.render.JarInternalsRenderer;
-import gay.sylv.wij.impl.network.client.ClientPackets;
+import gay.sylv.wij.impl.client.network.ClientPackets;
 import gay.sylv.wij.impl.util.Constants;
+import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.api.ClientModInitializer;
 import net.fabricmc.fabric.api.client.rendering.v1.CoreShaderRegistrationCallback;
 import org.slf4j.Logger;
 
-public final class MainClient implements ClientModInitializer {
-	private static final Logger LOGGER = Main.getLogger(MainClient.class);
+public final class WIJClient implements Initializable {
+	private static final Logger LOGGER = WIJMain.getLogger(WIJClient.class);
 	
 	@Override
-	public void onInitializeClient() {
+	public void initialize() {
 		LOGGER.info("Initializing {}/Client", Constants.MOD_NAME);
 		
 		ClientPackets.INSTANCE.initialize();

@@ -18,25 +18,17 @@
 package gay.sylv.wij.impl.block.entity;
 
 import com.mojang.authlib.GameProfile;
-import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.blaze3d.vertex.BufferBuilder;
-import com.mojang.blaze3d.vertex.MeshData;
-import com.mojang.blaze3d.vertex.PoseStack;
-import com.mojang.blaze3d.vertex.VertexBuffer;
 import com.mojang.serialization.MapCodec;
-import gay.sylv.wij.api.block.JarContainmentBlock;
 import gay.sylv.wij.api.block.WorldJar;
-import gay.sylv.wij.impl.Main;
+import gay.sylv.wij.impl.WIJMain;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.client.render.*;
 import gay.sylv.wij.impl.component.Components;
 import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.duck.PlayerWithReturn;
-import gay.sylv.wij.impl.network.JarChunkUpdatePayload;
-import gay.sylv.wij.impl.network.JarLoadedAckPayload;
+import gay.sylv.wij.impl.network.s2c.JarChunkUpdatePayload;
 import gay.sylv.wij.impl.network.Networking;
-import gay.sylv.wij.impl.network.client.JarEnterPayload;
-import gay.sylv.wij.impl.network.client.JarLoadedPayload;
+import gay.sylv.wij.impl.network.c2s.JarEnterPayload;
 import gay.sylv.wij.impl.util.Constants;
 import gay.sylv.wij.impl.util.WeakReferenceList;
 import gay.sylv.wij.impl.util.jar.JarEntry;
@@ -44,17 +36,10 @@ import it.unimi.dsi.fastutil.longs.Long2ObjectMap;
 import it.unimi.dsi.fastutil.longs.Long2ObjectOpenHashMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectMap;
 import it.unimi.dsi.fastutil.objects.Object2ObjectOpenHashMap;
-import net.fabricmc.api.EnvType;
-import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.fabricmc.fabric.api.entity.FakePlayer;
 import net.fabricmc.fabric.api.event.player.PlayerBlockBreakEvents;
-import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
 import net.fabricmc.fabric.api.networking.v1.ServerPlayNetworking;
-import net.minecraft.client.Minecraft;
-import net.minecraft.client.renderer.*;
-import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
-import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.core.SectionPos;
@@ -64,7 +49,6 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.server.MinecraftServer;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -86,11 +70,11 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.joml.Matrix4f;
-import org.joml.Matrix4fStack;
 
 import java.nio.charset.StandardCharsets;
 import java.util.*;
+
+import static gay.sylv.wij.impl.WIJMain.platformProvider;
 
 public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter, WorldJar {
 	private int scale = DEFAULT_SCALE;
@@ -110,9 +94,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	 * The full versions of chunks that are loaded in the {@link WorldJarBlockEntity}. This is used in lighting.
 	 */
 	private final Long2ObjectMap<JarChunk> chunks = new Long2ObjectOpenHashMap<>();
-	
-	@Environment(EnvType.CLIENT)
-	private JarRenderChunkRegion renderChunkRegion;
 	
 	/**
 	 * The location of the target jar.
@@ -137,7 +118,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	/**
 	 * True if loaded rather than placed.
 	 */
-	private boolean loadedNotPlaced = false;
+	protected boolean loadedNotPlaced = false;
 	
 	public WorldJarBlockEntity(BlockPos pos, BlockState blockState) {
 		super(Blocks.WORLD_JAR.type(), pos, blockState);
@@ -150,6 +131,14 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	
 	public int getScale() {
 		return scale;
+	}
+	
+	public boolean isStatesChanged() {
+		return statesChanged;
+	}
+	
+	public void setStatesChanged(boolean statesChanged) {
+		this.statesChanged = statesChanged;
 	}
 	
 	/**
@@ -216,31 +205,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		}
 	}
 	
-	/**
-	 * Initializes the chunks server-side.
-	 * @author sylv
-	 */
-	private void initializeServerChunks() {
-		// initialize chunks
-		chunkSections.clear();
-		chunks.clear();
-		int max = getChunkDiameter() - 1;
-		for (int x = 0; x < max; x++) {
-			for (int y = 0; y < max; y++) {
-				for (int z = 0; z < max; z++) {
-					var sectionPos = SectionPos.of(x, y, z);
-					var chunkSection = new JarLevelChunkSection(sectionPos, false);
-					var chunkPos = new ChunkPos(sectionPos.getX(), sectionPos.getZ());
-					var chunk = new JarChunk(chunkPos, this);
-					
-					// put chunk
-					chunkSections.put(sectionPos.asLong(), chunkSection);
-					chunks.put(chunkPos.toLong(), chunk);
-				}
-			}
-		}
-	}
-	
 	public void sendJarChunks(ServerPlayer player) {
 		Networking.JarLocation jarLocation = getJarLocation();
 		getChunkSections().forEach((pos, section) -> {
@@ -260,9 +224,13 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		ServerPlayNetworking.send(player, payload);
 	}
 	
-	private Networking.JarLocation getJarLocation() {
+	protected Networking.JarLocation getJarLocation() {
 		assert this.level != null;
 		return new Networking.JarLocation(this.getBlockPos(), this.level.dimension());
+	}
+	
+	protected Long2ObjectMap<JarChunk> getChunks() {
+		return chunks;
 	}
 	
 	public LightChunk getChunk(int chunkX, int chunkZ) {
@@ -297,27 +265,8 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		assert level != null;
 		if (!this.level.isClientSide()) {
 			this.fakePlayers.forEach((uuid, fakePlayer) -> {
-				Main.removeKnownFakePlayerWithJar(this, (ServerLevel) this.level, fakePlayer);
+				WIJMain.removeKnownFakePlayerWithJar(this, (ServerLevel) this.level, fakePlayer);
 			});
-		}
-	}
-	
-	@Override
-	public void setLevel(Level level) {
-		super.setLevel(level);
-		if (level.dimension() == Dimensions.JAR) return;
-		if (level.isClientSide) {
-			JarLevelLightEngine lightEngine = new JarLevelLightEngine(this, true, true);
-			renderChunkRegion = new JarRenderChunkRegion(this, lightEngine);
-			ClientPlayNetworking.send(new JarLoadedPayload(getJarLocation()));
-		} else {
-			initializeServerChunks();
-			// Send to tracking players when server loads placed jar.
-			if (!loadedNotPlaced) {
-				for (ServerPlayer player : PlayerLookup.tracking(this)) {
-					ServerPlayNetworking.send(player, new JarLoadedAckPayload(getJarLocation()));
-				}
-			}
 		}
 	}
 	
@@ -326,32 +275,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	@Override
 	public Level getLevel() {
 		return super.getLevel();
-	}
-	
-	/**
-	 * This method is called upon updating a chunk on the clientside. It first remaps {@link BlockState}s to the given {@link PalettedContainer}&lt;{@link BlockState}&gt;, then recreates the {@link JarLevelChunkSection}s, and finally marks {@code statesChanged} as {@code true}.
-	 * @author sylv
-	 */
-	@Environment(EnvType.CLIENT)
-	public void onChunkUpdate(Minecraft client, SectionPos sectionPos, PalettedContainer<BlockState> blockStateContainer) {
-		client.execute(() -> {
-			// put chunk
-			JarLevelChunkSection chunkSection = chunkSections.get(sectionPos.asLong());
-			ChunkPos chunkPos = new ChunkPos(sectionPos.getX(), sectionPos.getZ());
-			JarChunk chunk = chunks.get(chunkPos.toLong());
-			
-			// remap block states
-			if (chunkSection == null) {
-				chunkSection = new JarLevelChunkSection(sectionPos, true, blockStateContainer);
-			} else {
-				chunkSection.setBlockStates(blockStateContainer);
-			}
-			
-			chunkSections.put(sectionPos.asLong(), chunkSection);
-			chunks.put(chunkPos.toLong(), chunk);
-			
-			statesChanged = true;
-		});
 	}
 	
 	/**
@@ -390,141 +313,6 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		return getInternalPos().getCenter().add(scale / 2.0d, scale / 2.0d, scale / 2.0d);
 	}
 	
-	@Environment(EnvType.CLIENT)
-	public static class WorldJarRenderer implements BlockEntityRenderer<WorldJarBlockEntity> {
-		private final BlockEntityRendererProvider.Context context;
-		// always reuse the same SectionBufferBuilderPack because it cannot be freed, so it's an instant memory leak.
-		private static final SectionBufferBuilderPack BYTE_BUFFER_BUILDERS = new SectionBufferBuilderPack();
-		private static final Map<RenderType, BufferBuilder> BUFFERS = new HashMap<>();
-		
-		public WorldJarRenderer(BlockEntityRendererProvider.Context context) {
-			this.context = context;
-		}
-		
-		@Override
-		public void render(
-				WorldJarBlockEntity jar,
-				float partialTick,
-				PoseStack poseStack,
-				MultiBufferSource bufferSource,
-				int packedLight,
-				int packedOverlay
-		) {
-			if (jar.level != null && jar.level.dimension().equals(Dimensions.JAR)) return;
-			poseStack.pushPose();
-			// prevent z-fighting
-			poseStack.scale(
-					jar.getVisualScale() - 0.001f,
-					jar.getVisualScale() - 0.001f,
-					jar.getVisualScale() - 0.001f
-			);
-			poseStack.translate(
-					0.001f,
-					0.001f,
-					0.001f
-			);
-			
-			if (jar.statesChanged) {
-				jar.statesChanged = false;
-				buildJar(context, jar);
-			}
-			
-			renderJar(jar, poseStack);
-			poseStack.popPose();
-		}
-		
-		public static void renderJar(
-				WorldJarBlockEntity jar,
-				PoseStack poseStack
-		) {
-			for (RenderType renderType : RenderType.chunkBufferLayers()) {
-				renderType.setupRenderState();
-				ShaderInstance shader = RenderSystem.getShader();
-				Matrix4f frustumMatrix = poseStack.last().pose();
-				Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
-				matrix4fStack.pushMatrix();
-				matrix4fStack.mul(frustumMatrix);
-				Matrix4f modelView = new Matrix4f(matrix4fStack);
-				
-				jar.getChunkSections().forEach((pos, section) -> {
-					if (section.isHasBuilt() && section.getRenderedTypes().contains(renderType)) {
-						VertexBuffer buffer = section.getVertexBuffers().get(renderType);
-						buffer.bind();
-						buffer.drawWithShader(modelView, RenderSystem.getProjectionMatrix(), shader);
-						VertexBuffer.unbind();
-					}
-				});
-				
-				matrix4fStack.popMatrix();
-				
-				renderType.clearRenderState();
-			}
-		}
-		
-		public static void buildJar(
-				BlockEntityRendererProvider.Context context,
-				WorldJarBlockEntity jar
-		) {
-			RandomSource randomSource = Objects.requireNonNull(jar.getLevel()).getRandom();
-			// The sections' PoseStack
-			PoseStack poseStack = new PoseStack();
-			
-			jar.getChunkSections().forEach((pos, section) -> {
-				BlockPos origin = section.getOrigin();
-				BlockPos offset = new BlockPos(15, 15, 15).offset(origin);
-				
-				section.getRenderedTypes().clear();
-				
-				for (BlockPos blockPos : BlockPos.betweenClosed(origin, offset)) {
-					BlockState state = jar.getBlockState(blockPos);
-					if (state.getBlock() instanceof JarContainmentBlock containmentBlock && !containmentBlock.renderInJar()) continue; // Don't render jar container blocks.
-					FluidState fluidState = state.getFluidState();
-					
-					if (!fluidState.isEmpty()) {
-						RenderType renderType = ItemBlockRenderTypes.getRenderLayer(fluidState);
-						section.getRenderedTypes().add(renderType);
-						BufferBuilder bufferBuilder = getOrSetBufferBuilder(renderType);
-						
-						context.getBlockRenderDispatcher().renderLiquid(blockPos, jar.renderChunkRegion, bufferBuilder, state, fluidState);
-					}
-					
-					if (state.getRenderShape() == RenderShape.MODEL) {
-						RenderType renderType = ItemBlockRenderTypes.getChunkRenderType(state);
-						section.getRenderedTypes().add(renderType);
-						BufferBuilder bufferBuilder = getOrSetBufferBuilder(renderType);
-						
-						poseStack.pushPose();
-						poseStack.translate(
-								blockPos.getX(),
-								blockPos.getY(),
-								blockPos.getZ()
-						);
-						context.getBlockRenderDispatcher().renderBatched(state, blockPos, jar.renderChunkRegion, poseStack, bufferBuilder, true, randomSource);
-						poseStack.popPose();
-					}
-				}
-				
-				// end building and upload vertex buffers
-				for (RenderType renderType : section.getRenderedTypes()) {
-					VertexBuffer buffer = section.getVertexBuffers().get(renderType);
-					BufferBuilder bufferBuilder = BUFFERS.get(renderType);
-					MeshData renderedBuffer = bufferBuilder.build();
-					buffer.bind();
-					buffer.upload(renderedBuffer);
-					VertexBuffer.unbind();
-				}
-				
-				// flush buffers
-				BUFFERS.clear();
-				section.setHasBuilt(true);
-			});
-		}
-		
-		private static BufferBuilder getOrSetBufferBuilder(RenderType renderType) {
-			return JarInternalsRenderer.getOrSetBufferBuilder(renderType, BUFFERS, BYTE_BUFFER_BUILDERS);
-		}
-	}
-	
 	public Object2ObjectMap<UUID, FakePlayer> getFakePlayers() {
 		return fakePlayers;
 	}
@@ -532,6 +320,10 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	public FakePlayer getOrCreateFakePlayer(ServerLevel outsideJarLevel, ServerPlayer player) {
 		UUID uuid = UUID.nameUUIDFromBytes(player.getName().getString().getBytes(StandardCharsets.UTF_8));
 		return fakePlayers.computeIfAbsent(uuid, ignored -> FakePlayer.get(outsideJarLevel, new GameProfile(uuid, player.getName().getString())));
+	}
+	
+	protected boolean isInJarDimension() throws NullPointerException {
+		return Objects.requireNonNull(getLevel()).dimension() == Dimensions.JAR;
 	}
 	
 	public static class WorldJarBlock extends BaseEntityBlock {
@@ -553,7 +345,10 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 		@Nullable
 		@Override
 		public BlockEntity newBlockEntity(BlockPos pos, BlockState state) {
-			return new WorldJarBlockEntity(pos, state);
+			return platformProvider
+					.getSidedProvider()
+					.makeWorldJarBlockEntity()
+					.create(pos, state);
 		}
 		
 		@Override
@@ -606,7 +401,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 			Vec3 returnPos = ((PlayerWithReturn) player).worldinajar$getReturnPos();
 			ResourceKey<Level> returnDim = ((PlayerWithReturn) player).worldinajar$getReturnDimension();
 			
-			Main.removeFakePlayer((ServerLevel) level, (ServerPlayer) player);
+			WIJMain.removeFakePlayer((ServerLevel) level, (ServerPlayer) player);
 			
 			ServerLevel returnLevel = server.getLevel(returnDim);
 			DimensionTransition transition = new DimensionTransition(returnLevel, returnPos, Vec3.ZERO, 0.0f, 0.0f, DimensionTransition.DO_NOTHING);

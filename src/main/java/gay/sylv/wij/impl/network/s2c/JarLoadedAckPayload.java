@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.impl.network.client;
+package gay.sylv.wij.impl.network.s2c;
 
 import gay.sylv.wij.impl.network.Networking;
 import net.minecraft.network.RegistryFriendlyByteBuf;
@@ -26,14 +26,13 @@ import org.jetbrains.annotations.NotNull;
 import static gay.sylv.wij.impl.util.Instantiation.packetType;
 
 /**
- * A request from the client to send a {@link gay.sylv.wij.impl.network.JarChunkUpdatePayload}.
- * @param jarLocation the location of the jar.
+ * Sent to clients when the jar has loaded server-side.
  */
-public record JarLoadedPayload(Networking.JarLocation jarLocation) implements CustomPacketPayload {
-	public static final Type<JarLoadedPayload> TYPE = packetType("jar_loaded");
-	public static final StreamCodec<RegistryFriendlyByteBuf, JarLoadedPayload> CODEC = StreamCodec.composite(
-			Networking.JarLocation.STREAM_CODEC, JarLoadedPayload::jarLocation,
-			JarLoadedPayload::new
+public record JarLoadedAckPayload(Networking.JarLocation jarLocation) implements CustomPacketPayload {
+	public static final Type<JarLoadedAckPayload> TYPE = packetType("jar_loaded_ack");
+	public static final StreamCodec<RegistryFriendlyByteBuf, JarLoadedAckPayload> CODEC = StreamCodec.composite(
+			Networking.JarLocation.STREAM_CODEC, JarLoadedAckPayload::jarLocation,
+			JarLoadedAckPayload::new
 	);
 	
 	@Override

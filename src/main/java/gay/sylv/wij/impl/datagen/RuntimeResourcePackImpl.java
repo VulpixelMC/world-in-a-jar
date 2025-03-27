@@ -23,7 +23,7 @@ import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.mojang.blaze3d.platform.NativeImage;
 import gay.sylv.wij.api.datagen.RuntimeResourcePack;
-import gay.sylv.wij.impl.Main;
+import gay.sylv.wij.impl.WIJMain;
 import gay.sylv.wij.impl.util.Constants;
 import gay.sylv.wij.impl.util.Conversions;
 import net.fabricmc.fabric.api.resource.ModResourcePack;
@@ -156,7 +156,7 @@ public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResourc
 	
 	@Override
 	public ModMetadata getFabricModMetadata() {
-		return Main.getModContainer().getMetadata();
+		return WIJMain.getModContainer().getMetadata();
 	}
 	
 	@Override
@@ -168,7 +168,7 @@ public class RuntimeResourcePackImpl implements RuntimeResourcePack, PackResourc
 	@Override
 	public IoSupplier<InputStream> getRootResource(String... elements) {
 		FileUtil.validatePath(elements);
-		Optional<Path> optionalPath = Main.getModContainer().findPath("rrp/" + String.join("/", elements));
+		Optional<Path> optionalPath = WIJMain.getModContainer().findPath("rrp/" + String.join("/", elements));
 		return optionalPath.map(IoSupplier::create).orElse(null);
 	}
 	

@@ -19,8 +19,12 @@ package gay.sylv.wij.impl.network;
 
 import com.mojang.serialization.Codec;
 import com.mojang.serialization.codecs.RecordCodecBuilder;
-import gay.sylv.wij.impl.network.client.JarEnterPayload;
-import gay.sylv.wij.impl.network.client.JarLoadedPayload;
+import gay.sylv.wij.impl.network.s2c.ExternalChunkUpdatePayload;
+import gay.sylv.wij.impl.network.s2c.JarChunkUpdatePayload;
+import gay.sylv.wij.impl.network.s2c.JarLoadedAckPayload;
+import gay.sylv.wij.impl.network.c2s.JarEnterPayload;
+import gay.sylv.wij.impl.network.c2s.JarLoadedPayload;
+import gay.sylv.wij.impl.server.network.ServerPackets;
 import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.fabric.api.networking.v1.PayloadTypeRegistry;
 import net.minecraft.core.BlockPos;

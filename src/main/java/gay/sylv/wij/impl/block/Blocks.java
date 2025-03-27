@@ -17,11 +17,12 @@
  */
 package gay.sylv.wij.impl.block;
 
-import gay.sylv.wij.impl.Main;
+import gay.sylv.wij.impl.WIJMain;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.block.entity.type.BlockEntityHolder;
 import gay.sylv.wij.impl.block.item.CreativePlacedBlockItem;
 import gay.sylv.wij.impl.block.item.WorldJarBlockItem;
+import gay.sylv.wij.impl.client.render.WorldJarRenderer;
 import gay.sylv.wij.impl.util.Conversions;
 import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -41,6 +42,7 @@ import net.minecraft.world.level.block.state.properties.NoteBlockInstrument;
 import net.minecraft.world.level.material.MapColor;
 import org.jetbrains.annotations.NotNull;
 
+import static gay.sylv.wij.impl.WIJMain.platformProvider;
 import static gay.sylv.wij.impl.util.Constants.modId;
 
 public final class Blocks implements Initializable {
@@ -68,7 +70,9 @@ public final class Blocks implements Initializable {
 								.isRedstoneConductor(net.minecraft.world.level.block.Blocks::never)
 								.isViewBlocking(net.minecraft.world.level.block.Blocks::never)
 				),
-				WorldJarBlockEntity::new,
+				platformProvider
+						.getSidedProvider(platformProvider.getDistSide())
+						.makeWorldJarBlockEntity(),
 				WorldJarBlockItem::new,
 				new Item.Properties()
 		);
@@ -110,7 +114,7 @@ public final class Blocks implements Initializable {
 				)
 		);
 		
-		if (Main.isClient()) {
+		if (WIJMain.isClient()) {
 			BlockRendering.INSTANCE.initialize();
 		}
 	}
@@ -150,7 +154,7 @@ public final class Blocks implements Initializable {
 		
 		@Override
 		public void initialize() {
-			register(WORLD_JAR, WorldJarBlockEntity.WorldJarRenderer::new);
+			register(WORLD_JAR, WorldJarRenderer::new);
 			addRenderType(WORLD_JAR.block(), RenderType.cutout());
 			addRenderType(REINFORCED_ECHNOPLAST.block(), RenderType.translucent());
 		}

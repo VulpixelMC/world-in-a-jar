@@ -15,8 +15,9 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.impl.network;
+package gay.sylv.wij.impl.network.c2s;
 
+import gay.sylv.wij.impl.network.Networking;
 import net.minecraft.network.RegistryFriendlyByteBuf;
 import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
@@ -25,13 +26,14 @@ import org.jetbrains.annotations.NotNull;
 import static gay.sylv.wij.impl.util.Instantiation.packetType;
 
 /**
- * Sent to clients when the jar has loaded server-side.
+ * A request from the client to enter a {@link gay.sylv.wij.impl.block.entity.WorldJarBlockEntity}.
+ * @param jarLocation the location of the jar.
  */
-public record JarLoadedAckPayload(Networking.JarLocation jarLocation) implements CustomPacketPayload {
-	public static final Type<JarLoadedAckPayload> TYPE = packetType("jar_loaded_ack");
-	public static final StreamCodec<RegistryFriendlyByteBuf, JarLoadedAckPayload> CODEC = StreamCodec.composite(
-			Networking.JarLocation.STREAM_CODEC, JarLoadedAckPayload::jarLocation,
-			JarLoadedAckPayload::new
+public record JarEnterPayload(Networking.JarLocation jarLocation) implements CustomPacketPayload {
+	public static final Type<JarEnterPayload> TYPE = packetType("jar_enter");
+	public static final StreamCodec<RegistryFriendlyByteBuf, JarEnterPayload> CODEC = StreamCodec.composite(
+			Networking.JarLocation.STREAM_CODEC, JarEnterPayload::jarLocation,
+			JarEnterPayload::new
 	);
 	
 	@Override

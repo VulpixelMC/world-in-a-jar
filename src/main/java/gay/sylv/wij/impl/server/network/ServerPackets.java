@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.impl.network;
+package gay.sylv.wij.impl.server.network;
 
 import gay.sylv.wij.api.entity.event.ServerPlayerEventsExtra;
 import gay.sylv.wij.impl.block.Blocks;
@@ -23,8 +23,10 @@ import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.duck.PlayerWithEnteredJar;
 import gay.sylv.wij.impl.duck.PlayerWithReturn;
-import gay.sylv.wij.impl.network.client.JarEnterPayload;
-import gay.sylv.wij.impl.network.client.JarLoadedPayload;
+import gay.sylv.wij.impl.network.Networking;
+import gay.sylv.wij.impl.network.s2c.ExternalChunkUpdatePayload;
+import gay.sylv.wij.impl.network.c2s.JarEnterPayload;
+import gay.sylv.wij.impl.network.c2s.JarLoadedPayload;
 import gay.sylv.wij.impl.util.Initializable;
 import gay.sylv.wij.impl.util.Instantiation;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
