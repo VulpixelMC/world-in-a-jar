@@ -29,10 +29,7 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
-@Mixin(
-		value = BedrockBlock.class,
-		remap = false
-)
+@Mixin(BedrockBlock.class)
 @Pseudo
 public abstract class Mixin_BedrockBlock extends BlockBehaviour {
 	public Mixin_BedrockBlock(Properties properties) {
