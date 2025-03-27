@@ -355,6 +355,20 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 	}
 	
 	/**
+	 * This method is called upon updating a block on the clientside.
+	 * @author sylv
+	 */
+	@Environment(EnvType.CLIENT)
+	public void onBlockUpdate(Minecraft client, BlockPos blockPos, BlockState blockState) {
+		client.execute(() -> {
+			// set block state
+			this.setBlockState(blockPos, blockState);
+			
+			statesChanged = true;
+		});
+	}
+	
+	/**
 	 * Returns how many chunks high/wide the {@link WorldJarBlockEntity} is. This always rounds up to include partial chunks.
 	 * @return how many chunks high/wide the {@link WorldJarBlockEntity} is.
 	 * @author sylv
@@ -425,6 +439,7 @@ public class WorldJarBlockEntity extends BlockEntity implements LightChunkGetter
 			);
 			
 			if (jar.statesChanged) {
+				Main.LOGGER.info("Building world jar");
 				jar.statesChanged = false;
 				buildJar(context, jar);
 			}

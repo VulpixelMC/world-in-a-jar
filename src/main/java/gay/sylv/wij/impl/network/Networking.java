@@ -32,6 +32,7 @@ import net.minecraft.network.codec.StreamCodec;
 import net.minecraft.network.protocol.common.custom.CustomPacketPayload;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.chunk.PalettedContainer;
 import net.minecraft.world.phys.Vec3;
@@ -72,6 +73,17 @@ public final class Networking implements Initializable {
 				return blockStateContainer;
 			}
 		};
+		public static final StreamCodec<RegistryFriendlyByteBuf, BlockState> BLOCK_STATE = new StreamCodec<>() {
+			@Override
+			public void encode(RegistryFriendlyByteBuf buf, BlockState blockState) {
+				buf.writeVarInt(Block.getId(blockState));
+			}
+			
+			@Override
+			public @NotNull BlockState decode(RegistryFriendlyByteBuf buf) {
+				return Block.stateById(buf.readVarInt());
+			}
+		};
 		public static final StreamCodec<RegistryFriendlyByteBuf, Vec3> VEC3 = StreamCodec.of(
 				(buf, pos) -> {
 					buf.writeDouble(pos.x());
@@ -107,6 +119,7 @@ public final class Networking implements Initializable {
 	@Override
 	public void initialize() {
 		s2c(JarChunkUpdatePayload.TYPE, JarChunkUpdatePayload.CODEC);
+		s2c(JarBlockUpdatePayload.TYPE, JarBlockUpdatePayload.CODEC);
 		s2c(JarLoadedAckPayload.TYPE, JarLoadedAckPayload.CODEC);
 		s2c(ExternalChunkUpdatePayload.TYPE, ExternalChunkUpdatePayload.CODEC);
 		c2s(JarEnterPayload.TYPE, JarEnterPayload.CODEC);

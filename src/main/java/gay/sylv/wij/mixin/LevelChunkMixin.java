@@ -42,6 +42,8 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import java.util.Objects;
+
 @Mixin(LevelChunk.class)
 public abstract class LevelChunkMixin extends ChunkAccess {
 	@Shadow
@@ -67,8 +69,8 @@ public abstract class LevelChunkMixin extends ChunkAccess {
 			WorldJarBlockEntity.INSTANCES.forEachAuto(jar -> {
 				if (jar.hasBlockPos(pos)) {
 					SectionPos sectionPos = SectionPos.of(pos.subtract(jar.getInternalPos()));
+					jar.updateSectionStates(Objects.requireNonNull(this.level.getServer()), sectionPos);
 					for (ServerPlayer player : PlayerLookup.tracking(jar)) {
-						jar.updateSectionStates(player.server, sectionPos);
 						jar.sendJarChunk(player, sectionPos);
 					}
 				}

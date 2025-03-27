@@ -21,6 +21,7 @@ import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.client.render.JarInternalsRenderer;
 import gay.sylv.wij.impl.network.ExternalChunkUpdatePayload;
+import gay.sylv.wij.impl.network.JarBlockUpdatePayload;
 import gay.sylv.wij.impl.network.JarChunkUpdatePayload;
 import gay.sylv.wij.impl.network.JarLoadedAckPayload;
 import gay.sylv.wij.impl.util.Initializable;
@@ -29,6 +30,7 @@ import net.fabricmc.api.Environment;
 import net.fabricmc.fabric.api.client.networking.v1.ClientPlayNetworking;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.core.SectionPos;
 import net.minecraft.resources.ResourceKey;
 import net.minecraft.world.level.Level;
 
@@ -53,6 +55,16 @@ public final class ClientPackets implements Initializable {
 			if (optionalJar.isEmpty()) return;
 			WorldJarBlockEntity jar = optionalJar.get();
 			jar.onChunkUpdate(context.client(), payload.sectionPos(), payload.blockStateContainer());
+		});
+		ClientPlayNetworking.registerGlobalReceiver(JarBlockUpdatePayload.TYPE, (payload, context) -> {
+			// verify that the jar is in the current client level
+			var level = context.player().level();
+			ResourceKey<Level> dimension = level.dimension();
+			if (dimension != payload.jarLocation().dimension()) return;
+			Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(payload.jarLocation().blockPos(), Blocks.WORLD_JAR.type());
+			if (optionalJar.isEmpty()) return;
+			WorldJarBlockEntity jar = optionalJar.get();
+			jar.onBlockUpdate(context.client(), payload.blockPos(), payload.blockState());
 		});
 		ClientPlayNetworking.registerGlobalReceiver(JarLoadedAckPayload.TYPE, (payload, context) -> {
 			var level = context.player().level();

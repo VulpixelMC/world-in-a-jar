@@ -64,7 +64,7 @@ import java.util.UUID;
 import static gay.sylv.wij.impl.util.Constants.modId;
 
 public final class Main implements ModInitializer {
-	private static final Logger LOGGER = getLogger(Main.class);
+	public static final Logger LOGGER = getLogger(Main.class);
 	private static EnvType environment;
 	
 	@Override
