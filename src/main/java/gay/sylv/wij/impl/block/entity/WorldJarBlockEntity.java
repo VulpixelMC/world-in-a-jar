@@ -658,10 +658,6 @@ public class WorldJarBlockEntity extends BaseContainerBlockEntity implements Lig
 		@Override
 		protected @NotNull ItemInteractionResult useItemOn(ItemStack stack, BlockState state, Level level, BlockPos pos, Player player, InteractionHand hand, BlockHitResult hitResult) {
 			if (BuiltInRegistries.ITEM.getKey(stack.getItem()).equals(ResourceLocation.fromNamespaceAndPath("glowcase", "lock")) && player.isCreative()) {
-				Optional<WorldJarBlockEntity> optionalJar = level.getBlockEntity(pos, Blocks.WORLD_JAR.type());
-				if (optionalJar.isEmpty()) return ItemInteractionResult.FAIL;
-				WorldJarBlockEntity jar = optionalJar.get();
-				jar.setLocked(!jar.isLocked());
 				return ItemInteractionResult.CONSUME;
 			} else {
 				return super.useItemOn(stack, state, level, pos, player, hand, hitResult);
