@@ -31,6 +31,7 @@ import net.minecraft.world.level.ChunkPos;
 import net.minecraft.world.level.ColorResolver;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.chunk.LightChunk;
 import net.minecraft.world.level.lighting.LevelLightEngine;
 import net.minecraft.world.level.material.FluidState;
 import org.jetbrains.annotations.NotNull;
@@ -86,7 +87,8 @@ public class JarRenderChunkRegion implements BlockAndTintGetter {
 	@Override
 	public BlockEntity getBlockEntity(BlockPos pos) {
 		ChunkPos chunkPos = Conversions.convert(pos);
-		return jar.getChunk(chunkPos.x, chunkPos.z).getBlockEntity(pos);
+		LightChunk chunk = jar.getChunk(chunkPos.x, chunkPos.z);
+		return chunk != null ? chunk.getBlockEntity(pos) : null;
 	}
 	
 	@Override
