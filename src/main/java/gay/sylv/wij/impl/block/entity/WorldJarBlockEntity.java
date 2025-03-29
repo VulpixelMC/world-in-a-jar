@@ -293,9 +293,6 @@ public class WorldJarBlockEntity extends BaseContainerBlockEntity implements Lig
 	@Override
 	protected void loadAdditional(CompoundTag tag, HolderLookup.Provider registries) {
 		super.loadAdditional(tag, registries);
-		if (this.isLocked()) {
-			Main.LOGGER.info("WorldJarBlockEntity is locked");
-		}
 		loadedNotPlaced = true;
 		CompoundTag modTag = tag.getCompound(Constants.COMPAT_MOD_ID);
 		scale = modTag.getInt("scale");
