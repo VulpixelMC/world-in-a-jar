@@ -2,3 +2,4 @@
 ## Fixed
 - BuiltInPackSourceMixin being client-only causing dynamic recipes to fail to load.
 - Crash when loading next to World Jar.
+- Remove extra logging.
