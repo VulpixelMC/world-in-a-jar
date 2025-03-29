@@ -8,6 +8,7 @@
 		"AnvilMenuMixin",
 		"AxeItemMixin",
 		"BlockBehaviourMixin",
+		"BuiltInPackSourceMixin",
 		"EntityMixin",
 		"HarvestProviderMixin",
 		"LevelChunkMixin",
@@ -18,7 +19,6 @@
 		"breakingbedrock.Mixin_BedrockBlock"
 	],
 	"client": [
-		"client.BuiltInPackSourceMixin",
 		"client.ClientPacketListenerMixin",
 		"client.PackRepositoryMixin",
 		"client.SkinManagerMixin"
