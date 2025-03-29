@@ -23,6 +23,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -51,11 +52,6 @@ public class BedrockPickaxeItem extends PickaxeItem {
 		if (isBedrockMineable(level, state, miningEntity)) {
 			ServerLevel serverLevel = (ServerLevel) level;
 			Player player = (Player) miningEntity;
-			if (!FabricLoader.getInstance().isModLoaded("breakingbedrock")) {
-				level.setBlockAndUpdate(pos, gay.sylv.wij.impl.block.Blocks.CRACKED_BEDROCK.block().defaultBlockState());
-			} else {
-				level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
-			}
 			LootParams lootParams = new LootParams.Builder(serverLevel)
 					.withParameter(LootContextParams.ORIGIN, Vec3.atCenterOf(pos))
 					.withParameter(LootContextParams.TOOL, stack)
@@ -72,6 +68,12 @@ public class BedrockPickaxeItem extends PickaxeItem {
 			} else {
 				return;
 			}
+			if (!FabricLoader.getInstance().isModLoaded("breakingbedrock")) {
+				level.setBlockAndUpdate(pos, gay.sylv.wij.impl.block.Blocks.CRACKED_BEDROCK.block().defaultBlockState());
+			} else {
+				level.setBlockAndUpdate(pos, Blocks.AIR.defaultBlockState());
+			}
+			stack.hurtAndBreak(1, miningEntity, EquipmentSlot.MAINHAND);
 			Block.popResource(level, pos, new ItemStack(Items.BEDROCK_SHARD, chance));
 			level.playSound(null, pos, SoundEvents.WITHER_BREAK_BLOCK, SoundSource.BLOCKS, 1.5F, 1.0F);
 		}
