@@ -15,7 +15,7 @@
  * You should have received a copy of the GNU Lesser General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  */
-package gay.sylv.wij.mixin.client;
+package gay.sylv.wij.mixin;
 
 import gay.sylv.wij.impl.datagen.RuntimeResourcePackImpl;
 import net.minecraft.server.packs.PackType;
