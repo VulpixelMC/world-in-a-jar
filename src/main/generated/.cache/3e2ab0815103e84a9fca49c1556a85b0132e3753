@@ -1,5 +1,5 @@
-// 1.21.1	2025-02-08T18:57:40.6479482	World In a Jar/Tags for minecraft:item
-bca801de119c2c62047951b7291d17d29d42a212 data\minecraft\tags\item\pickaxes.json
-a102816f072b82dd5e9a67c810e1ebfd58720e16 data\worldinajar\tags\item\chips_unbreakable.json
-bca801de119c2c62047951b7291d17d29d42a212 data\worldinajar\tags\item\destroys_unbreakable.json
-76a5abe5ace5de67fa16958aabda4a6d4e3942e0 data\worldinajar\tags\item\chips_or_destroys_unbreakable.json
+// 1.21.1	2025-03-29T20:03:34.510906697	World In a Jar/Tags for minecraft:item
+bca801de119c2c62047951b7291d17d29d42a212 data/worldinajar/tags/item/destroys_unbreakable.json
+76a5abe5ace5de67fa16958aabda4a6d4e3942e0 data/worldinajar/tags/item/chips_or_destroys_unbreakable.json
+bca801de119c2c62047951b7291d17d29d42a212 data/minecraft/tags/item/pickaxes.json
+a102816f072b82dd5e9a67c810e1ebfd58720e16 data/worldinajar/tags/item/chips_unbreakable.json

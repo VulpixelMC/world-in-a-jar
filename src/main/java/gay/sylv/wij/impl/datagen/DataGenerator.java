@@ -33,6 +33,7 @@ import net.minecraft.data.recipes.RecipeCategory;
 import net.minecraft.data.recipes.RecipeOutput;
 import net.minecraft.data.recipes.ShapedRecipeBuilder;
 import net.minecraft.data.recipes.SmithingTransformRecipeBuilder;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.crafting.Ingredient;
 
 import java.util.concurrent.CompletableFuture;
@@ -81,6 +82,9 @@ public final class DataGenerator implements DataGeneratorEntrypoint {
 			getOrCreateTagBuilder(net.minecraft.tags.BlockTags.INCORRECT_FOR_NETHERITE_TOOL)
 					.addTag(BlockTags.NEEDS_BEDROCK_TOOL);
 			getOrCreateTagBuilder(BlockTags.INCORRECT_FOR_BEDROCK_TOOL);
+			
+			getOrCreateTagBuilder(BlockTags.NAUGHTY_BLOCKS)
+					.addOptional(ResourceLocation.fromNamespaceAndPath("affinity", "the_sky"));
 		}
 	}
 	

@@ -28,6 +28,7 @@ import gay.sylv.wij.api.block.JarContainmentBlock;
 import gay.sylv.wij.api.block.WorldJar;
 import gay.sylv.wij.impl.Main;
 import gay.sylv.wij.impl.block.Blocks;
+import gay.sylv.wij.impl.block.tag.BlockTags;
 import gay.sylv.wij.impl.client.render.*;
 import gay.sylv.wij.impl.component.Components;
 import gay.sylv.wij.impl.dimension.Dimensions;
@@ -546,6 +547,8 @@ public class WorldJarBlockEntity extends BaseContainerBlockEntity implements Lig
 					if (state.getBlock() instanceof JarContainmentBlock containmentBlock && !containmentBlock.renderInJar()) continue; // Don't render jar container blocks.
 					FluidState fluidState = state.getFluidState();
 					
+					if (state.is(BlockTags.NAUGHTY_BLOCKS)) continue;
+					
 					if (!fluidState.isEmpty()) {
 						RenderType renderType = ItemBlockRenderTypes.getRenderLayer(fluidState);
 						section.getRenderedTypes().add(renderType);
@@ -668,10 +671,9 @@ public class WorldJarBlockEntity extends BaseContainerBlockEntity implements Lig
 			if (level.isClientSide()) {
 				if (!isReturnJar) {
 					ClientPlayNetworking.send(new JarEnterPayload(new Networking.JarLocation(pos, level.dimension())));
-					return InteractionResult.PASS;
 				}
 				
-				return InteractionResult.SUCCESS;
+				return InteractionResult.CONSUME;
 			}
 			if (!isReturnJar) return InteractionResult.SUCCESS;
 			

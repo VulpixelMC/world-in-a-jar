@@ -27,6 +27,7 @@ public final class BlockTags {
 	public static final TagKey<Block> INCORRECT_FOR_BEDROCK_TOOL = create("incorrect_for_bedrock_tool");
 	public static final TagKey<Block> NEEDS_BEDROCK_TOOL = create("needs_bedrock_tool");
 	public static final TagKey<Block> UNBREAKABLE = create("unbreakable");
+	public static final TagKey<Block> NAUGHTY_BLOCKS = create("naughty_blocks");
 	
 	private static TagKey<Block> create(String id) {
 		return TagKey.create(Registries.BLOCK, modId(id));

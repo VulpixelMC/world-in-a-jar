@@ -19,6 +19,7 @@ package gay.sylv.wij.impl.client.render;
 
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.*;
+import gay.sylv.wij.impl.block.tag.BlockTags;
 import gay.sylv.wij.impl.dimension.Dimensions;
 import gay.sylv.wij.impl.duck.RendererWithExternalBlockStates;
 import gay.sylv.wij.impl.util.Initializable;
@@ -158,6 +159,8 @@ public final class JarInternalsRenderer implements Initializable, BlockAndTintGe
 			if (blockPos.equals(center)) continue;
 			BlockState state = externalBlockStateContainer.get(blockPos.getX(), blockPos.getY(), blockPos.getZ());
 			FluidState fluidState = state.getFluidState();
+			
+			if (state.is(BlockTags.NAUGHTY_BLOCKS)) continue;
 			
 			if (!fluidState.isEmpty()) {
 				RenderType renderType = ItemBlockRenderTypes.getRenderLayer(fluidState);
