@@ -30,10 +30,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 
+import java.util.List;
 import java.util.Objects;
 
 public class WorldJarBlockItem extends BlockItem {
@@ -42,14 +44,22 @@ public class WorldJarBlockItem extends BlockItem {
 	}
 	
 	@Override
+	public void appendHoverText(ItemStack stack, TooltipContext context, List<Component> tooltipComponents, TooltipFlag tooltipFlag) {
+		super.appendHoverText(stack, context, tooltipComponents, tooltipFlag);
+		tooltipComponents.add(Component.translatable("tooltip.worldinajar.world_jar.id", stack.getOrDefault(Components.JAR_ENTRY_TYPE, new JarEntry(-1))));
+	}
+	
+	@Override
 	protected boolean canPlace(BlockPlaceContext context, BlockState state) {
-		ItemStack itemInHand = context.getItemInHand();
-		boolean canCreate = context.getPlayer() != null && PlayerRolesApi.lookup().byPlayer(context.getPlayer()).overrides().test(Permissions.CREATE_JAR);
-		if (!(itemInHand.has(Components.JAR_ENTRY_TYPE) && Objects.requireNonNull(itemInHand.get(Components.JAR_ENTRY_TYPE)).id() > -1) && !canCreate) {
-			if (context.getPlayer() != null && !context.getLevel().isClientSide()) {
-				context.getPlayer().sendSystemMessage(Component.literal("You cannot create new World Jars! Ask a team member to place a new one from the creative menu."));
+		if (!context.getLevel().isClientSide()) {
+			ItemStack itemInHand = context.getItemInHand();
+			boolean canCreate = context.getPlayer() != null && PlayerRolesApi.lookup().byPlayer(context.getPlayer()).overrides().test(Permissions.CREATE_JAR);
+			if (!(itemInHand.has(Components.JAR_ENTRY_TYPE) && Objects.requireNonNull(itemInHand.get(Components.JAR_ENTRY_TYPE)).id() > -1) && !canCreate) {
+				if (context.getPlayer() != null && !context.getLevel().isClientSide()) {
+					context.getPlayer().sendSystemMessage(Component.literal("You cannot create new World Jars! Ask a team member to place a new one from the creative menu."));
+				}
+				return false;
 			}
-			return false;
 		}
 		
 		// Prevent placement in jar dimension

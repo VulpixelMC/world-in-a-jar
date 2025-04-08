@@ -19,6 +19,7 @@
 	"item.worldinajar.bark.minecraft.spruce.well_done": "Forbidden Steak",
 	"item.worldinajar.bark.minecraft.warped": "Warped Bark",
 	"item.worldinajar.bark.minecraft.crimson": "Crimson Bark",
+	"tooltip.worldinajar.world_jar.id": "ID: %1$d",
 	"worldinajar.lore.bark": "The bark of a tree, obtained by stripping a tree's log.",
 	"worldinajar.lore.bark.well_done": "It looks too tasty to resist…",
 	"tag.item.worldinajar.destroys_unbreakable": "Destroys Unbreakable Blocks",

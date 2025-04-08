@@ -113,10 +113,6 @@ tasks.processResources {
 	filesMatching("fabric.mod.json") {
 		expand("group" to mavenGroup, "id" to modId, "version" to version)
 	}
-	
-	filesMatching("**/lang/*.json") {
-		expand("id" to modId)
-	}
 }
 
 tasks.withType<JavaCompile> {
