@@ -17,6 +17,7 @@ modmenu = "11.0.3"
 luckperms = "5.4"
 sodium = "mc1.21.1-0.6.9-fabric"
 breakingbedrock = "1.1.3+1.21.1-fabric"
+playerroles = "Y5EAJzwR"
 
 # Runtime Mods
 resource_explorer = "RuU8ZS7y"
@@ -38,6 +39,7 @@ modmenu = { module = "com.terraformersmc:modmenu", version.ref = "modmenu" }
 luckperms = { module = "net.luckperms:api", version.ref = "luckperms" }
 sodium = { module = "maven.modrinth:sodium", version.ref = "sodium" }
 bedrockbreaking = { module = "maven.modrinth:breakingbedrock", version.ref = "breakingbedrock" }
+playerroles = { module = "maven.modrinth:player-roles", version.ref = "playerroles" }
 
 # Runtime Mods
 resource_explorer = { module = "maven.modrinth:resource_explorer", version.ref = "resource_explorer" }

@@ -19,6 +19,7 @@
 		"breakingbedrock.Mixin_BedrockBlock"
 	],
 	"client": [
+		"MultiPlayerGameModeMixin",
 		"client.ClientPacketListenerMixin",
 		"client.PackRepositoryMixin",
 		"client.SkinManagerMixin"
