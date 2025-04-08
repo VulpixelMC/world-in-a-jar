@@ -17,6 +17,8 @@
  */
 package gay.sylv.wij.impl.block.item;
 
+import dev.gegy.roles.api.PlayerRolesApi;
+import gay.sylv.wij.api.permissions.Permissions;
 import gay.sylv.wij.impl.block.Blocks;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.component.Components;
@@ -25,6 +27,7 @@ import gay.sylv.wij.impl.util.Constants;
 import gay.sylv.wij.impl.util.jar.JarEntry;
 import gay.sylv.wij.impl.util.jar.JarPlacer;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -40,6 +43,15 @@ public class WorldJarBlockItem extends BlockItem {
 	
 	@Override
 	protected boolean canPlace(BlockPlaceContext context, BlockState state) {
+		ItemStack itemInHand = context.getItemInHand();
+		boolean canCreate = context.getPlayer() != null && PlayerRolesApi.lookup().byPlayer(context.getPlayer()).overrides().test(Permissions.CREATE_JAR);
+		if (!(itemInHand.has(Components.JAR_ENTRY_TYPE) && Objects.requireNonNull(itemInHand.get(Components.JAR_ENTRY_TYPE)).id() > -1) && !canCreate) {
+			if (context.getPlayer() != null && !context.getLevel().isClientSide()) {
+				context.getPlayer().sendSystemMessage(Component.literal("You cannot create new World Jars! Ask a team member to place a new one from the creative menu."));
+			}
+			return false;
+		}
+		
 		// Prevent placement in jar dimension
 		if (!context.getLevel().dimension().equals(Dimensions.JAR)) {
 			return super.canPlace(context, state);
@@ -60,10 +72,12 @@ public class WorldJarBlockItem extends BlockItem {
 		if (itemInHand.has(Components.JAR_ENTRY_TYPE) && Objects.requireNonNull(itemInHand.get(Components.JAR_ENTRY_TYPE)).id() > -1) {
 			jarEntry = itemInHand.get(Components.JAR_ENTRY_TYPE);
 			assert jarEntry != null;
-		} else {
+		} else if (context.getPlayer() != null && PlayerRolesApi.lookup().byPlayer(context.getPlayer()).overrides().test(Permissions.CREATE_JAR)) {
 			jarEntry = jarPlacer.getFreeJarEntry();
 			itemInHand.set(Components.JAR_ENTRY_TYPE, jarEntry);
 			jarPlacer.placeJar(jarEntry);
+		} else {
+			return context;
 		}
 		
 		CompoundTag tag = new CompoundTag();

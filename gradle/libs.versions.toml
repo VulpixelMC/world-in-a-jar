@@ -14,10 +14,9 @@ fabric_permissions = "0.3.3"
 # Mod Integrations
 wthit = "fabric-12.5.1"
 modmenu = "11.0.3"
-luckperms = "5.4"
 sodium = "mc1.21.1-0.6.9-fabric"
 breakingbedrock = "1.1.3+1.21.1-fabric"
-playerroles = "Y5EAJzwR"
+playerroles = "1.6.13"
 
 # Runtime Mods
 resource_explorer = "RuU8ZS7y"
@@ -36,10 +35,10 @@ lucko_fabric_permissions = { module = "me.lucko:fabric-permissions-api", version
 wthit = { module = "mcp.mobius.waila:wthit", version.ref = "wthit" }
 wthit_api = { module = "mcp.mobius.waila:wthit-api", version.ref = "wthit" }
 modmenu = { module = "com.terraformersmc:modmenu", version.ref = "modmenu" }
-luckperms = { module = "net.luckperms:api", version.ref = "luckperms" }
 sodium = { module = "maven.modrinth:sodium", version.ref = "sodium" }
 bedrockbreaking = { module = "maven.modrinth:breakingbedrock", version.ref = "breakingbedrock" }
-playerroles = { module = "maven.modrinth:player-roles", version.ref = "playerroles" }
+playerroles = { module = "dev.gegy:player-roles", version.ref = "playerroles" }
+playerroles-api = { module = "dev.gegy:player-roles-api", version.ref = "playerroles" }
 
 # Runtime Mods
 resource_explorer = { module = "maven.modrinth:resource_explorer", version.ref = "resource_explorer" }

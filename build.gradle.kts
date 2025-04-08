@@ -53,6 +53,22 @@ repositories {
 			includeGroup("maven.modrinth")
 		}
 	}
+	
+	maven {
+		name = "Gegy Maven"
+		url = uri("https://maven.gegy.dev/releases")
+		content {
+			includeGroup("dev.gegy")
+		}
+	}
+	
+	maven {
+		name = "Nucleoid Maven"
+		url = uri("https://maven.nucleoid.xyz/")
+		content {
+			includeGroup("xyz.nucleoid")
+		}
+	}
 }
 
 val modImplementationInclude by configurations.register("modImplementationInclude")
@@ -71,27 +87,23 @@ dependencies {
 	
 	// Libraries
 	modImplementation(libs.fabric.api)
+	modImplementation(libs.playerroles.api) {
+		exclude(group = "net.fabricmc.fabric-api")
+		exclude(group = "net.fabricmc")
+	}
+	include(libs.playerroles.api)
 	
 	// Mod Integrations
 	modCompileOnly(libs.wthit)
 	modCompileOnly(libs.wthit.api)
-	modCompileOnly(libs.lucko.fabric.permissions) {
-		exclude(group = "net.fabricmc.fabric-api")
-		exclude(group = "net.fabricmc")
-	}
 	modImplementation(libs.sodium)
 	modImplementation(libs.bedrockbreaking)
-	
 	modRuntimeOnly(libs.wthit)
 	modRuntimeOnly(libs.modmenu) {
 		exclude(group = "net.fabricmc.fabric-api")
 		exclude(group = "net.fabricmc")
 	}
-	modRuntimeOnly(libs.luckperms)
-	modRuntimeOnly(libs.lucko.fabric.permissions) {
-		exclude(group = "net.fabricmc.fabric-api")
-		exclude(group = "net.fabricmc")
-	}
+	modRuntimeOnly(libs.playerroles)
 	modRuntimeOnly(libs.resource.explorer)
 }
 

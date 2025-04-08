@@ -25,6 +25,9 @@
 		],
 		"client": [
 			"gay.sylv.wij.impl.client.MainClient"
+		],
+		"preLaunch": [
+			"gay.sylv.wij.impl.EarlyMain"
 		]
 	},
 	"mixins": [
