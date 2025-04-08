@@ -17,6 +17,7 @@
  */
 package gay.sylv.wij.mixin;
 
+import gay.sylv.wij.impl.Main;
 import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.dimension.Dimensions;
 import net.fabricmc.fabric.api.networking.v1.PlayerLookup;
@@ -64,7 +65,7 @@ public abstract class LevelChunkMixin extends ChunkAccess {
 			at = @At("RETURN")
 	)
 	private void updateWorldJar(BlockPos pos, BlockState state, boolean isMoving, CallbackInfoReturnable<BlockState> cir) {
-		if (!this.level.isClientSide() && this.level.dimension().equals(Dimensions.JAR)) {
+		if (!Main.DISABLE_LAG && !this.level.isClientSide() && this.level.dimension().equals(Dimensions.JAR)) {
 			// TODO: optimize/cache this somehow
 			WorldJarBlockEntity.INSTANCES.forEachAuto(jar -> {
 				if (jar.hasBlockPos(pos)) {
