@@ -1,0 +1,16 @@
+{
+  "required": true,
+  "minVersion": "0.8",
+  "package": "gay.sylv.wij.mixin",
+  "compatibilityLevel": "JAVA_21",
+  "mixins": [
+		"PlayerMixin",
+		"JarPlayerMixin"
+  ],
+  "client": [
+  ],
+  "server": [],
+  "injectors": {
+	"defaultRequire": 1
+  }
+}

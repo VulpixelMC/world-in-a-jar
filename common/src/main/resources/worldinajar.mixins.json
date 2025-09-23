@@ -1,0 +1,25 @@
+{
+	"required": true,
+	"minVersion": "0.8",
+	"package": "gay.sylv.wij.mixin",
+	"compatibilityLevel": "JAVA_21",
+	"mixins": [
+		"AnvilMenuMixin",
+		"AxeItemMixin",
+		"BlockBehaviourMixin",
+		"EntityMixin",
+		"HarvestProviderMixin",
+		"LevelChunkMixin",
+		"NearestAttackableTargetGoalMixin",
+		"PlayerListMixin",
+		"gay.sylv.wij.impl.mixin.PlayerMixin"
+	],
+	"client": [
+		"client.BuiltInPackSourceMixin",
+		"client.MinecraftMixin",
+		"client.SkinManagerMixin"
+	],
+	"injectors": {
+		"defaultRequire": 1
+	}
+}
