@@ -46,7 +46,7 @@ public record BarkType(ResourceLocation logTextureId, String woodName, String fu
 	public static final BarkType MANGROVE = new BarkType(vanilla("mangrove_log"));
 	public static final BarkType OAK = new BarkType(vanilla("oak_log"));
 	public static final BarkType SPRUCE = new BarkType(vanilla("spruce_log"));
-	public static final BarkType WARPED = new BarkType(vanilla("warped_stem"), "hyphae", 5);
+	public static final BarkType WARPED = new BarkType(vanilla("warped_stem"), "hyphae", 5); // fixme hi yeah maybe don't hardcode the frames
 	public static final BarkType CRIMSON = new BarkType(vanilla("crimson_stem"), "hyphae", 5);
 	
 	private static final List<BarkType> TYPES = new ArrayList<>();
