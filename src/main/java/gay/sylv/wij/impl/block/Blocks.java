@@ -22,6 +22,7 @@ import gay.sylv.wij.impl.block.entity.WorldJarBlockEntity;
 import gay.sylv.wij.impl.block.entity.type.BlockEntityHolder;
 import gay.sylv.wij.impl.block.item.CreativePlacedBlockItem;
 import gay.sylv.wij.impl.block.item.WorldJarBlockItem;
+import gay.sylv.wij.impl.client.block.entity.render.WorldJarRenderer;
 import gay.sylv.wij.impl.util.Conversions;
 import gay.sylv.wij.impl.util.Initializable;
 import net.fabricmc.fabric.api.blockrenderlayer.v1.BlockRenderLayerMap;
@@ -150,7 +151,7 @@ public final class Blocks implements Initializable {
 		
 		@Override
 		public void initialize() {
-			register(WORLD_JAR, WorldJarBlockEntity.WorldJarRenderer::new);
+			register(WORLD_JAR, WorldJarRenderer::new);
 			addRenderType(WORLD_JAR.block(), RenderType.cutout());
 			addRenderType(REINFORCED_ECHNOPLAST.block(), RenderType.translucent());
 		}

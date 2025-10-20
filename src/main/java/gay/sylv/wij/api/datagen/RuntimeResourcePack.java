@@ -28,6 +28,12 @@ import org.jetbrains.annotations.Nullable;
 import java.io.InputStream;
 import java.util.Map;
 
+/**
+ * common fabric resource api fail
+ * <br>
+ * basically just use this for adding resources at runtime or something idk lol.
+ * good for when you need to dynamically do resources after all the other mods.
+ */
 public interface RuntimeResourcePack extends PackResources, ModResourcePack {
 	static RuntimeResourcePack getInstance() {
 		return RuntimeResourcePackImpl.INSTANCE;

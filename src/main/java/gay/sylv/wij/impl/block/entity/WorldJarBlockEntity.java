@@ -125,7 +125,7 @@ public class WorldJarBlockEntity extends BaseContainerBlockEntity implements Lig
 	private final Long2ObjectMap<JarChunk> chunks = new Long2ObjectOpenHashMap<>();
 	
 	@Environment(EnvType.CLIENT)
-	private JarRenderChunkRegion renderChunkRegion;
+	public JarRenderChunkRegion renderChunkRegion;
 	
 	/**
 	 * The location of the target jar.
@@ -143,7 +143,7 @@ public class WorldJarBlockEntity extends BaseContainerBlockEntity implements Lig
 	 * <p>
 	 * This is used in rendering to determine whether we need to rebuild the VBOs.
 	 */
-	private boolean statesChanged = false;
+	public boolean statesChanged = false;
 	
 	private final Object2ObjectMap<UUID, FakePlayer> fakePlayers = new Object2ObjectOpenHashMap<>();
 	
@@ -455,143 +455,6 @@ public class WorldJarBlockEntity extends BaseContainerBlockEntity implements Lig
 	@Override
 	public int getContainerSize() {
 		return 0;
-	}
-	
-	@Environment(EnvType.CLIENT)
-	public static class WorldJarRenderer implements BlockEntityRenderer<WorldJarBlockEntity> {
-		private final BlockEntityRendererProvider.Context context;
-		// always reuse the same SectionBufferBuilderPack because it cannot be freed, so it's an instant memory leak.
-		private static final SectionBufferBuilderPack BYTE_BUFFER_BUILDERS = new SectionBufferBuilderPack();
-		private static final Map<RenderType, BufferBuilder> BUFFERS = new HashMap<>();
-		
-		public WorldJarRenderer(BlockEntityRendererProvider.Context context) {
-			this.context = context;
-		}
-		
-		@Override
-		public void render(
-				WorldJarBlockEntity jar,
-				float partialTick,
-				PoseStack poseStack,
-				MultiBufferSource bufferSource,
-				int packedLight,
-				int packedOverlay
-		) {
-			if (jar.level != null && jar.level.dimension().equals(Dimensions.JAR)) return;
-			poseStack.pushPose();
-			// prevent z-fighting
-			poseStack.scale(
-					jar.getVisualScale() - 0.001f,
-					jar.getVisualScale() - 0.001f,
-					jar.getVisualScale() - 0.001f
-			);
-			poseStack.translate(
-					0.001f,
-					0.001f,
-					0.001f
-			);
-			
-			if (jar.statesChanged) {
-				jar.statesChanged = false;
-				buildJar(context, jar);
-			}
-			
-			renderJar(jar, poseStack);
-			poseStack.popPose();
-		}
-		
-		public static void renderJar(
-				WorldJarBlockEntity jar,
-				PoseStack poseStack
-		) {
-			for (RenderType renderType : RenderType.chunkBufferLayers()) {
-				renderType.setupRenderState();
-				ShaderInstance shader = RenderSystem.getShader();
-				Matrix4f frustumMatrix = poseStack.last().pose();
-				Matrix4fStack matrix4fStack = RenderSystem.getModelViewStack();
-				matrix4fStack.pushMatrix();
-				matrix4fStack.mul(frustumMatrix);
-				Matrix4f modelView = new Matrix4f(matrix4fStack);
-				
-				jar.getChunkSections().forEach((pos, section) -> {
-					if (section.isHasBuilt() && section.getRenderedTypes().contains(renderType)) {
-						VertexBuffer buffer = section.getVertexBuffers().get(renderType);
-						buffer.bind();
-						buffer.drawWithShader(modelView, RenderSystem.getProjectionMatrix(), shader);
-						VertexBuffer.unbind();
-					}
-				});
-				
-				matrix4fStack.popMatrix();
-				
-				renderType.clearRenderState();
-			}
-		}
-		
-		public static void buildJar(
-				BlockEntityRendererProvider.Context context,
-				WorldJarBlockEntity jar
-		) {
-			RandomSource randomSource = Objects.requireNonNull(jar.getLevel()).getRandom();
-			// The sections' PoseStack
-			PoseStack poseStack = new PoseStack();
-			
-			jar.getChunkSections().forEach((pos, section) -> {
-				BlockPos origin = section.getOrigin();
-				BlockPos offset = new BlockPos(15, 15, 15).offset(origin);
-				
-				section.getRenderedTypes().clear();
-				
-				for (BlockPos blockPos : BlockPos.betweenClosed(origin, offset)) {
-					BlockState state = jar.getBlockState(blockPos);
-					if (state.getBlock() instanceof JarContainmentBlock containmentBlock && !containmentBlock.renderInJar()) continue; // Don't render jar container blocks.
-					FluidState fluidState = state.getFluidState();
-					
-					if (state.is(BlockTags.NAUGHTY_BLOCKS)) continue;
-					
-					if (!fluidState.isEmpty()) {
-						RenderType renderType = ItemBlockRenderTypes.getRenderLayer(fluidState);
-						section.getRenderedTypes().add(renderType);
-						BufferBuilder bufferBuilder = getOrSetBufferBuilder(renderType);
-						
-						context.getBlockRenderDispatcher().renderLiquid(blockPos, jar.renderChunkRegion, bufferBuilder, state, fluidState);
-					}
-					
-					if (state.getRenderShape() == RenderShape.MODEL) {
-						RenderType renderType = ItemBlockRenderTypes.getChunkRenderType(state);
-						section.getRenderedTypes().add(renderType);
-						BufferBuilder bufferBuilder = getOrSetBufferBuilder(renderType);
-						
-						poseStack.pushPose();
-						poseStack.translate(
-								blockPos.getX(),
-								blockPos.getY(),
-								blockPos.getZ()
-						);
-						context.getBlockRenderDispatcher().renderBatched(state, blockPos, jar.renderChunkRegion, poseStack, bufferBuilder, true, randomSource);
-						poseStack.popPose();
-					}
-				}
-				
-				// end building and upload vertex buffers
-				for (RenderType renderType : section.getRenderedTypes()) {
-					VertexBuffer buffer = section.getVertexBuffers().get(renderType);
-					BufferBuilder bufferBuilder = BUFFERS.get(renderType);
-					MeshData renderedBuffer = bufferBuilder.build();
-					buffer.bind();
-					buffer.upload(renderedBuffer);
-					VertexBuffer.unbind();
-				}
-				
-				// flush buffers
-				BUFFERS.clear();
-				section.setHasBuilt(true);
-			});
-		}
-		
-		private static BufferBuilder getOrSetBufferBuilder(RenderType renderType) {
-			return JarInternalsRenderer.getOrSetBufferBuilder(renderType, BUFFERS, BYTE_BUFFER_BUILDERS);
-		}
 	}
 	
 	public Object2ObjectMap<UUID, FakePlayer> getFakePlayers() {
