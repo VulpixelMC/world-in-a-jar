@@ -62,18 +62,7 @@ public abstract class LevelChunkMixin extends ChunkAccess {
 	) {
 		super(chunkPos, upgradeData, levelHeightAccessor, biomeRegistry, inhabitedTime, sections, blendingData);
 	}
-	
-	@WrapOperation(
-			method = "setBlockState",
-			at = @At(value = "INVOKE", target = "Lnet/minecraft/world/level/chunk/LevelChunkSection;setBlockState(IIILnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/level/block/state/BlockState;")
-	)
-	private BlockState onSetBlockState(LevelChunkSection instance, int x, int y, int z, BlockState state, Operation<BlockState> original) {
-		if (this.level.dimension().equals(Dimensions.JAR) && state.is(Blocks.WORLD_JAR.block())) {
-			return state;
-		}
-		return original.call(instance, x, y, z, state);
-	}
-	
+
 	@Inject(
 			method = "setBlockState",
 			at = @At("RETURN")

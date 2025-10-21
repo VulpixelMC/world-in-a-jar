@@ -53,10 +53,10 @@ public class WorldJarBlockItem extends BlockItem {
 	protected boolean canPlace(BlockPlaceContext context, BlockState state) {
 		if (!context.getLevel().isClientSide()) {
 			ItemStack itemInHand = context.getItemInHand();
-			boolean canCreate = context.getPlayer() != null && PlayerRolesApi.lookup().byPlayer(context.getPlayer()).overrides().test(Permissions.CREATE_JAR);
+			boolean canCreate = Permissions.CREATE_JAR.test(context.getPlayer());
 			if (!(itemInHand.has(Components.JAR_ENTRY_TYPE) && Objects.requireNonNull(itemInHand.get(Components.JAR_ENTRY_TYPE)).id() > -1) && !canCreate) {
 				if (context.getPlayer() != null && !context.getLevel().isClientSide()) {
-					context.getPlayer().sendSystemMessage(Component.literal("You cannot create new World Jars! Ask a team member to place a new one from the creative menu."));
+					context.getPlayer().sendSystemMessage(Component.literal("You do not have permission create new World Jars!"));
 				}
 				return false;
 			}
@@ -82,7 +82,7 @@ public class WorldJarBlockItem extends BlockItem {
 		if (itemInHand.has(Components.JAR_ENTRY_TYPE) && Objects.requireNonNull(itemInHand.get(Components.JAR_ENTRY_TYPE)).id() > -1) {
 			jarEntry = itemInHand.get(Components.JAR_ENTRY_TYPE);
 			assert jarEntry != null;
-		} else if (context.getPlayer() != null && PlayerRolesApi.lookup().byPlayer(context.getPlayer()).overrides().test(Permissions.CREATE_JAR)) {
+		} else if (Permissions.CREATE_JAR.test(context.getPlayer())) {
 			jarEntry = jarPlacer.getFreeJarEntry();
 			itemInHand.set(Components.JAR_ENTRY_TYPE, jarEntry);
 			jarPlacer.placeJar(jarEntry);

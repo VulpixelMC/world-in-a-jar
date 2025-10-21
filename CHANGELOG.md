@@ -1,7 +1,6 @@
-# World In a Jar 1.0.0-beta.8+1.21.1.blanketcon
+# World In a Jar 1.0.0-beta.9+1.21.1
 ## Added
-- Show World Jar IDs
 ## Fixed
-- Don't let players break/place jars in jar dimension
+- Place exit World Jar inside new Jars.
 ## Changed
-- Players without the `worldinajar.create_jar` permission cannot create new jars.
+- Players without the `worldinajar.create_jar` permission can now create new jars by default.

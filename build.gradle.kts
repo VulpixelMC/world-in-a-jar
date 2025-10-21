@@ -103,7 +103,10 @@ dependencies {
 		exclude(group = "net.fabricmc.fabric-api")
 		exclude(group = "net.fabricmc")
 	}
-	modRuntimeOnly(libs.playerroles)
+	modRuntimeOnly(libs.playerroles) {
+		exclude(group = "net.fabricmc.fabric-api")
+		exclude(group = "net.fabricmc")
+	}
 	modRuntimeOnly(libs.resource.explorer)
 }
 
