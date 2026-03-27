@@ -1,3 +1,6 @@
+# Moved
+This project has moved [here](https://github.com/sylv256/world-in-a-jar).
+
 ![Modrinth Downloads](https://img.shields.io/modrinth/dt/worldinajar)
 ![Modrinth Followers](https://img.shields.io/modrinth/followers/worldinajar)
 ![Modrinth Game Versions](https://img.shields.io/modrinth/game-versions/worldinajar)
